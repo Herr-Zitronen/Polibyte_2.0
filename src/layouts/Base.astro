@@ -6,11 +6,12 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  noindex?: boolean;
 }
 
 await assertContentIntegrity();
 
-const { title, description = 'PoliByte · Club de la Carrera de Software (ESPOCH)' } = Astro.props;
+const { title, description = 'PoliByte · Club de la Carrera de Software (ESPOCH)', noindex = false } = Astro.props;
 ---
 
 <!doctype html>
@@ -20,6 +21,7 @@ const { title, description = 'PoliByte · Club de la Carrera de Software (ESPOCH
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{title}</title>
+    {noindex && <meta name="robots" content="noindex" />}
     <Fonts />
   </head>
   <body>
