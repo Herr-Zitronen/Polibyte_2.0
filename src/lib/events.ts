@@ -70,7 +70,7 @@ export function progressCells(target: Date, now: Date, window = 60, cells = 40):
 }
 
 /** Archivo: años descendentes y, dentro, fechas descendentes (año en Riobamba). */
-export function groupByYear<T extends Dated>(events: readonly T[]): { year: number; events: T[] }[] {
+export function groupByYear<T extends Dated>(events: readonly T[]): { year: number; events: (T & { date: Date })[] }[] {
   const byYear = new Map<number, (T & { date: Date })[]>();
   for (const e of datedOnly(events)) {
     const year = Number(localDay(e.date).slice(0, 4));

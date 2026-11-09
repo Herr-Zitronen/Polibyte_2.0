@@ -1,0 +1,16 @@
+---
+// Laboratorio H5.4: archivo por año (reloj fijo de recap-fixtures; 'hack' tiene vitrina publicada).
+import Archive from '../../components/events/Archive.astro';
+import Base from '../../layouts/Base.astro';
+import { archiveView } from '../../lib/archive';
+import { RECAP_NOW, recapEvents } from '../../lib/recap-fixtures';
+import { showcaseProjects } from '../../lib/showcase-fixtures';
+
+const years = archiveView(recapEvents, showcaseProjects, RECAP_NOW);
+---
+
+<Base title="Laboratorio · Archivo" noindex header={false}>
+  <main>
+    <Archive years={years} />
+  </main>
+</Base>
