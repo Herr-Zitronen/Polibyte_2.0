@@ -14,24 +14,33 @@ Cada historia se trabaja en **un chat nuevo** de Claude Code. Así el contexto s
 |---|---|---|
 | `main` | GitHub | **Producción** (Cloudflare) |
 | `staging` | GitHub | **Revisión** (URL de staging en Cloudflare) |
-| `feat/hX.Y-…` | **Solo local**, nunca se publica | — |
+| `feat/hX.Y-…` | GitHub, **solo para correr pruebas** | **Nunca se despliega** |
 
-Regla: **a GitHub solo se suben `main` y `staging`**, porque todo lo que llega a GitHub se despliega en Cloudflare.
+Regla: **solo `main` y `staging` se despliegan en Cloudflare.** Las ramas `feat/*` se suben únicamente para que GitHub Actions corra las pruebas.
+
+Dónde corre cada prueba (para no congelar la laptop):
+| Prueba | Local | GitHub Actions |
+|---|---|---|
+| Vitest (unitarias, < 2 s) | ✅ `npm run test` | ✅ |
+| `astro check`, ESLint, build | — | ✅ |
+| Playwright (E2E, visual, axe) | — | ✅ |
+| Lighthouse CI | — | ✅ |
 
 Flujo por historia:
 1. `git switch staging && git pull` → `git switch -c feat/hX.Y-nombre`.
-2. TDD local: rojo → verde → refactor. `npm run check` y `npm run e2e` en verde **antes** de integrar (no hay CI para ramas locales).
-3. `git switch staging && git merge --no-ff feat/hX.Y-nombre && git push` → CI + despliegue a staging.
-4. Revisar en la URL de staging (capturas 1440/1000/390).
-5. En GitHub: PR `staging → main` (puede agrupar varias historias). Al hacer merge → producción.
-6. Borrar la rama local: `git branch -d feat/hX.Y-nombre`.
+2. **Rojo**: escribir las pruebas. Las unitarias se ven fallar localmente; las E2E se ven fallar haciendo push de la rama → Actions en rojo.
+3. **Verde + refactor**: push → Actions en verde.
+4. PR `feat/hX.Y-nombre → staging`; solo se puede unir con CI en verde. Al unir → despliegue a staging.
+5. Revisar en la URL de staging (capturas 1440/1000/390 en los artefactos de Actions).
+6. PR `staging → main` (puede agrupar varias historias). Al unir → producción.
+7. Borrar la rama (GitHub lo hace solo al unir el PR si se activa *Automatically delete head branches*).
 
 ## Prompt para abrir una sesión
 ```
 Lee CLAUDE.md, docs/SESSIONS.md y el issue WOR-XX de Linear (proyecto PoliByte 2.0).
-Crea la rama local indicada en el issue desde staging (no la subas a GitHub). Escribe primero las
-pruebas y muéstrame que fallan; luego implementa hasta verde y refactoriza. Con check y e2e en verde,
-intégrala en staging y pregúntame antes de hacer push.
+Crea la rama indicada en el issue desde staging. Escribe primero las pruebas y muéstrame que fallan
+(Vitest local; E2E/Lighthouse solo en GitHub Actions, nunca en mi laptop). Implementa hasta verde,
+refactoriza y abre el PR hacia staging. Pregúntame antes de cada push.
 Al terminar, actualiza el issue con lo aprendido y muévelo a Done.
 ```
 
