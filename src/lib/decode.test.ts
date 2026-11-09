@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GLYPHS, decodeFrames } from './decode';
+import { GLYPHS, decodeFrames, decodeDuration, FRAME_MS } from './decode';
 
 describe('decodeFrames', () => {
   it('termina en el texto real', () => {
@@ -25,5 +25,16 @@ describe('decodeFrames', () => {
 
   it('es determinista con la misma semilla', () => {
     expect(decodeFrames('abc', 1)).toEqual(decodeFrames('abc', 1));
+  });
+});
+
+describe('decodeDuration', () => {
+  it('el titular completo se muestra en ~0,92 s (50 % de los 1,85 s originales)', () => {
+    const letters = 'Construimossoftware.Yaquienesloconstruyen.'.length; // 42 letras sin espacios
+    expect(decodeDuration(letters)).toBe(923);
+    // Los cuadros cubren esa duración y nada más (± un cuadro).
+    const frames = decodeFrames('x'.repeat(letters), 1);
+    expect((frames.length - 1) * FRAME_MS).toBeGreaterThanOrEqual(923);
+    expect((frames.length - 2) * FRAME_MS).toBeLessThan(923);
   });
 });
