@@ -1,0 +1,13 @@
+---
+// Laboratorio H5.3: calendario sin competencias (para el mensaje vacío).
+import Calendar from '../../components/events/Calendar.astro';
+import Base from '../../layouts/Base.astro';
+import { CALENDAR_NOW, clubOnlyEvents } from '../../lib/calendar-fixtures';
+import { calendarRows } from '../../lib/filter';
+---
+
+<Base title="Laboratorio · Calendario sin competencias" noindex header={false}>
+  <main>
+    <Calendar rows={calendarRows(clubOnlyEvents, CALENDAR_NOW)} />
+  </main>
+</Base>

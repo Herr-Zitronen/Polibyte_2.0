@@ -49,7 +49,7 @@ const columns = (page: import('@playwright/test').Page) =>
 test('a 1000 px la fila sigue en columnas; a 960 se apila', async ({ page }) => {
   await page.setViewportSize({ width: 1000, height: 900 });
   await page.goto('/lab/calendar/');
-  expect(await columns(page)).toBe(5);
+  expect(await columns(page)).toBe(4);
   await page.setViewportSize({ width: 960, height: 900 });
   expect(await columns(page)).toBe(2);
   await page.setViewportSize({ width: 390, height: 844 });

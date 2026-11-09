@@ -1,0 +1,67 @@
+---
+// Calendario con filtros (DESIGN §5, design/Eventos.dc.html #calendario). La lógica vive en lib/filter.ts;
+// la isla calendar-filter.ts solo oculta filas. Sin JS se ven todas.
+import type { CalendarRow } from '../../lib/filter';
+import Cross from '../Cross.astro';
+import LiveLine from '../LiveLine.astro';
+import Status from '../Status.astro';
+import '../../styles/fx.css';
+import '../../styles/tabs.css';
+import '../../styles/calendar.css';
+
+interface Props {
+  rows: CalendarRow[];
+  span?: string;
+}
+
+const { rows, span } = Astro.props;
+const filters = [
+  ['all', 'Todos'],
+  ['club', 'Del club'],
+  ['competition', 'Competencias'],
+] as const;
+---
+
+<section id="calendario" class="pb-on-light pb-calendar" data-calendar>
+  <div class="pb-calendar__bg" aria-hidden="true"><div class="pb-grain"></div></div>
+  <div class="pb-container pb-calendar__wrap">
+    <div class="pb-calendar__bar">
+      <div class="pb-calendar__title">
+        {span && <span class="pb-calendar__span">{span}</span>}
+        <h2>Calendario</h2>
+      </div>
+      <div role="group" aria-label="Filtrar por tipo" class="pb-tabs">
+        {filters.map(([key, label]) => (
+          <button type="button" class="pb-tab" data-filter={key} aria-pressed={String(key === 'all')}>{label}</button>
+        ))}
+      </div>
+    </div>
+    <div class="pb-calendar__list">
+      <LiveLine style="left: 0; right: 0; top: -1px" />
+      <Cross x="0" y="0" />
+      <Cross x="100%" y="0" />
+      <ul>
+        {rows.map((r) => (
+          <li class="pb-urow" data-type={r.type}>
+            <div class="pb-urow__date">
+              <span class="pb-uday">{r.day}</span>
+              <span class="pb-umonth">{r.month}</span>
+            </div>
+            <div class="pb-urow__name">
+              <span class="pb-urow__title">{r.title}</span>
+              <span class="pb-urow__type">{r.typeLine}</span>
+            </div>
+            <span class="pb-uplace">{r.place}</span>
+            <span class="pb-ustat"><Status status={r.status} /></span>
+          </li>
+        ))}
+      </ul>
+      <p class="pb-cal-empty" data-empty hidden={rows.length > 0}>No hay eventos de este tipo por ahora. Revisa el archivo más abajo.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initCalendarFilter } from '../../scripts/calendar-filter';
+  document.querySelectorAll<HTMLElement>('[data-calendar]').forEach(initCalendarFilter);
+</script>

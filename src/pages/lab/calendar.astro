@@ -1,0 +1,13 @@
+---
+// Laboratorio H5.3: calendario con 4 próximos (2 competencias) y un pasado que no aparece.
+import Calendar from '../../components/events/Calendar.astro';
+import Base from '../../layouts/Base.astro';
+import { CALENDAR_NOW, calendarEvents } from '../../lib/calendar-fixtures';
+import { calendarRows } from '../../lib/filter';
+---
+
+<Base title="Laboratorio · Calendario" noindex header={false}>
+  <main>
+    <Calendar rows={calendarRows(calendarEvents, CALENDAR_NOW)} span="2026–2027" />
+  </main>
+</Base>
