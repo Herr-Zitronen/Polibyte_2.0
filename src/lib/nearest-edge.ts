@@ -14,7 +14,7 @@ export interface Box {
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
-/** Lado del rect·ngulo m·s cercano al punto (variante C de los paneles: se enciende ese tramo). Distancia al segmento, no a la recta. */
+/** Lado del rect√°ngulo m√°s cercano al punto (variante C de los paneles: se enciende ese tramo). Distancia al segmento, no a la recta. */
 export function nearestEdge(p: Point, r: Box): Edge {
   const right = r.left + r.width;
   const bottom = r.top + r.height;

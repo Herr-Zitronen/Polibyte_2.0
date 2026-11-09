@@ -11,11 +11,11 @@ describe('nearestEdge', () => {
     [{ x: 3, y: 50 }, 'left'],
     [{ x: 250, y: 50 }, 'right'],
     [{ x: 100, y: -40 }, 'top'],
-  ] as const)('punto %o → %s', (p, edge) => {
+  ] as const)('punto %o â†’ %s', (p, edge) => {
     expect(nearestEdge(p, rect)).toBe(edge);
   });
 
-  it('respeta el desplazamiento del rectángulo', () => {
+  it('respeta el desplazamiento del rectÃ¡ngulo', () => {
     expect(nearestEdge({ x: 305, y: 250 }, { left: 300, top: 200, width: 200, height: 100 })).toBe('left');
   });
 });
