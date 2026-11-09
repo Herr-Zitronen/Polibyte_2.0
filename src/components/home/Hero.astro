@@ -5,8 +5,8 @@ import GlassBackground from '../GlassBackground.astro';
 import '../../styles/hero.css';
 
 const TITLE = 'Construimos software. Y a quienes lo construyen.';
-let k = 0;
-const words = TITLE.split(' ').map((w) => [...w].map((c) => ({ c, delay: (0.25 + k++ * 0.022).toFixed(3) })));
+// Escalonado corto (por palabra + leve por letra): el h1 es el LCP y debe terminar de entrar pronto (presupuesto 2 s).
+const words = TITLE.split(' ').map((w, wi) => [...w].map((c, ci) => ({ c, delay: (0.1 + wi * 0.05 + ci * 0.012).toFixed(3) })));
 const line = 'position: absolute; left: 0; right: 0; height: 1.5px';
 ---
 
