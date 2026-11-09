@@ -93,27 +93,32 @@
   opacity: var(--pb-grain-opacity, 0.6);
 }
 
-/* Paralaje: el estado por defecto es el final visible; solo se anima transform. */
+/* Paralaje: el estado por defecto es el final visible; solo se anima transform.
+   El timeline va en reglas aparte (otro selector): si comparte regla con el shorthand
+   `animation`, el minificador los fusiona en uno solo y Chromium descarta la declaración. */
 @supports (animation-timeline: view()) {
   .pb-par.far.root {
     animation: pb-par-root-far linear both;
-    animation-timeline: scroll(root);
-    animation-range: 0px 1100px;
   }
 
   .pb-par.near.root {
     animation: pb-par-root-near linear both;
-    animation-timeline: scroll(root);
-    animation-range: 0px 1100px;
   }
 
   .pb-par.far.view {
     animation: pb-par-view-far linear both;
-    animation-timeline: view();
   }
 
   .pb-par.near.view {
     animation: pb-par-view-near linear both;
+  }
+
+  .pb-glass .pb-par.root {
+    animation-timeline: scroll(root);
+    animation-range: 0px 1100px;
+  }
+
+  .pb-glass .pb-par.view {
     animation-timeline: view();
   }
 }
