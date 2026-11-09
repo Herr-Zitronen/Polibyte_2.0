@@ -387,6 +387,3 @@
     animation: none;
   }
 }
-
-/* EXP */
-.nomotion *, .nomotion *::after { animation: none !important; transform: none !important; opacity: 1 !important; }

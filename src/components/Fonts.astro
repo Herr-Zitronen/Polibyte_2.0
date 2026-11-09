@@ -1,16 +1,10 @@
 ---
-// Fuentes de DESIGN.md §2.2. display=swap: el texto se pinta de inmediato con la fuente de respaldo.
-// Las hojas se cargan sin bloquear el render (media="print" → "all" al cargar) para cumplir el
-// presupuesto de LCP (H0.2). Instrument Sans solo con las letras de "PoliByte" (~2 KB).
-const MAIN = 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300..800&family=Silkscreen:wght@400;700&display=swap';
-const WORDMARK = 'https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@600&text=PoliByte&display=swap';
+// Fuentes de DESIGN.md §2.2, servidas desde el propio dominio (Fontsource), con font-display: swap.
+// Sin conexiones a terceros: Google Fonts añadía DNS + TLS a dos orígenes antes del primer pintado
+// y Lighthouse (4G simulado) subía el FCP/LCP de Inicio a ~2,3 s (H4.1).
+// unicode-range: el navegador solo descarga los subconjuntos que usa la página.
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import '@fontsource/silkscreen/latin-400.css';
+import '@fontsource/silkscreen/latin-700.css';
+import '@fontsource/instrument-sans/latin-600.css';
 ---
-
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href={MAIN} media="print" onload="this.media='all'" />
-<link rel="stylesheet" href={WORDMARK} media="print" onload="this.media='all'" />
-<noscript>
-  <link rel="stylesheet" href={MAIN} />
-  <link rel="stylesheet" href={WORDMARK} />
-</noscript>
