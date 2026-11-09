@@ -60,7 +60,8 @@ test('la barra no empuja el contenido', async ({ page }) => {
 });
 
 test('captura de la barra', async ({ page }) => {
-  await page.goto('/');
+  // Página sin imagen de fondo: la captura no depende de la portada.
+  await page.goto('/equipo/');
   await page.evaluate(() => document.fonts.ready);
   // .pb-hdr mide 0 de alto (no empuja): se captura la franja superior de 92px de la página.
   const width = page.viewportSize()!.width;

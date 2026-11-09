@@ -50,7 +50,7 @@ describe('H1.1 · escala tipográfica (§2.2)', () => {
     expect(mobile).toMatch(/--pb-fs-hero:\s*34px/);
   });
   it('define las familias tipográficas', () => {
-    expect(vars['--pb-font-mono']).toMatch(/^'JetBrains Mono'/);
+    expect(vars['--pb-font-mono']).toMatch(/^'JetBrains Mono Variable', 'JetBrains Mono'/);
     expect(vars['--pb-font-pixel']).toMatch(/^'Silkscreen'/);
     expect(vars['--pb-font-wordmark']).toMatch(/^'Instrument Sans'/);
   });
