@@ -18,7 +18,9 @@ describe('Fonts.astro', () => {
   });
 
   it('tiene respaldo <noscript> con las mismas hojas', () => {
-    expect(src).toMatch(/<noscript>[\s\S]*fonts\.googleapis\.com[\s\S]*<\/noscript>/);
+    const noscript = /<noscript>([\s\S]*?)<\/noscript>/.exec(src)?.[1] ?? '';
+    expect(noscript).toMatch(/href=\{MAIN\}/);
+    expect(noscript).toMatch(/href=\{WORDMARK\}/);
     expect(stylesheets.length).toBe(4);
   });
 });
