@@ -1,0 +1,47 @@
+---
+// Pie de página (DESIGN §3.10): wordmark en tono sólido + linterna al pasar el mouse.
+import '../styles/glass.css';
+import '../styles/fx.css';
+import '../styles/footer.css';
+
+const wordmark = {
+  x: 0,
+  y: 235,
+  'font-family': "'Instrument Sans','Helvetica Neue',Arial,sans-serif",
+  'font-weight': 600,
+  'font-size': 270,
+  'letter-spacing': -16,
+};
+---
+
+<footer id="contacto" class="pb-foot">
+  <div class="pb-grain" aria-hidden="true"></div>
+  <div class="pb-container pb-foot-in">
+    <div class="pb-foot-row">
+      <div class="pb-foot-id">
+        <span class="pb-foot-copy">© 2026–2027 PoliByte · Club de la Carrera de Software</span>
+        <span class="pb-foot-org">ESPOCH · Escuela Superior Politécnica de Chimborazo</span>
+      </div>
+      <div class="pb-foot-links">
+        <a href="#contacto">[Correo]</a><span aria-hidden="true">·</span><a href="#contacto">[Instagram]</a><span aria-hidden="true">·</span><a href="#contacto">[GitHub]</a>
+      </div>
+    </div>
+    <div class="pb-foot-rule" aria-hidden="true"><span class="pb-x" style="left:0"></span><span class="pb-x" style="left:100%"></span></div>
+    <div class="pb-lamp" role="img" aria-label="PoliByte">
+      <svg class="pb-lamp__base" viewBox="0 0 1240 300" aria-hidden="true"><text {...wordmark} fill="#252D4F">PoliByte</text></svg>
+      <div class="lit" aria-hidden="true">
+        <svg viewBox="0 0 1240 300">
+          <defs>
+            <linearGradient id="pbLit" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#DCE3F5"></stop><stop offset="1" stop-color="#F2E0A0"></stop></linearGradient>
+          </defs>
+          <text {...wordmark} fill="url(#pbLit)">PoliByte</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  import { initLantern } from '../scripts/lantern';
+  initLantern();
+</script>

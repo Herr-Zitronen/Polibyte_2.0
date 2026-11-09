@@ -1,0 +1,102 @@
+/* DESIGN §3.10 · Pie de página. */
+.pb-foot {
+  position: relative;
+  display: flow-root;
+  overflow: clip;
+  background: #0d1438;
+  color: #f2f4fa;
+}
+
+.pb-foot-in {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 72px;
+  padding-top: 64px;
+}
+
+.pb-foot-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  font-size: 14px;
+}
+
+.pb-foot-id {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pb-foot-copy {
+  font-weight: 500;
+}
+
+.pb-foot-org,
+.pb-foot-links > span {
+  color: #aeb6d3;
+}
+
+.pb-foot-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.pb-foot-links a {
+  color: inherit;
+}
+
+.pb-foot-rule {
+  position: relative;
+  height: 1px;
+  margin-bottom: -40px;
+  background: rgb(242 244 250 / 28%);
+}
+
+.pb-foot-rule .pb-x {
+  top: 0;
+}
+
+/* Wordmark: tono sólido (opacidad 1). La linterna es una capa sólida cuya opacidad va al grupo,
+   así el solape de la "y" y la "t" no se nota. */
+.pb-lamp {
+  position: relative;
+  overflow: clip;
+  aspect-ratio: 1240 / 262;
+}
+
+.pb-lamp svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pb-lamp .lit {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s;
+  mask-image: radial-gradient(300px circle at var(--x, -999px) var(--y, -999px), #000, transparent 72%);
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .pb-lamp:hover .lit {
+    opacity: 0.75;
+  }
+}
+
+/* Al final: movimiento reducido deja todo quieto (sin linterna). */
+@media (prefers-reduced-motion: reduce) {
+  .pb-lamp .lit {
+    transition: none;
+  }
+
+  .pb-lamp:hover .lit {
+    opacity: 0;
+  }
+}

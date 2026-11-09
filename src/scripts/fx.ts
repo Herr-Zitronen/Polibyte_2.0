@@ -3,6 +3,24 @@ import { nearestEdge } from '../lib/nearest-edge';
 
 let started = false;
 
+// Un solo `pointermove` en todo el documento; los efectos se suscriben y trabajan en un rAF.
+type PointerSub = (x: number, y: number, target: EventTarget | null) => void;
+const subs: PointerSub[] = [];
+let listening = false;
+
+export function onPointer(sub: PointerSub): void {
+  subs.push(sub);
+  if (listening) return;
+  listening = true;
+  document.addEventListener(
+    'pointermove',
+    (e) => {
+      for (const s of subs) s(e.clientX, e.clientY, e.target);
+    },
+    { passive: true },
+  );
+}
+
 export function initFx(): void {
   if (started) return;
   started = true;
@@ -45,16 +63,12 @@ export function initFx(): void {
     target.style.setProperty('--gy', `${Math.round(py - r.top)}px`);
     target.dataset['edge'] = nearestEdge({ x: px, y: py }, r);
   };
-  document.addEventListener(
-    'pointermove',
-    (e) => {
-      px = e.clientX;
-      py = e.clientY;
-      const t = e.target instanceof Element ? e.target.closest<HTMLElement>('[data-fx]') : null;
-      if (target && target !== t) delete target.dataset['edge'];
-      target = t;
-      if (!raf) raf = requestAnimationFrame(apply);
-    },
-    { passive: true },
-  );
+  onPointer((x, y, evTarget) => {
+    px = x;
+    py = y;
+    const t = evTarget instanceof Element ? evTarget.closest<HTMLElement>('[data-fx]') : null;
+    if (target && target !== t) delete target.dataset['edge'];
+    target = t;
+    if (!raf) raf = requestAnimationFrame(apply);
+  });
 }
