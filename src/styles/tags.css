@@ -1,0 +1,116 @@
+/* DESIGN.md §3.2 · Etiquetas, par conectado y estados. */
+.pb-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 14px;
+  border: 1px solid currentColor;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.pb-tag.pill {
+  border-radius: 999px;
+  padding: 9px 16px;
+}
+
+.pb-pair {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 8px;
+}
+
+.pb-pair__line {
+  display: inline-block;
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+}
+
+.pb-dot {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--pb-accent);
+}
+
+.pb-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--pb-accent);
+  animation: pb-pulse 1.8s ease-out infinite;
+}
+
+@keyframes pb-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+/* Estado: el texto siempre centrado; el punto va fuera del flujo y no lo empuja. */
+.pb-st {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 136px;
+  padding: 9px 26px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.pb-st .pb-dot {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+}
+
+.pb-st--upcoming {
+  border-color: var(--pb-accent);
+  background: var(--pb-accent);
+  color: #0e1a4a;
+}
+
+.pb-st--upcoming .pb-dot,
+.pb-st--upcoming .pb-dot::after {
+  background: #0e1a4a;
+}
+
+.pb-st--past {
+  border-style: solid;
+}
+
+.pb-st--tbd {
+  border-style: dashed;
+}
+
+@media (max-width: 520px) {
+  .pb-pair {
+    column-gap: 8px;
+  }
+
+  .pb-pair__line {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-dot::after {
+    animation: none;
+    opacity: 0;
+  }
+}
