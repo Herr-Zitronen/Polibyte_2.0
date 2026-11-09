@@ -1,11 +1,14 @@
 ---
 import Fonts from '../components/Fonts.astro';
+import { assertContentIntegrity } from '../content/integrity';
 import '../styles/global.css';
 
 interface Props {
   title: string;
   description?: string;
 }
+
+await assertContentIntegrity();
 
 const { title, description = 'PoliByte · Club de la Carrera de Software (ESPOCH)' } = Astro.props;
 ---
