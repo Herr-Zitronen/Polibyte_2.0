@@ -47,6 +47,7 @@ test('el chip aparece en la barra al pasar el panel (solo ≥1180 px)', async ({
       max: document.documentElement.scrollHeight - innerHeight,
       panel: document.querySelector('#proximo')!.getBoundingClientRect().toJSON(),
       hdr: document.querySelector('.pb-hdr')!.className,
+      log: (window as unknown as { __chip?: unknown }).__chip,
       chip: getComputedStyle(document.querySelector('.pb-chip')!).visibility,
     }));
     await expect(chip, JSON.stringify(state)).toBeVisible();

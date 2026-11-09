@@ -30,8 +30,10 @@ export function initCountdown(): void {
 
   // Chip de la barra: aparece cuando el panel ya salió por arriba.
   const header = document.querySelector<HTMLElement>('[data-header]');
+  (window as unknown as { __chip?: unknown[] }).__chip = ['init', !!header];
   if (!header) return;
   new IntersectionObserver(([e]) => {
+    (window as unknown as { __chip?: unknown[] }).__chip = [...((window as unknown as { __chip?: unknown[] }).__chip ?? []), e && [e.isIntersecting, e.boundingClientRect.top]];
     if (e) header.classList.toggle('show-chip', !e.isIntersecting && e.boundingClientRect.top < 0);
   }).observe(panel);
 }
