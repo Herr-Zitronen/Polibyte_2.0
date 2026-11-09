@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "polibyte-web",
+  "name": "polibyte-site",
   "compatibility_date": "2026-11-01",
   // Solo assets estáticos (salida de `astro build`).
   "assets": {

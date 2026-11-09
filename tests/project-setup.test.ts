@@ -91,6 +91,10 @@ describe('H0.1 · criterio 2: CI en cada PR', () => {
     expect(existsSync(resolve(root, 'wrangler.jsonc'))).toBe(true);
   });
 
+  it('despliega al Worker nuevo "polibyte-site"', () => {
+    expect(read('wrangler.jsonc')).toMatch(/"name":\s*"polibyte-site"/);
+  });
+
   it('Playwright corre a 1440, 1000 y 390 px', () => {
     const cfg = read('playwright.config.ts');
     for (const w of [1440, 1000, 390]) expect(cfg).toMatch(new RegExp(`width:\\s*${w}\\b`));
