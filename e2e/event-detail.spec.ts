@@ -1,9 +1,9 @@
-// H6.1 · Plantilla de detalle de evento. Usa el contenido de ejemplo:
-// imagine-cup-2027 (próximo), icpc-2025 (pasado), codefest-2027 (por confirmar).
+// H6.1 · Plantilla de detalle de evento. Los estados usan /lab/event-detail/* (reloj fijo: 9 nov 2026),
+// así las pruebas no caducan cuando pasan las fechas del contenido real.
 import { expect, test } from '@playwright/test';
 
 test('evento próximo: ruta, tipo, título, datos, cuenta regresiva, cronograma e inscripción', async ({ page }) => {
-  await page.goto('/eventos/imagine-cup-2027/');
+  await page.goto('/lab/event-detail/upcoming/');
   const crumb = page.getByRole('navigation', { name: 'Ruta' });
   await expect(crumb).toHaveText(/Eventos\s*\/\s*Imagine Cup/);
   await expect(crumb.getByRole('link', { name: 'Eventos' })).toHaveAttribute('href', '/eventos/');
@@ -25,14 +25,14 @@ test('evento próximo: ruta, tipo, título, datos, cuenta regresiva, cronograma 
 });
 
 test('evento pasado: "Realizado", sin cuenta regresiva ni inscripción', async ({ page }) => {
-  await page.goto('/eventos/icpc-2025/');
+  await page.goto('/lab/event-detail/past/');
   await expect(page.locator('.pb-dstate')).toHaveText('Realizado');
   await expect(page.getByRole('timer')).toHaveCount(0);
   await expect(page.locator('#inscripcion')).toHaveCount(0);
 });
 
 test('evento por confirmar: "Por confirmar" en lugar de la cuenta regresiva', async ({ page }) => {
-  await page.goto('/eventos/codefest-2027/');
+  await page.goto('/lab/event-detail/tbd/');
   await expect(page.locator('.pb-dstate')).toHaveText('Por confirmar');
   await expect(page.getByRole('timer')).toHaveCount(0);
 });

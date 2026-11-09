@@ -19,17 +19,18 @@ interface Props {
   place?: string | undefined;
   mode?: 'presencial' | 'remoto' | 'híbrido' | undefined;
   timing: DetailTiming;
+  now: Date;
   registration: boolean;
 }
 
-const { title, typeLine, date, place, mode, timing, registration } = Astro.props;
+const { title, typeLine, date, place, mode, timing, now, registration } = Astro.props;
 const short = (d: Date) =>
   new Intl.DateTimeFormat('es-EC', { timeZone: TIME_ZONE, day: 'numeric', month: 'short', year: 'numeric' })
     .format(d)
     .replace('.', '');
 const dateText = date ? short(date) : 'Por confirmar';
 const start = timing.kind === 'countdown' ? timing.start : null;
-const cd = start && nextEventView({ date: start }, new Date());
+const cd = start && nextEventView({ date: start }, now);
 ---
 
 <section id="top" class="pb-glass" data-bg>
