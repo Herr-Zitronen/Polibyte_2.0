@@ -11,9 +11,9 @@ test('wordmark sólido: color #252D4F, opacidad 1 y cruce "yt" sin mancha', asyn
   const lamp = page.locator('.pb-foot .pb-lamp');
   await lamp.scrollIntoViewIfNeeded();
   const box = (await lamp.boundingBox())!;
-  // "yt" de "PoliByte" ocupa aprox. el 66–82 % del ancho del viewBox.
+  // "yt" de "PoliByte" ocupa aprox. el 48–72 % del ancho del viewBox.
   await expect(page).toHaveScreenshot('footer-yt.png', {
-    clip: { x: box.x + box.width * 0.62, y: box.y, width: box.width * 0.22, height: box.height },
+    clip: { x: box.x + box.width * 0.44, y: box.y, width: box.width * 0.3, height: box.height },
   });
 });
 
