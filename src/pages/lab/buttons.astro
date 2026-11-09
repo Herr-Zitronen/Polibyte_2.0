@@ -1,0 +1,38 @@
+---
+// Laboratorio de pruebas visuales (no enlazado, noindex).
+import Button from '../../components/Button.astro';
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="Laboratorio · Botones" noindex>
+  <main>
+    <section class="pb-section">
+      <div class="pb-container">
+        <h1>Botones</h1>
+        <div class="pb-actions" data-pair>
+          <Button variant="primary" href="#">Ver eventos</Button>
+          <Button variant="secondary" href="#">Unirme al club</Button>
+        </div>
+        <p></p>
+        <div class="pb-actions" data-pair>
+          <Button variant="primary" href="#">Inscribir a mi equipo en la competencia internacional</Button>
+          <Button variant="secondary" href="#">Ver todos los detalles del evento</Button>
+        </div>
+        <p></p>
+        <div class="pb-actions">
+          <Button variant="primary" size="sm" href="#">unirme</Button>
+          <Button variant="secondary" size="sm" href="#">Calendario completo</Button>
+        </div>
+      </div>
+    </section>
+    <section class="pb-section pb-on-light">
+      <div class="pb-container">
+        <h2>Sobre fondo claro</h2>
+        <div class="pb-actions" data-pair>
+          <Button variant="primary" href="#">Quiero unirme</Button>
+          <Button variant="secondary" href="#">Calendario completo</Button>
+        </div>
+      </div>
+    </section>
+  </main>
+</Base>
