@@ -1,0 +1,60 @@
+// Paneles y efectos: UN IntersectionObserver y UN listener de cursor para todos (DESIGN §3.5).
+import { nearestEdge } from '../lib/nearest-edge';
+
+let started = false;
+
+export function initFx(): void {
+  if (started) return;
+  started = true;
+  const panels = [...document.querySelectorAll<HTMLElement>('[data-fx]')];
+  if (!panels.length) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // A: se arma (borde a escala 0) solo si el panel empieza fuera de pantalla.
+  const vh = window.innerHeight;
+  for (const el of panels) {
+    el.classList.add('is-off');
+    if (!reduce && el.classList.contains('pb-draw') && el.getBoundingClientRect().top > vh * 0.9) el.classList.add('pb-arm');
+  }
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        const el = e.target as HTMLElement;
+        el.classList.toggle('is-off', !e.isIntersecting);
+        if (e.isIntersecting && e.intersectionRatio > 0.15 && !el.hasAttribute('data-drawn')) {
+          el.classList.add('is-in');
+          el.setAttribute('data-drawn', '');
+        }
+      }
+    },
+    { threshold: [0, 0.15] },
+  );
+  for (const el of panels) io.observe(el);
+
+  // C: sin cursor (táctil) no se registra nada.
+  if (reduce || !matchMedia('(hover: hover)').matches) return;
+  let px = 0;
+  let py = 0;
+  let target: HTMLElement | null = null;
+  let raf = 0;
+  const apply = () => {
+    raf = 0;
+    if (!target) return;
+    const r = target.getBoundingClientRect();
+    target.style.setProperty('--gx', `${Math.round(px - r.left)}px`);
+    target.style.setProperty('--gy', `${Math.round(py - r.top)}px`);
+    target.dataset['edge'] = nearestEdge({ x: px, y: py }, r);
+  };
+  document.addEventListener(
+    'pointermove',
+    (e) => {
+      px = e.clientX;
+      py = e.clientY;
+      const t = e.target instanceof Element ? e.target.closest<HTMLElement>('[data-fx]') : null;
+      if (target && target !== t) delete target.dataset['edge'];
+      target = t;
+      if (!raf) raf = requestAnimationFrame(apply);
+    },
+    { passive: true },
+  );
+}

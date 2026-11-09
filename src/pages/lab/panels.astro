@@ -1,0 +1,27 @@
+---
+// Laboratorio de paneles, cruces y líneas vivas (no enlazado, noindex).
+import LiveLine from '../../components/LiveLine.astro';
+import Panel from '../../components/Panel.astro';
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="Laboratorio · Paneles" noindex header={false}>
+  <main>
+    <section class="pb-section">
+      <div class="pb-container">
+        <h1 style="position: relative; padding-bottom: 16px">Paneles <LiveLine style="left: 0; right: 0; bottom: 0" /></h1>
+        <Panel id="above" draw pulse>
+          <div style="padding: 48px">A + B + C · visible al cargar</div>
+        </Panel>
+        <div style="height: 150vh"></div>
+        <Panel id="below" draw pulse>
+          <div style="padding: 48px">A + B + C · bajo el pliegue</div>
+        </Panel>
+        <div style="height: 40vh"></div>
+        <Panel id="hover-pulse" hoverPulse>
+          <div style="padding: 32px">Directiva: pulso solo con hover</div>
+        </Panel>
+      </div>
+    </section>
+  </main>
+</Base>
