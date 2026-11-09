@@ -1,5 +1,8 @@
 // H4.3 · "soft" + "ware" se unen con el scroll y quedan detrás de la franja de píxeles.
 import { expect, test, type Page } from '@playwright/test';
+import { pixelRuns } from '../../src/lib/pixel-strip';
+
+const SEED = 23;
 
 /** Lleva el scroll hasta que la palabra esté en `p` (0–1) de su rango `cover` de view(). */
 async function scrollToCover(page: Page, p: number): Promise<void> {
@@ -43,19 +46,25 @@ test('la franja de píxeles queda encima de la palabra', async ({ page }) => {
   await scrollToCover(page, 0.6);
   const strip = page.locator('#que-hacemos .pb-div');
   await expect(strip).toBeVisible();
-  // En una columna con píxel azul en la última fila, el elemento visible es la franja, no la palabra.
-  const topEl = await page.evaluate(() => {
+  // Sobre una celda azul de la última fila que cae encima de la palabra, lo visible es la franja.
+  const runs = pixelRuns(SEED).filter((r) => r.row === 3);
+  const hit = await page.evaluate((runs) => {
     const word = document.querySelector('.pb-gword')!.getBoundingClientRect();
     const svg = document.querySelector('#que-hacemos .pb-div svg')!.getBoundingClientRect();
-    const y = svg.bottom - 1;
-    const x = word.left + word.width / 2;
-    const el = document.elementFromPoint(x, y);
+    const cell = svg.width / 36;
+    const y = svg.bottom - svg.height / 8;
+    const run = runs.find((r) => {
+      const x = svg.left + (r.x + 0.5) * cell;
+      return x > word.left && x < word.right;
+    })!;
+    const el = document.elementFromPoint(svg.left + (run.x + 0.5) * cell, y);
     return { overlaps: word.bottom > svg.top, inStrip: !!el?.closest('.pb-div') };
-  });
-  expect(topEl.overlaps).toBe(true);
-  expect(topEl.inStrip).toBe(true);
-  // La franja es la variante transparente: color superior transparente.
-  await expect(strip.locator('rect').first()).toHaveAttribute('fill', 'transparent');
+  }, runs);
+  expect(hit.overlaps).toBe(true);
+  expect(hit.inStrip).toBe(true);
+  // Variante transparente: sin fondo, solo celdas del color de abajo.
+  const fills = await strip.locator('rect').evaluateAll((rs) => [...new Set(rs.map((r) => r.getAttribute('fill')))]);
+  expect(fills).toEqual(['#0F1A4D']);
 });
 
 test('la palabra es decorativa y usa --pb-ghost', async ({ page }) => {
