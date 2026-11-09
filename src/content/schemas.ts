@@ -3,7 +3,6 @@
 // porque solo existen dentro de Astro.
 import { z } from 'astro/zod';
 
-type SchemaFactory = () => z.ZodType;
 
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -42,7 +41,7 @@ export const eventSchema = z.object({
 
 export type EventData = z.infer<typeof eventSchema>;
 
-export const projectSchema = (image: SchemaFactory, eventRef: SchemaFactory) =>
+export const projectSchema = <I extends z.ZodType, R extends z.ZodType>(image: () => I, eventRef: () => R) =>
   z.object({
     event: eventRef(),
     title: z.string(),
@@ -58,7 +57,7 @@ export const projectSchema = (image: SchemaFactory, eventRef: SchemaFactory) =>
     order: z.number().default(0),
   });
 
-export const memberSchema = (image: SchemaFactory) =>
+export const memberSchema = <I extends z.ZodType>(image: () => I) =>
   z.object({
     role: z.enum(['Presidencia', 'Vicepresidencia', 'Secretaría', 'Tesorería', 'Webmaster', 'Tutor']),
     name: z.string(),
