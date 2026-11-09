@@ -1,0 +1,25 @@
+---
+// Fondo de vidrio (DESIGN §3.8). Va como primer hijo de una <section class="pb-glass" data-bg>;
+// el contenido de la sección va en un .pb-content.
+import '../styles/glass.css';
+
+interface Props {
+  image: 'hero' | 'join' | 'recap';
+  /** `root`: portadas (scroll de la página); `view`: secciones intermedias. */
+  parallax?: 'root' | 'view';
+  /** Color sólido del borde inferior (debe coincidir con la franja). */
+  fadeTo?: string;
+  grainOpacity?: number;
+}
+
+const { image, parallax = 'view', fadeTo = 'var(--pb-blue-750)', grainOpacity = 0.6 } = Astro.props;
+---
+
+<div class="pb-bg" aria-hidden="true" style={`--pb-fade-to: ${fadeTo}; --pb-grain-opacity: ${grainOpacity}`}>
+  <div class={`pb-par far img-${image} ${parallax}`}></div>
+  <div class={`pb-par near ${parallax}`}></div>
+  <div class="pb-sheen"></div>
+  <div class="pb-reed"></div>
+  <div class="pb-fade"></div>
+  <div class="pb-grain" aria-hidden="true"></div>
+</div>
