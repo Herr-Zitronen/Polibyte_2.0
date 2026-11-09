@@ -1,0 +1,159 @@
+/* Calendario (DESIGN §5, design/Eventos.dc.html #calendario). Fondo claro. */
+.pb-calendar {
+  position: relative;
+  display: flow-root;
+  background: #eceff6;
+  color: #13205a;
+}
+
+.pb-calendar__bg {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  pointer-events: none;
+}
+
+.pb-calendar__bg .pb-grain {
+  opacity: 0.5;
+}
+
+.pb-calendar__wrap {
+  position: relative;
+  padding-top: 120px;
+  padding-bottom: 120px;
+}
+
+.pb-calendar__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.pb-calendar__title {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pb-calendar__span {
+  font-family: var(--pb-font-pixel);
+  font-size: 14px;
+}
+
+.pb-calendar__title h2 {
+  margin: 0;
+  font-weight: 800;
+  font-size: clamp(44px, 7vw, 112px);
+  letter-spacing: -0.075em;
+  line-height: 0.95;
+}
+
+.pb-calendar__list {
+  position: relative;
+  border-top: 1px solid #13205a;
+}
+
+.pb-calendar__list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pb-urow {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) minmax(0, 0.6fr) auto;
+  gap: 24px;
+  align-items: center;
+  padding: 26px 8px;
+  border-bottom: 1px solid rgba(19, 32, 90, 0.3);
+}
+
+.pb-urow[hidden] {
+  display: none;
+}
+
+.pb-urow__date,
+.pb-urow__name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pb-urow__date {
+  gap: 8px;
+}
+
+.pb-urow__name {
+  gap: 6px;
+}
+
+.pb-uday {
+  font-family: var(--pb-font-pixel);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 0.85;
+}
+
+.pb-umonth {
+  font-size: 12px;
+}
+
+.pb-urow__title {
+  font-weight: 700;
+  font-size: clamp(22px, 2.6vw, 36px);
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+}
+
+.pb-urow__type,
+.pb-uplace {
+  font-size: 14px;
+  color: #3a4677;
+}
+
+.pb-cal-empty {
+  margin: 0;
+  padding: 32px 8px;
+  font-size: 15px;
+  color: #3a4677;
+}
+
+.pb-cal-empty[hidden] {
+  display: none;
+}
+
+/* Sobre fondo claro el chip "Próximo" va en tinta (como el prototipo), no en amarillo. */
+.pb-calendar .pb-st--upcoming {
+  border-color: #13205a;
+  background: #13205a;
+  color: #f2f4fa;
+}
+
+.pb-calendar .pb-st--upcoming .pb-dot,
+.pb-calendar .pb-st--upcoming .pb-dot::after {
+  background: #f2f4fa;
+}
+
+/* Se apila solo en el punto de quiebre explícito (DESIGN §2.3). */
+@media (max-width: 960px) {
+  .pb-urow {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 8px 16px;
+  }
+
+  .pb-uplace,
+  .pb-ustat {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 820px) {
+  .pb-calendar__wrap {
+    padding-top: 96px;
+    padding-bottom: 96px;
+  }
+}

@@ -1,11 +1,13 @@
 ---
-// Eventos: portada con el último evento concluido (H5.1) y su vitrina (H5.2). Archivo: H5.4. Calendario: H5.3.
+// Eventos: portada con el último evento concluido (H5.1) y su vitrina (H5.2). Calendario (H5.3) antes del archivo (H5.4).
 import { getCollection } from 'astro:content';
+import Calendar from '../../components/events/Calendar.astro';
 import Archive from '../../components/events/Archive.astro';
 import Recap from '../../components/events/Recap.astro';
 import Showcase from '../../components/events/Showcase.astro';
 import Base from '../../layouts/Base.astro';
 import { archiveView } from '../../lib/archive';
+import { calendarRows } from '../../lib/filter';
 import { recapView } from '../../lib/recap';
 import { showcaseLayout } from '../../lib/showcase';
 
@@ -14,6 +16,8 @@ const projects = (await getCollection('projects')).map((p) => ({ ...p.data, even
 const now = new Date();
 const view = recapView(events, projects, now);
 const archive = archiveView(events, projects, now);
+const calendar = calendarRows(events, now);
+const year = now.getFullYear();
 const showcase = view.kind === 'event' ? showcaseLayout(view.event, projects) : null;
 ---
 
@@ -21,6 +25,7 @@ const showcase = view.kind === 'event' ? showcaseLayout(view.event, projects) : 
   <main>
     <Recap view={view} />
     {showcase && view.kind === 'event' && <Showcase eventTitle={view.title} layout={showcase} />}
+    <Calendar rows={calendar} span={`${year}–${year + 1}`} />
     <Archive years={archive} />
   </main>
 </Base>
