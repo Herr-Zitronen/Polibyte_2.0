@@ -1,10 +1,21 @@
 ---
+// Inicio provisional: la portada y sus secciones llegan en H4.*.
 import Base from '../layouts/Base.astro';
 ---
 
 <Base title="PoliByte · Club de la Carrera de Software">
   <main>
-    <h1>PoliByte</h1>
-    <p>Club de la Carrera de Software · ESPOCH</p>
+    <section class="pb-section pb-page-top" style="min-height: 100vh">
+      <div class="pb-container">
+        <h1>PoliByte</h1>
+        <p>Club de la Carrera de Software · ESPOCH</p>
+      </div>
+    </section>
+    <section class="pb-section pb-on-light" data-theme="light" style="min-height: 100vh">
+      <div class="pb-container">
+        <h2>Qué hacemos</h2>
+        <p>Construimos software. Y a quienes lo construyen.</p>
+      </div>
+    </section>
   </main>
 </Base>

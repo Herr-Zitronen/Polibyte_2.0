@@ -1,0 +1,23 @@
+---
+// Isotipo animado por piezas (DESIGN §3.11) + nombre del club.
+interface Props {
+  href?: string;
+  subtitle?: boolean;
+}
+
+const { href = '/', subtitle = true } = Astro.props;
+---
+
+<a href={href} class="pb-logo">
+  <svg viewBox="0 0 913 1264" width="24" height="33" role="img" aria-label="PoliByte">
+    <path class="lg-d" fill="currentColor" d="M0 0H180V184H0Z"></path>
+    <path class="lg-d r" fill="currentColor" d="M736 0H913V184H736Z"></path>
+    <path class="lg-bl" fill="currentColor" d="M0 269H433V410L258 411V1120H433V1264H0Z"></path>
+    <path class="lg-br" fill="currentColor" d="M483 269H913V1264H483V1120H659V411L483 410Z"></path>
+    <path class="lg-c" fill="currentColor" d="M330 847V621Q330 611 340 611H573Q583 611 583 621V847Z"></path>
+  </svg>
+  <span class="pb-logo__text" aria-hidden="true">
+    <span class="pb-logo__name">PoliByte</span>
+    {subtitle && <span class="pb-logo__sub">Club de la Carrera de Software</span>}
+  </span>
+</a>

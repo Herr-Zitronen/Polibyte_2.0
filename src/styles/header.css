@@ -1,0 +1,322 @@
+/* DESIGN.md §3.9 · Barra superior: fija, altura 0 en el flujo, blur progresivo de 3 capas. */
+.pb-hdr {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 20;
+  height: 0;
+}
+
+/* Blur: ningún ancestro puede tener view-transition-name (sería "backdrop root"). */
+.pb-blur {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 92px;
+  pointer-events: none;
+}
+
+.pb-blur > div {
+  position: absolute;
+  inset: 0;
+}
+
+.pb-blur > .l1 {
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 35%);
+  mask-image: linear-gradient(to top, transparent 0%, #000 35%);
+}
+
+.pb-blur > .l2 {
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  -webkit-mask-image: linear-gradient(to top, transparent 30%, #000 65%);
+  mask-image: linear-gradient(to top, transparent 30%, #000 65%);
+}
+
+.pb-blur > .l3 {
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  -webkit-mask-image: linear-gradient(to top, transparent 60%, #000 100%);
+  mask-image: linear-gradient(to top, transparent 60%, #000 100%);
+}
+
+.pb-blur > .tint-dark {
+  background: linear-gradient(180deg, rgba(20, 34, 110, 0.55) 0%, rgba(20, 34, 110, 0.2) 55%, rgba(20, 34, 110, 0) 100%);
+  transition: opacity 0.45s;
+}
+
+.pb-blur > .tint-light {
+  background: linear-gradient(180deg, rgba(236, 239, 246, 0.85) 0%, rgba(236, 239, 246, 0.4) 55%, rgba(236, 239, 246, 0) 100%);
+  opacity: 0;
+  transition: opacity 0.45s;
+}
+
+.pb-hdr[data-theme='light'] .tint-dark {
+  opacity: 0;
+}
+
+.pb-hdr[data-theme='light'] .tint-light {
+  opacity: 1;
+}
+
+.pb-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  color: var(--pb-white);
+  transition: color 0.45s;
+}
+
+.pb-hdr[data-theme='light'] .pb-bar {
+  color: var(--pb-ink);
+}
+
+/* 1fr auto 1fr: el centro queda centrado aunque logo y botón midan distinto. */
+.pb-bar-in {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  max-width: var(--pb-container);
+  margin: 0 auto;
+  padding: 16px var(--pb-gutter);
+  view-transition-name: pb-header;
+}
+
+.pb-bar-in > .pb-logo {
+  justify-self: start;
+}
+
+.pb-right {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 10px;
+}
+
+.pb-bar a {
+  color: inherit;
+}
+
+.pb-nav {
+  display: flex;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.pb-nav a {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 11px 13px;
+  text-decoration: none;
+}
+
+.pb-nav a::after {
+  content: '';
+  position: absolute;
+  right: 13px;
+  bottom: 5px;
+  left: 13px;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.45s var(--pb-ease-stroke);
+}
+
+.pb-nav a:hover::after,
+.pb-nav a[aria-current='page']::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.pb-nav a[aria-current='page']::after {
+  view-transition-name: pb-navcur;
+}
+
+.pb-nav .pb-n,
+.pb-join .pb-n {
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+.pb-nav .pb-arr {
+  display: inline-block;
+  transition: transform 0.35s var(--pb-ease-stroke);
+}
+
+.pb-nav a:hover .pb-arr {
+  transform: translate(3px, -3px);
+}
+
+/* Sobre secciones claras el botón se invierte. */
+.pb-hdr[data-theme='light'] .pb-b1 {
+  border-color: rgba(19, 32, 90, 0.6);
+}
+
+.pb-hdr[data-theme='light'] .pb-b1__box {
+  background: var(--pb-ink);
+  color: var(--pb-white);
+}
+
+/* Logo */
+.pb-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.pb-logo svg {
+  overflow: visible;
+}
+
+.pb-logo__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.pb-logo__name {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.pb-logo__sub {
+  font-size: 11px;
+  opacity: 0.88;
+}
+
+.pb-logo .lg-d,
+.pb-logo .lg-bl,
+.pb-logo .lg-br {
+  transition: translate 0.32s steps(3);
+}
+
+.pb-logo .lg-c {
+  transition: color 0.2s steps(2);
+}
+
+.pb-logo .lg-d {
+  animation: pb-logo-drop 0.7s steps(5) backwards;
+}
+
+.pb-logo .lg-d.r {
+  animation-delay: 0.12s;
+}
+
+.pb-logo .lg-bl {
+  animation: pb-logo-in-l 0.5s steps(3) 0.28s backwards;
+}
+
+.pb-logo .lg-br {
+  animation: pb-logo-in-r 0.5s steps(3) 0.28s backwards;
+}
+
+.pb-logo .lg-c {
+  animation: pb-logo-core 0.9s steps(1) 0.7s backwards;
+}
+
+@media (hover: hover) {
+  .pb-logo:hover .lg-bl {
+    translate: -80px 0;
+  }
+
+  .pb-logo:hover .lg-br {
+    translate: 80px 0;
+  }
+
+  .pb-logo:hover .lg-d {
+    translate: 0 -120px;
+  }
+
+  .pb-logo:hover .lg-c {
+    color: var(--pb-accent);
+  }
+}
+
+@keyframes pb-logo-drop {
+  from {
+    transform: translateY(-520px);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes pb-logo-in-l {
+  from {
+    transform: translateX(-320px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes pb-logo-in-r {
+  from {
+    transform: translateX(320px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes pb-logo-core {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  75% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 820px) {
+  .pb-bar-in {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-block: 12px;
+  }
+
+  .pb-nav,
+  .pb-join .pb-n {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .pb-logo__sub {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-logo .lg-d,
+  .pb-logo .lg-bl,
+  .pb-logo .lg-br,
+  .pb-logo .lg-c {
+    animation: none;
+    transition: none;
+  }
+}
