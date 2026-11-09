@@ -1,0 +1,22 @@
+---
+// Laboratorio H5.2: vitrina oculta (reloj fijo de recap-fixtures).
+import Recap from '../../components/events/Recap.astro';
+import Showcase from '../../components/events/Showcase.astro';
+import Base from '../../layouts/Base.astro';
+import { recapView } from '../../lib/recap';
+import { RECAP_NOW, recapEvents } from '../../lib/recap-fixtures';
+import { showcaseLayout } from '../../lib/showcase';
+import { showcaseProjects } from '../../lib/showcase-fixtures';
+
+const events = recapEvents.map((e) => (e.id === 'hack' ? { ...e, showcase: 'hidden' as const } : e));
+const projects = showcaseProjects.map((p) => p);
+const view = recapView(events, projects, RECAP_NOW);
+const layout = view.kind === 'event' ? showcaseLayout(view.event, projects) : null;
+---
+
+<Base title="Laboratorio · Vitrina oculta" noindex header={false}>
+  <main>
+    <Recap view={view} />
+    {layout && view.kind === 'event' && <Showcase eventTitle={view.title} layout={layout} />}
+  </main>
+</Base>
