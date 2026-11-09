@@ -1,0 +1,14 @@
+---
+// Recibe el estado calculado (eventStatus, H3.2), no el texto: el texto vive en STATUS_LABELS.
+import { STATUS_LABELS, type EventStatus } from '../lib/status-labels';
+import '../styles/tags.css';
+
+interface Props {
+  status: EventStatus;
+  dot?: boolean;
+}
+
+const { status, dot = status === 'upcoming' } = Astro.props;
+---
+
+<span class={`pb-st pb-st--${status}`}>{dot && <span class="pb-dot" aria-hidden="true"></span>}{STATUS_LABELS[status]}</span>

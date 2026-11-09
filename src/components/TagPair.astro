@@ -1,0 +1,17 @@
+---
+// Par conectado: etiqueta —— píldora (p. ej. "Competencia —— Microsoft"). La línea se oculta en ≤520.
+import Tag from './Tag.astro';
+
+interface Props {
+  label: string;
+  pill: string;
+}
+
+const { label, pill } = Astro.props;
+---
+
+<div class="pb-pair">
+  <Tag>{label}</Tag>
+  <span class="pb-pair__line" aria-hidden="true"></span>
+  <Tag pill>{pill}</Tag>
+</div>
