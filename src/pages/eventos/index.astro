@@ -1,15 +1,17 @@
 ---
-// Página provisional (H2.1): la completa su historia del backlog.
+// Eventos: portada con el último evento concluido (H5.1). Destacados, calendario y archivo: H5.2–H5.4.
+import { getCollection } from 'astro:content';
+import Recap from '../../components/events/Recap.astro';
 import Base from '../../layouts/Base.astro';
+import { recapView } from '../../lib/recap';
+
+const events = (await getCollection('events')).map((e) => ({ ...e.data, id: e.id }));
+const projects = (await getCollection('projects')).map((p) => ({ event: p.data.event.id, featured: p.data.featured }));
+const view = recapView(events, projects, new Date());
 ---
 
 <Base title="Eventos · PoliByte" description="Calendario, archivo y proyectos del club.">
   <main>
-    <section class="pb-section pb-page-top">
-      <div class="pb-container">
-        <h1>Eventos</h1>
-        <p>Calendario, archivo y proyectos del club.</p>
-      </div>
-    </section>
+    <Recap view={view} />
   </main>
 </Base>
