@@ -2,6 +2,7 @@
 import Fonts from '../components/Fonts.astro';
 import Header from '../components/Header.astro';
 import MobileMenu from '../components/MobileMenu.astro';
+import Footer from '../components/Footer.astro';
 import { assertContentIntegrity } from '../content/integrity';
 import '../styles/global.css';
 
@@ -38,5 +39,6 @@ const { title, description = 'PoliByte · Club de la Carrera de Software (ESPOCH
     }
     {header && <MobileMenu />}
     <slot />
+    {header && <Footer />}
   </body>
 </html>
