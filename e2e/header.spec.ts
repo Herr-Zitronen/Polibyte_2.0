@@ -41,7 +41,9 @@ test('ningún ancestro del blur tiene view-transition-name', async ({ page }) =>
   await page.goto('/');
   const names = await page.locator('.pb-blur').evaluate((el) => {
     const out: string[] = [];
-    for (let n = el.parentElement; n; n = n.parentElement) out.push(getComputedStyle(n).viewTransitionName);
+    // <html> lleva `view-transition-name: root` por defecto (hoja del navegador): no cuenta.
+    for (let n = el.parentElement; n && n !== document.documentElement; n = n.parentElement)
+      out.push(getComputedStyle(n).viewTransitionName);
     return out;
   });
   expect(names.length).toBeGreaterThan(0);
@@ -60,5 +62,7 @@ test('la barra no empuja el contenido', async ({ page }) => {
 test('captura de la barra', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(() => document.fonts.ready);
-  await expect(page.locator('.pb-hdr')).toHaveScreenshot('header.png', { animations: 'disabled' });
+  // .pb-hdr mide 0 de alto (no empuja): se captura la franja superior de 92px de la página.
+  const width = page.viewportSize()!.width;
+  await expect(page).toHaveScreenshot('header.png', { clip: { x: 0, y: 0, width, height: 92 } });
 });
