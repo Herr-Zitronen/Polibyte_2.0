@@ -29,11 +29,14 @@ export function initCountdown(): void {
   setInterval(() => render(panel, start), 60_000);
 
   // Chip de la barra: aparece cuando el panel ya salió por arriba.
+  // La zona observada se extiende sin límite hacia abajo: "no intersecta" = "el panel quedó arriba".
+  // (Con la ventana normal, un salto de abajo a arriba —ancla, scrollTo— no cambia el estado y no avisa.)
   const header = document.querySelector<HTMLElement>('[data-header]');
-  (window as unknown as { __chip?: unknown[] }).__chip = ['init', !!header];
   if (!header) return;
-  new IntersectionObserver(([e]) => {
-    (window as unknown as { __chip?: unknown[] }).__chip = [...((window as unknown as { __chip?: unknown[] }).__chip ?? []), e && [e.isIntersecting, e.boundingClientRect.top]];
-    if (e) header.classList.toggle('show-chip', !e.isIntersecting && e.boundingClientRect.top < 0);
-  }).observe(panel);
+  new IntersectionObserver(
+    ([e]) => {
+      if (e) header.classList.toggle('show-chip', !e.isIntersecting);
+    },
+    { rootMargin: '0px 0px 100000px 0px' },
+  ).observe(panel);
 }
