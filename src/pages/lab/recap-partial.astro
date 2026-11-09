@@ -1,0 +1,15 @@
+---
+// Laboratorio H5.1: `stats` parcial (sin proyectos) y vitrina oculta.
+import Recap from '../../components/events/Recap.astro';
+import Base from '../../layouts/Base.astro';
+import { recapView } from '../../lib/recap';
+import { RECAP_NOW, recapEvents, recapProjects } from '../../lib/recap-fixtures';
+
+const events = recapEvents.map((e) =>
+  e.id === 'hack' ? { ...e, stats: { teams: 12, people: 44 }, showcase: 'hidden' as const } : e,
+);
+---
+
+<Base title="Laboratorio · Último evento parcial" noindex header={false}>
+  <main><Recap view={recapView(events, recapProjects, RECAP_NOW)} /></main>
+</Base>
