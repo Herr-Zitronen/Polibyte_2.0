@@ -1,0 +1,157 @@
+/* DESIGN.md §3.8 · Vidrio granulado sobre el Chimborazo.
+   Capas (atrás → adelante): nevado → niebla → brillo → vidrio acanalado → degradado → grano. */
+.pb-glass {
+  position: relative;
+  isolation: isolate; /* contexto propio: el grano (z 3) queda sobre el contenido (z 2) */
+  display: flow-root;
+  overflow: clip; /* nunca hidden: congelaría las animaciones view() */
+  background-color: #2a44b4;
+}
+
+.pb-glass--join {
+  background-color: var(--pb-blue-500);
+}
+
+.pb-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pb-content {
+  position: relative;
+  z-index: 2;
+}
+
+.pb-par {
+  position: absolute;
+  inset: -180px 0;
+  background-repeat: no-repeat;
+  background-size: cover;
+  will-change: transform;
+}
+
+.pb-par.far.img-hero {
+  background-image: url('../assets/backgrounds/chimborazo-hero.webp');
+  background-position: center 40%;
+}
+
+.pb-par.far.img-join {
+  background-image: url('../assets/backgrounds/chimborazo-join.webp');
+  background-position: center 45%;
+}
+
+.pb-par.far.img-recap {
+  background-image: url('../assets/backgrounds/chimborazo-recap.webp');
+  background-position: 70% 45%;
+}
+
+.pb-par.near {
+  background-image: url('../assets/backgrounds/fog.webp');
+  background-position: center 62%;
+  opacity: 0.55;
+}
+
+.pb-sheen {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 45% at 50% 42%, rgba(214, 224, 248, 0.22), rgba(214, 224, 248, 0) 70%),
+    linear-gradient(180deg, rgba(10, 18, 60, 0.25), rgba(10, 18, 60, 0) 22%, rgba(10, 18, 60, 0) 70%, rgba(10, 18, 60, 0.35));
+}
+
+.pb-reed {
+  position: absolute;
+  inset: 0 -12px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0 1px,
+    rgba(255, 255, 255, 0) 1px 9px,
+    rgba(8, 14, 50, 0.06) 9px 10px,
+    rgba(255, 255, 255, 0) 10px 18px
+  );
+}
+
+/* Degradado a sólido en el borde: empalma con la franja de píxeles. */
+.pb-fade {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 260px;
+  background: linear-gradient(180deg, transparent, var(--pb-fade-to, var(--pb-blue-750)));
+}
+
+/* Una sola capa de grano por sección, siempre arriba. */
+.pb-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image: url('../assets/backgrounds/grain.webp');
+  background-size: 160px 160px;
+  opacity: var(--pb-grain-opacity, 0.6);
+}
+
+/* Paralaje: el estado por defecto es el final visible; solo se anima transform. */
+@supports (animation-timeline: view()) {
+  .pb-par.far.root {
+    animation: pb-par-root-far linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0px 1100px;
+  }
+
+  .pb-par.near.root {
+    animation: pb-par-root-near linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0px 1100px;
+  }
+
+  .pb-par.far.view {
+    animation: pb-par-view-far linear both;
+    animation-timeline: view();
+  }
+
+  .pb-par.near.view {
+    animation: pb-par-view-near linear both;
+    animation-timeline: view();
+  }
+}
+
+@keyframes pb-par-root-far {
+  to {
+    transform: translate3d(0, 170px, 0);
+  }
+}
+
+@keyframes pb-par-root-near {
+  to {
+    transform: translate3d(0, -110px, 0);
+  }
+}
+
+@keyframes pb-par-view-far {
+  from {
+    transform: translate3d(0, -90px, 0);
+  }
+  to {
+    transform: translate3d(0, 90px, 0);
+  }
+}
+
+@keyframes pb-par-view-near {
+  from {
+    transform: translate3d(0, 70px, 0);
+  }
+  to {
+    transform: translate3d(0, -70px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-par.far,
+  .pb-par.near {
+    animation: none;
+    transform: none;
+  }
+}

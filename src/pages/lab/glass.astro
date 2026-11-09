@@ -1,0 +1,18 @@
+---
+// Laboratorio de pruebas visuales (no enlazado, noindex).
+import GlassBackground from '../../components/GlassBackground.astro';
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="Laboratorio · Vidrio" noindex>
+  <main>
+    <section class="pb-glass pb-section" data-bg style="min-height: 100vh">
+      <GlassBackground image="hero" parallax="root" />
+      <div class="pb-content pb-container"><h1>Vidrio granulado</h1></div>
+    </section>
+    <section class="pb-glass pb-glass--join pb-section" data-bg style="min-height: 100vh">
+      <GlassBackground image="join" fadeTo="var(--pb-navy-950)" />
+      <div class="pb-content pb-container"><h2>Únete</h2></div>
+    </section>
+  </main>
+</Base>
