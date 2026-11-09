@@ -1,0 +1,44 @@
+---
+// Menú móvil (DESIGN §3.9, §6): <dialog> nativo con showModal() → fondo inerte y Escape gratis.
+// Va fuera de la barra: su backdrop-filter no puede tener un ancestro con view-transition-name.
+// El botón que lo abre vive en Header.astro.
+import Button from './Button.astro';
+import Logo from './Logo.astro';
+import '../styles/mobile-menu.css';
+
+const LINKS = [
+  { n: '01', label: 'club', href: '/' },
+  { n: '02', label: 'eventos', href: '/eventos/' },
+  { n: '03', label: 'equipo', href: '/equipo/' },
+  { n: '04', label: 'unirme', href: '/unirme/' },
+];
+---
+
+<dialog id="pb-menu" class="pb-sheet" aria-modal="true" aria-label="Menú" data-menu>
+  <div class="pb-grain" aria-hidden="true"></div>
+  <div class="pb-sheet__top">
+    <Logo subtitle={false} />
+    <button type="button" class="pb-b2 sm" data-menu-close>cerrar</button>
+  </div>
+  <nav class="pb-sheet-nav" aria-label="Menú móvil">
+    {
+      LINKS.map((l) => (
+        <a href={l.href}>
+          <span class="pb-n">{l.n}</span>
+          {l.label}
+        </a>
+      ))
+    }
+  </nav>
+  <div class="pb-sheet__cta">
+    <Button variant="primary" href="/unirme/">Quiero unirme</Button>
+  </div>
+</dialog>
+
+<script>
+  import { initMobileMenu } from '../scripts/mobile-menu';
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-menu]');
+  const opener = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+  if (dialog && opener) initMobileMenu(dialog, opener);
+</script>
