@@ -1,0 +1,11 @@
+---
+// Cruz 25×25 centrada en una intersección real (DESIGN §3.4). `n` (1–4) ordena el destello del pulso.
+interface Props {
+  x: string;
+  y: string;
+  n?: 1 | 2 | 3 | 4;
+}
+const { x, y, n } = Astro.props;
+---
+
+<span class:list={['pb-x', n && `c${n}`]} style={`left: ${x}; top: ${y}`} aria-hidden="true"><i></i></span>

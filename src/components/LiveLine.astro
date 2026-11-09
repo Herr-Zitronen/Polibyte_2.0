@@ -1,0 +1,10 @@
+---
+// Línea viva (DESIGN §3.4): un destello recorre la línea cada 9 s. Se posiciona con `style`.
+interface Props {
+  vertical?: boolean;
+  style?: string;
+}
+const { vertical = false, style } = Astro.props;
+---
+
+<span class={vertical ? 'pb-vl' : 'pb-hl'} style={style} aria-hidden="true"></span>
