@@ -55,10 +55,10 @@ Al terminar, actualiza el issue con lo aprendido y muévelo a Done.
 | 6 | WOR-84 H2.4 → WOR-85 L1 |
 
 ## Estado actual
-- `main` y `staging` publicadas en GitHub con la documentación y el diseño.
-- Rama local `feat/h0.1-project-ci` con 11 pruebas de H0.1 en **rojo** (`tests/project-setup.test.ts`). Siguiente paso: implementar H0.1.
+- H0.1 (WOR-57) terminada: proyecto Astro + CI. Staging: https://staging-polibyte-site.der-zitronen-saft.workers.dev
+- Worker de Cloudflare: `polibyte-site` (producción: https://polibyte-site.der-zitronen-saft.workers.dev, solo desde `main`).
+- Las historias se trabajan en orden (ver tabla); el estado de cada una vive en su issue de Linear.
 
 ## Pendiente del usuario
 - En GitHub: rama por defecto `main`; proteger `main` (solo PR desde `staging`, CI en verde).
-- Secretos de GitHub: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
 - Contenido real (ver issue WOR-85).
