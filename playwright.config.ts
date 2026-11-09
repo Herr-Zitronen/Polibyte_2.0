@@ -11,6 +11,10 @@ export default defineConfig({
   testDir: './e2e',
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 1 : 0,
+  // Capturas base generadas en Linux (CI) y versionadas en e2e/**/*-snapshots.
+  // Si falta una, CI la crea y la sube como artefacto para versionarla.
+  updateSnapshots: process.env['CI'] ? 'missing' : 'none',
+  expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.01, animations: 'disabled' } },
   reporter: [['html', { open: 'never' }], ['list']],
   use: {
     baseURL: 'http://localhost:4321',

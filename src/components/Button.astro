@@ -1,0 +1,23 @@
+---
+// DESIGN.md §3.1: solo existen dos variantes. Con `href` es enlace; sin él, <button>.
+import '../styles/buttons.css';
+
+interface Props {
+  variant: 'primary' | 'secondary';
+  size?: 'sm';
+  href?: string;
+  external?: boolean;
+  class?: string;
+}
+
+const { variant, size, href, external = false, class: extra } = Astro.props;
+const classes = [variant === 'primary' ? 'pb-b1' : 'pb-b2', size, extra].filter(Boolean).join(' ');
+const Tag = href ? 'a' : 'button';
+const linkAttrs = href
+  ? { href, ...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {}) }
+  : { type: 'button' as const };
+---
+
+<Tag class={classes} {...linkAttrs}>
+  {variant === 'primary' ? <span class="pb-b1__box"><slot /></span> : <slot />}
+</Tag>

@@ -1,0 +1,108 @@
+/* DESIGN.md §3.1 · Solo dos botones. Altura igual: primario = 1 + 4 + 14 + texto + 14 + 4 + 1;
+   secundario = 1 + 18 + texto + 18 + 1. */
+.pb-b1,
+.pb-b2 {
+  display: inline-flex;
+  max-width: 100%;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.25;
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--pb-line-main);
+  border-radius: 6px;
+}
+
+.pb-b1 {
+  padding: 4px;
+}
+
+.pb-b1__box {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 22px;
+  border-radius: 3px;
+  background: #ffffff;
+  color: var(--pb-blue-800);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: transform 0.35s var(--pb-ease-stroke), background-color 0.3s, color 0.3s;
+}
+
+.pb-b1:hover .pb-b1__box {
+  transform: translateY(-2px);
+}
+
+.pb-b2 {
+  align-items: center;
+  gap: 10px;
+  padding: 18px 26px;
+  color: var(--pb-white);
+  white-space: nowrap;
+  transition: background-color 0.3s, color 0.3s, border-color 0.45s;
+}
+
+.pb-b2:hover {
+  background: #ffffff;
+  color: var(--pb-blue-800);
+}
+
+/* Tamaño pequeño (barra y listas) */
+.pb-b1.sm {
+  padding: 3px;
+}
+
+.pb-b1.sm .pb-b1__box {
+  padding: 9px 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pb-b2.sm {
+  padding: 12px 16px;
+  font-size: 14px;
+}
+
+/* Sobre fondo claro: invertidos */
+.pb-on-light .pb-b1,
+.pb-on-light .pb-b2 {
+  border-color: rgba(19, 32, 90, 0.6);
+}
+
+.pb-on-light .pb-b1__box {
+  background: var(--pb-ink);
+  color: var(--pb-white);
+}
+
+.pb-on-light .pb-b2 {
+  color: var(--pb-ink);
+}
+
+.pb-on-light .pb-b2:hover {
+  background: var(--pb-ink);
+  color: var(--pb-white);
+}
+
+.pb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+/* Solo en ≤520 pueden partir su texto */
+@media (max-width: 520px) {
+  .pb-b1__box,
+  .pb-b2 {
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-b1:hover .pb-b1__box {
+    transform: none;
+  }
+}

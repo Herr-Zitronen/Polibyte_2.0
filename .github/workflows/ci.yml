@@ -75,6 +75,7 @@ jobs:
           path: |
             playwright-report
             test-results
+            e2e/**/*-snapshots
           retention-days: 14
 
   lighthouse:
