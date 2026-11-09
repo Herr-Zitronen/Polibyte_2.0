@@ -293,6 +293,46 @@
   }
 }
 
+/* Chip del próximo evento (solo ≥1180 px): aparece cuando el panel ya pasó por arriba. */
+.pb-chip {
+  display: none;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(12px);
+  transition:
+    visibility 0.4s,
+    opacity 0.4s,
+    transform 0.8s var(--pb-ease-stroke);
+}
+
+.pb-chip .pb-chip-n {
+  font-family: var(--pb-font-pixel);
+}
+
+@media (min-width: 1180px) {
+  .pb-chip {
+    display: inline-flex;
+  }
+
+  .pb-hdr.show-chip .pb-chip {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+}
+
 @media (max-width: 820px) {
   .pb-bar-in {
     grid-template-columns: minmax(0, 1fr) auto;

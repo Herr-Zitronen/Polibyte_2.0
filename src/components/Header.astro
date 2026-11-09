@@ -40,6 +40,7 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
         }
       </nav>
       <div class="pb-right">
+        <slot name="chip" />
         <Button variant="primary" size="sm" href="/unirme/" class="pb-join"><span class="pb-n">04</span> unirme</Button>
         <button type="button" class="pb-menu-btn" aria-label="Abrir menú" aria-expanded="false" aria-controls="pb-menu" data-menu-open>
           <span aria-hidden="true"></span>

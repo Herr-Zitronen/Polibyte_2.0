@@ -1,0 +1,110 @@
+---
+// Panel del próximo evento (DESIGN §5.1). Los números se calculan en el build (sin JS ya se ven);
+// la isla countdown.ts los refresca con la hora real cada minuto.
+import { modeLabel } from '../../lib/mode-label';
+import { eventStart, longDate, nextEventView } from '../../lib/next-event-view';
+import { typeLine } from '../../lib/events';
+import type { EventData } from '../../content/schemas';
+import Button from '../Button.astro';
+import Panel from '../Panel.astro';
+import TagPair from '../TagPair.astro';
+import Tag from '../Tag.astro';
+import '../../styles/next-event.css';
+import '../../styles/tags.css';
+
+interface Props {
+  event?: (EventData & { id: string; date: Date }) | undefined;
+}
+
+const { event } = Astro.props;
+const view = event && nextEventView(event, new Date());
+const [typeLabel, org] = event ? typeLine(event).split(' · ') : [];
+---
+
+{
+  event && view && (
+    <div class="pb-container pb-next-wrap">
+      <Panel id="proximo" class="pb-panel" draw pulse>
+        <div class="pb-pgrid" data-countdown={eventStart(event).toISOString()}>
+          <div class="pb-pc pb-pc-info">
+            <div class="pb-pc-stack">
+              <span class="pb-plabel">
+                <span class="pb-dot" aria-hidden="true" />
+                Próximo evento
+              </span>
+              <h2 class="pb-pname">{event.title}</h2>
+              {org ? <TagPair label={typeLabel!} pill={org} /> : <Tag>{typeLabel}</Tag>}
+              <dl class="pb-meta">
+                <dt>Fecha</dt>
+                <dd>{longDate(event.date)}</dd>
+                {event.place && (
+                  <>
+                    <dt>Lugar</dt>
+                    <dd>{event.place}</dd>
+                  </>
+                )}
+                {event.mode && (
+                  <>
+                    <dt>Modalidad</dt>
+                    <dd>{modeLabel(event.mode)}</dd>
+                  </>
+                )}
+              </dl>
+            </div>
+            <div class="pb-pc-stack">
+              {event.registrationDeadline && (
+                <p class="pb-reg">
+                  Inscripciones abiertas hasta el {longDate(event.registrationDeadline)}. Te ayudamos a formar equipo si aún no tienes uno.
+                </p>
+              )}
+              <div class="pb-actions">
+                {event.registrationUrl && (
+                  <Button variant="primary" href={event.registrationUrl} external>
+                    Inscribir a mi equipo
+                  </Button>
+                )}
+                <Button variant="secondary" href={`/eventos/${event.id}/`}>
+                  Ver detalles
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div class="pb-pc pb-pc-mid">
+            <div class="pb-count" role="timer" aria-label={view.aria} data-cd="aria">
+              <div class="pb-unit" aria-hidden="true">
+                <span class="pb-dig" data-cd="days">{view.days}</span>
+                <span class="pb-ul">días</span>
+              </div>
+              <span class="pb-sep" aria-hidden="true">:</span>
+              <div class="pb-unit" aria-hidden="true">
+                <span class="pb-dig" data-cd="hours">{view.hours}</span>
+                <span class="pb-ul">horas</span>
+              </div>
+            </div>
+            <div class="pb-bin-wrap">
+              <span class="pb-binary" aria-hidden="true">
+                <span data-cd="binary">{view.binary}</span>
+                <span class="pb-cursor" />
+              </span>
+              <span class="pb-dic" data-cd="label">{view.label}</span>
+            </div>
+          </div>
+        </div>
+        <div class="pb-prog">
+          <span class="pb-prog__t">cuenta atrás</span>
+          <div class="pb-cells" aria-hidden="true" data-cd="cells">
+            {view.cells.map((c) => <span class:list={['pb-cell', c !== 'off' && 'on', c === 'now' && 'now']} />)}
+          </div>
+          <span>
+            <span data-cd="percent">{view.percent}</span>% del camino
+          </span>
+        </div>
+      </Panel>
+    </div>
+  )
+}
+
+<script>
+  import { initCountdown } from '../../scripts/countdown';
+  initCountdown();
+</script>
