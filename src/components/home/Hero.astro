@@ -1,0 +1,78 @@
+---
+// Portada de Inicio (DESIGN §4, design/Main.dc.html): marco de líneas que se abre al hacer scroll + titular decodificado.
+import Button from '../Button.astro';
+import GlassBackground from '../GlassBackground.astro';
+import '../../styles/hero.css';
+
+const TITLE = 'Construimos software. Y a quienes lo construyen.';
+let k = 0;
+const words = TITLE.split(' ').map((w) => [...w].map((c) => ({ c, delay: (0.25 + k++ * 0.022).toFixed(3) })));
+const line = 'position: absolute; left: 0; right: 0; height: 1.5px';
+---
+
+<section id="top" class="pb-glass pb-hero-s" data-bg>
+  <GlassBackground image="hero" parallax="root" />
+  <div class="pb-hero pb-content">
+    <div class="pb-hero__lines" aria-hidden="true">
+      <div class="pb-tlg">
+        <div class="pb-line pb-flow" style={`${line}; top: 72px`}></div>
+        <div class="pb-line pb-flow" style={`${line}; top: 168px`}></div>
+        <div class="pb-node" style="right: 0; top: 168px"></div>
+      </div>
+      <div class="pb-trg">
+        <div class="pb-line r pb-flow" style={`${line}; top: 72px`}></div>
+        <div class="pb-line r pb-flow" style={`${line}; top: 168px`}></div>
+        <div class="pb-node" style="left: 0; top: 72px"></div>
+      </div>
+      <div class="pb-flg">
+        <div class="pb-vline" style="position: absolute; left: 0; top: 0; bottom: 0; width: 1.5px"></div>
+        <div class="pb-line" style={`${line}; top: 50%`}></div>
+        <div class="pb-node" style="left: 100%; top: 50%"></div>
+      </div>
+      <div class="pb-frg">
+        <div class="pb-vline" style="position: absolute; right: 0; top: 0; bottom: 0; width: 1.5px"></div>
+        <div class="pb-line r" style={`${line}; top: 50%`}></div>
+        <div class="pb-node" style="left: 0; top: 50%"></div>
+      </div>
+      <div class="pb-blg">
+        <div class="pb-line pb-flow" style={`${line}; top: 0`}></div>
+        <div class="pb-line pb-flow" style={`${line}; top: 96px`}></div>
+      </div>
+      <div class="pb-brg">
+        <div class="pb-line r pb-flow" style={`${line}; top: 0`}></div>
+        <div class="pb-line r pb-flow" style={`${line}; top: 96px`}></div>
+        <div class="pb-node" style="left: 0; top: 96px"></div>
+      </div>
+    </div>
+    <div class="pb-box pb-hx">
+      <h1 class="pb-h1" aria-label={TITLE} data-decode>
+        {
+          words.map((w) => (
+            <>
+              <span class="pb-word" aria-hidden="true">
+                {w.map((ch) => (
+                  <span class="pb-ch" style={`animation-delay: ${ch.delay}s`}>
+                    {ch.c}
+                  </span>
+                ))}
+              </span>{' '}
+            </>
+          ))
+        }
+      </h1>
+      <div class="pb-sub">
+        <p>Eventos, competencias y comunidad para quien quiere construir. Abierto a toda la carrera y a todo público.</p>
+        <div class="pb-actions">
+          <Button variant="primary" href="/eventos/">Ver eventos</Button>
+          <Button variant="secondary" href="/unirme/">Unirme al club</Button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initDecode } from '../../scripts/decode';
+  const h1 = document.querySelector<HTMLElement>('[data-decode]');
+  if (h1) initDecode(h1);
+</script>
