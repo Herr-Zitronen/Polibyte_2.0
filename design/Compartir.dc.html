@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>PoliByte · Imagen para compartir</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300..800&amp;family=Silkscreen:wght@400;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@600&amp;text=PoliByte&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.og-img{position:absolute;inset:0;background-color:#2A44B4;background-image:url(assets/chimborazo-hero.webp);background-size:cover;background-position:center 40%}
+.og-fog{position:absolute;inset:0;background-image:url(assets/fog.webp);background-size:cover;background-position:center 62%;opacity:.55}
+.og-grain{position:absolute;inset:0;background-image:url(assets/grain.webp);background-size:160px 160px;opacity:.6}
+.og-reed{position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,rgba(255,255,255,0) 1px 9px,rgba(8,14,50,.06) 9px 10px,rgba(255,255,255,0) 10px 18px)}
+.og-x{position:absolute;width:25px;height:25px;margin:-12px 0 0 -12px}
+.og-x::before,.og-x::after{content:"";position:absolute;background:#F2F4FA}
+.og-x::before{left:12px;top:0;width:1px;height:25px}
+.og-x::after{top:12px;left:0;width:25px;height:1px}
+</style>
+</helmet>
+<div style="position: relative; width: 1200px; height: 630px; overflow: hidden; color: #F2F4FA; font-family: 'JetBrains Mono', monospace; background: #1A2C78">
+<div class="og-img"></div><div class="og-fog"></div><div class="og-reed"></div>
+<div style="position: absolute; inset: 0; background: radial-gradient(60% 50% at 40% 45%, rgba(214,224,248,0.18), rgba(214,224,248,0) 70%), linear-gradient(180deg, rgba(10,18,60,0.2), rgba(10,18,60,0) 30%, rgba(10,18,60,0.35))"></div>
+<div class="og-grain"></div>
+<div style="position: absolute; left: 72px; right: 72px; top: 150px; height: 1px; background: rgba(242,244,250,0.55)"></div>
+<div style="position: absolute; left: 72px; right: 72px; bottom: 118px; height: 1px; background: rgba(242,244,250,0.55)"></div>
+<span class="og-x" style="left: 72px; top: 150px"></span><span class="og-x" style="left: 1128px; top: 150px"></span><span class="og-x" style="left: 72px; top: 512px"></span><span class="og-x" style="left: 1128px; top: 512px"></span>
+<div style="position: absolute; left: 72px; top: 56px; display: flex; align-items: center; gap: 16px">
+<svg viewBox="0 0 913 1264" width="40" height="55" aria-hidden="true"><path fill="#F2F4FA" d="M0 0H180V184H0Z M736 0H913V184H736Z M0 269H433V410L258 411V1120H433V1264H0Z M483 269H913V1264H483V1120H659V411L483 410Z M330 847V621Q330 611 340 611H573Q583 611 583 621V847Z"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 700; font-size: 26px">PoliByte</span><span style="font-size: 16px; opacity: 0.88">Club de la Carrera de Software</span></div>
+</div>
+<h1 style="position: absolute; left: 72px; right: 72px; top: 196px; margin: 0; font-weight: 700; font-size: 76px; line-height: 1; letter-spacing: -0.06em">Construimos software. Y a quienes lo construyen.</h1>
+<div style="position: absolute; left: 72px; right: 72px; bottom: 50px; display: flex; justify-content: space-between; align-items: center; font-size: 18px">
+<span>Escuela Superior Politécnica de Chimborazo</span>
+<span style="font-family: Silkscreen, monospace; font-size: 16px; color: #F2E0A0">[dominio del club]</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1200,"height":630}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

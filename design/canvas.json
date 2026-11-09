@@ -1,0 +1,193 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Main.dc.html": {
+      "expand": "fill",
+      "h": 5787,
+      "is_interactive": true,
+      "title": "Inicio · escritorio",
+      "w": 1440,
+      "x": -55,
+      "y": 9,
+      "page": "inicio"
+    },
+    "MainMovil.dc.html": {
+      "h": 5983,
+      "is_interactive": true,
+      "title": "Inicio · celular",
+      "w": 390,
+      "x": 1465,
+      "y": 9,
+      "page": "inicio"
+    },
+    "Eventos.dc.html": {
+      "expand": "fill",
+      "h": 5941,
+      "is_interactive": true,
+      "title": "Eventos · escritorio",
+      "w": 1440,
+      "x": 0,
+      "y": 0,
+      "page": "eventos"
+    },
+    "EventosMovil.dc.html": {
+      "h": 7181,
+      "is_interactive": true,
+      "title": "Eventos · celular",
+      "w": 390,
+      "x": 1520,
+      "y": 0,
+      "page": "eventos"
+    },
+    "Equipo.dc.html": {
+      "expand": "fill",
+      "h": 3607,
+      "is_interactive": true,
+      "title": "Equipo · escritorio",
+      "w": 1440,
+      "x": 0,
+      "y": 0,
+      "page": "equipo"
+    },
+    "EquipoMovil.dc.html": {
+      "h": 4706,
+      "is_interactive": true,
+      "title": "Equipo · celular",
+      "w": 390,
+      "x": 1520,
+      "y": 0,
+      "page": "equipo"
+    },
+    "Unirme.dc.html": {
+      "expand": "fill",
+      "h": 2397,
+      "is_interactive": true,
+      "title": "Unirme · escritorio",
+      "w": 1440,
+      "x": 0,
+      "y": 0,
+      "page": "unirme"
+    },
+    "UnirmeMovil.dc.html": {
+      "h": 2531,
+      "is_interactive": true,
+      "title": "Unirme · celular",
+      "w": 390,
+      "x": 1520,
+      "y": 0,
+      "page": "unirme"
+    },
+    "EventoDetalle.dc.html": {
+      "expand": "fill",
+      "h": 3996,
+      "is_interactive": true,
+      "title": "Detalle de evento · escritorio",
+      "w": 1440,
+      "x": 0,
+      "y": 0,
+      "page": "detalle"
+    },
+    "EventoDetalleMovil.dc.html": {
+      "h": 3825,
+      "is_interactive": true,
+      "title": "Detalle de evento · celular",
+      "w": 390,
+      "x": 1520,
+      "y": 0,
+      "page": "detalle"
+    },
+    "NoEncontrado.dc.html": {
+      "expand": "fill",
+      "h": 1558,
+      "is_interactive": true,
+      "title": "404 · escritorio",
+      "w": 1440,
+      "x": 0,
+      "y": 0,
+      "page": "404"
+    },
+    "NoEncontradoMovil.dc.html": {
+      "h": 1133,
+      "is_interactive": true,
+      "title": "404 · celular",
+      "w": 390,
+      "x": 1520,
+      "y": 0,
+      "page": "404"
+    },
+    "Compartir.dc.html": {
+      "h": 630,
+      "title": "Imagen para compartir · 1200 × 630",
+      "w": 1200,
+      "x": 0,
+      "y": 0,
+      "page": "marca"
+    },
+    "Favicon.dc.html": {
+      "h": 512,
+      "title": "Favicon · 512 × 512",
+      "w": 512,
+      "x": 1280,
+      "y": 0,
+      "page": "marca"
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-11-09T01:15:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas",
+    "page": "inicio"
+  },
+  "notes": {},
+  "order": [
+    "Main.dc.html",
+    "MainMovil.dc.html",
+    "Eventos.dc.html",
+    "EventosMovil.dc.html",
+    "EventoDetalle.dc.html",
+    "EventoDetalleMovil.dc.html",
+    "Equipo.dc.html",
+    "EquipoMovil.dc.html",
+    "Unirme.dc.html",
+    "UnirmeMovil.dc.html",
+    "NoEncontrado.dc.html",
+    "NoEncontradoMovil.dc.html",
+    "Compartir.dc.html",
+    "Favicon.dc.html"
+  ],
+  "pages": [
+    {
+      "id": "inicio",
+      "name": "Inicio"
+    },
+    {
+      "id": "eventos",
+      "name": "Eventos"
+    },
+    {
+      "id": "detalle",
+      "name": "Detalle de evento"
+    },
+    {
+      "id": "equipo",
+      "name": "Equipo"
+    },
+    {
+      "id": "unirme",
+      "name": "Unirme"
+    },
+    {
+      "id": "404",
+      "name": "404"
+    },
+    {
+      "id": "marca",
+      "name": "Marca"
+    }
+  ],
+  "title": "PoliByte — rediseño web"
+}

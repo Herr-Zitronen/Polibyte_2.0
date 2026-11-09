@@ -1,0 +1,40 @@
+# Dependencias
+node_modules/
+
+# Build de Astro
+dist/
+.astro/
+
+# Cloudflare / wrangler (estado local y secretos de desarrollo)
+.wrangler/
+.dev.vars
+.dev.vars.*
+
+# Variables de entorno (nunca se suben; usar .env.example como plantilla)
+.env
+.env.*
+!.env.example
+
+# Pruebas
+coverage/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+.lighthouseci/
+# Las capturas base de Playwright (*-snapshots/) SÍ se versionan
+
+# Logs
+npm-debug.log*
+*.log
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Claude Code (configuración local personal)
+.claude/settings.local.json
