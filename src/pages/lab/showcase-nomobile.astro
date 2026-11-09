@@ -1,0 +1,22 @@
+---
+// Laboratorio H5.2: vitrina publicada sin captura móvil (reloj fijo de recap-fixtures).
+import Recap from '../../components/events/Recap.astro';
+import Showcase from '../../components/events/Showcase.astro';
+import Base from '../../layouts/Base.astro';
+import { recapView } from '../../lib/recap';
+import { RECAP_NOW, recapEvents } from '../../lib/recap-fixtures';
+import { showcaseLayout } from '../../lib/showcase';
+import { showcaseProjects } from '../../lib/showcase-fixtures';
+
+const events = recapEvents;
+const projects = showcaseProjects.map((p) => ({ ...p, shotMobile: undefined }));
+const view = recapView(events, projects, RECAP_NOW);
+const layout = view.kind === 'event' ? showcaseLayout(view.event, projects) : null;
+---
+
+<Base title="Laboratorio · Vitrina publicada sin captura móvil" noindex header={false}>
+  <main>
+    <Recap view={view} />
+    {layout && view.kind === 'event' && <Showcase eventTitle={view.title} layout={layout} />}
+  </main>
+</Base>

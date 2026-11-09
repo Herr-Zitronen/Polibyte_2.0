@@ -1,17 +1,21 @@
 ---
-// Eventos: portada con el último evento concluido (H5.1). Destacados, calendario y archivo: H5.2–H5.4.
+// Eventos: portada con el último evento concluido (H5.1) y su vitrina (H5.2). Calendario y archivo: H5.3–H5.4.
 import { getCollection } from 'astro:content';
 import Recap from '../../components/events/Recap.astro';
+import Showcase from '../../components/events/Showcase.astro';
 import Base from '../../layouts/Base.astro';
 import { recapView } from '../../lib/recap';
+import { showcaseLayout } from '../../lib/showcase';
 
 const events = (await getCollection('events')).map((e) => ({ ...e.data, id: e.id }));
-const projects = (await getCollection('projects')).map((p) => ({ event: p.data.event.id, featured: p.data.featured }));
+const projects = (await getCollection('projects')).map((p) => ({ ...p.data, event: p.data.event.id }));
 const view = recapView(events, projects, new Date());
+const showcase = view.kind === 'event' ? showcaseLayout(view.event, projects) : null;
 ---
 
 <Base title="Eventos · PoliByte" description="Calendario, archivo y proyectos del club.">
   <main>
     <Recap view={view} />
+    {showcase && view.kind === 'event' && <Showcase eventTitle={view.title} layout={showcase} />}
   </main>
 </Base>

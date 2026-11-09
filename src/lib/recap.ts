@@ -1,5 +1,6 @@
 // Portada de Eventos: el último evento concluido y sus cifras (DESIGN §5, §5.2). Pura: el tiempo llega como `now`.
 import { lastConcluded, typeLine } from './events';
+import { showcaseLayout } from './showcase';
 
 type Stats = { [K in StatKey]?: number | undefined };
 type RecapEvent = {
@@ -14,7 +15,7 @@ type RecapEvent = {
   stats?: Stats | undefined;
   showcase: 'hidden' | 'published';
 };
-type FeaturedRef = { event: string; featured: boolean };
+type FeaturedRef = { event: string; featured: boolean; order?: number | undefined };
 
 export type StatKey = 'teams' | 'projects' | 'people';
 export type Stat = { key: StatKey; value: number; label: string };
@@ -51,7 +52,7 @@ export function recapView<E extends RecapEvent>(events: readonly E[], projects: 
       primary: CALENDAR,
     };
   }
-  const showcase = last.showcase === 'published' && projects.some((p) => p.event === last.id && p.featured);
+  const showcase = showcaseLayout(last, projects) !== null;
   return {
     kind: 'event',
     title: last.title,
