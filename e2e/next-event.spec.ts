@@ -41,7 +41,16 @@ test('el chip aparece en la barra al pasar el panel (solo ≥1180 px)', async ({
   await expect(chip).toBeHidden();
   await page.locator('#proximo').evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().bottom + window.scrollY + 50));
   const wide = page.viewportSize()!.width >= 1180;
-  if (wide) await expect(chip).toBeVisible();
+  if (wide) {
+    const state = await page.evaluate(() => ({
+      y: window.scrollY,
+      max: document.documentElement.scrollHeight - innerHeight,
+      panel: document.querySelector('#proximo')!.getBoundingClientRect().toJSON(),
+      hdr: document.querySelector('.pb-hdr')!.className,
+      chip: getComputedStyle(document.querySelector('.pb-chip')!).visibility,
+    }));
+    await expect(chip, JSON.stringify(state)).toBeVisible();
+  }
   else {
     await page.waitForTimeout(500);
     await expect(chip).toBeHidden();
