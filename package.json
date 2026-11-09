@@ -3,10 +3,28 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "vitest run"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "vitest run",
+    "e2e": "playwright test",
+    "lint": "eslint .",
+    "check:types": "astro check",
+    "check": "astro check && npm run lint && npm run test"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@axe-core/playwright": "^4.14.0",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.65.0",
+    "astro": "^7.3.8",
+    "eslint": "^10.14.0",
+    "eslint-plugin-astro": "^1.7.0",
+    "globals": "^17.14.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.1",
     "vitest": "^3.2.7",
+    "wrangler": "^4.158.0",
     "yaml": "^2.9.1"
   }
 }

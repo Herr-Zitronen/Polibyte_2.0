@@ -49,9 +49,33 @@ describe('H0.1 · criterio 2: CI en cada PR', () => {
       .map((s) => `${s.run ?? ''} ${s.uses ?? ''}`)
       .join('\n');
 
-  it('el workflow existe y se dispara en pull_request', () => {
+  type Job = { needs?: string | string[]; if?: string; steps: { run?: string; uses?: string; with?: Record<string, unknown> }[] };
+  const jobs = () => ci().jobs as Record<string, Job>;
+  const deployJobs = () => Object.entries(jobs()).filter(([, j]) => j.steps.some((s) => /wrangler/.test(`${s.run ?? ''} ${s.uses ?? ''}`)));
+
+  it('se dispara en push a feat/**, staging y main, y en PR hacia staging/main', () => {
     expect(existsSync(resolve(root, ciPath))).toBe(true);
-    expect(ci().on).toHaveProperty('pull_request');
+    const on = ci().on;
+    expect(on.push.branches).toEqual(expect.arrayContaining(['feat/**', 'staging', 'main']));
+    expect(on.pull_request.branches).toEqual(expect.arrayContaining(['staging', 'main']));
+  });
+
+  it('solo despliega desde staging (preview-alias) y main (deploy), tras pasar las pruebas', () => {
+    const deploys = deployJobs();
+    expect(deploys.length).toBeGreaterThanOrEqual(2);
+    for (const [, j] of deploys) {
+      expect(j.needs, 'needs').toBeTruthy();
+      expect(j.if ?? '').toMatch(/github\.event_name\s*==\s*'push'/);
+      expect(j.if ?? '').toMatch(/refs\/heads\/(staging|main)/);
+    }
+    const byRef = (ref: string) => deploys.find(([, j]) => (j.if ?? '').includes(`refs/heads/${ref}`))?.[1];
+    const runsOf = (j?: Job) => (j?.steps ?? []).map((s) => `${s.run ?? ''} ${JSON.stringify(s.with ?? {})}`).join('\n');
+    expect(runsOf(byRef('staging'))).toMatch(/versions upload.*--preview-alias staging/);
+    expect(runsOf(byRef('main'))).toMatch(/wrangler deploy|"command":"deploy"/);
+  });
+
+  it('sube el reporte de Playwright como artefacto', () => {
+    expect(allRuns()).toMatch(/actions\/upload-artifact/);
   });
 
   it('ejecuta check, Vitest, Playwright y Lighthouse CI', () => {
