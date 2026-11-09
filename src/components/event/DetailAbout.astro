@@ -1,0 +1,38 @@
+---
+// "Sobre el evento" (cuerpo Markdown) y datos clave (design/EventoDetalle.dc.html #sobre).
+import type { Fact } from '../../lib/event-detail';
+import Panel from '../Panel.astro';
+
+interface Props {
+  pitch?: string | undefined;
+  summary: string;
+  facts: Fact[];
+}
+
+const { pitch, summary, facts } = Astro.props;
+---
+
+<section id="sobre" class="pb-dabout">
+  <div class="pb-dabout__bg" aria-hidden="true"><div class="pb-grain"></div></div>
+  <div class="pb-container pb-dabout__wrap">
+    <div class="pb-dgrid">
+      <div class="pb-dabout__text">
+        <span class="pb-dlabel">sobre el evento</span>
+        <h2 class="pb-dabout__lead">{pitch ?? summary}</h2>
+        <div class="pb-dbody"><slot /></div>
+      </div>
+      <Panel class="pb-dfacts" draw pulse>
+        <dl>
+          {
+            facts.map((f) => (
+              <>
+                <dt>{f.label}</dt>
+                <dd>{f.value}</dd>
+              </>
+            ))
+          }
+        </dl>
+      </Panel>
+    </div>
+  </div>
+</section>

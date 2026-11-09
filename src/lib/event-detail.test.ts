@@ -48,7 +48,7 @@ describe('keyFacts', () => {
     expect(facts.find((f) => f.label === 'Modalidad')?.value).toBe('Remoto');
   });
   it('sin fecha dice "Por confirmar" y muestra el aliado del club', () => {
-    const facts = keyFacts({ title: 'CodeFest', type: 'club', organizer: 'PoliByte', ally: 'GDG' });
+    const facts = keyFacts({ type: 'club', organizer: 'PoliByte', ally: 'GDG' });
     expect(facts).toEqual([
       { label: 'Fecha', value: 'Por confirmar' },
       { label: 'Organiza', value: 'PoliByte' },

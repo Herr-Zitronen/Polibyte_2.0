@@ -1,0 +1,338 @@
+/* Detalle de evento (H6.1, design/EventoDetalle.dc.html). */
+.pb-thero {
+  position: relative;
+  padding-top: 168px;
+  padding-bottom: 112px;
+}
+
+.pb-thero__head {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 1000px;
+}
+
+.pb-crumb {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.pb-crumb a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pb-dtype {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  opacity: 0.88;
+}
+
+.pb-th1 {
+  margin: 0;
+  font-weight: 800;
+  font-size: clamp(46px, 8vw, 128px);
+  letter-spacing: -0.075em;
+  line-height: 0.94;
+  view-transition-name: pb-evtitle;
+}
+
+.pb-thero__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+}
+
+.pb-thero__foot {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-top: 72px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(242, 244, 250, 0.5);
+}
+
+.pb-dcount {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.pb-dcount .n,
+.pb-dstate {
+  font-family: var(--pb-font-pixel);
+  font-weight: 700;
+  line-height: 0.8;
+}
+
+.pb-dcount .n {
+  font-size: clamp(56px, 7vw, 104px);
+}
+
+.pb-dstate {
+  font-size: clamp(32px, 4vw, 56px);
+}
+
+.pb-dcount__u {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 4px;
+}
+
+.pb-dcount__l {
+  font-family: var(--pb-font-pixel);
+  font-size: 14px;
+}
+
+.pb-dcount__h {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.pb-thero__actions,
+.pb-dreg__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+/* Sobre el evento */
+.pb-dabout {
+  position: relative;
+  display: flow-root;
+  background: #0f1a4d;
+  color: #f2f4fa;
+}
+
+.pb-dabout__bg,
+.pb-dsched__bg {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  pointer-events: none;
+}
+
+.pb-dabout__bg {
+  background: radial-gradient(36% 30% at 86% 30%, rgba(45, 79, 196, 0.4), rgba(45, 79, 196, 0) 100%);
+}
+
+.pb-dabout__bg .pb-grain {
+  opacity: 0.6;
+}
+
+.pb-dabout__wrap {
+  position: relative;
+  padding-top: 112px;
+  padding-bottom: 120px;
+}
+
+.pb-dgrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+}
+
+.pb-dabout__text {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pb-dlabel {
+  font-family: var(--pb-font-pixel);
+  font-size: 14px;
+}
+
+.pb-dabout__lead {
+  margin: 0;
+  font-weight: 500;
+  font-size: clamp(28px, 3.4vw, 48px);
+  letter-spacing: -0.05em;
+  line-height: 1.08;
+}
+
+.pb-dbody {
+  max-width: 600px;
+  font-size: 16px;
+  line-height: 1.7;
+  opacity: 0.92;
+}
+
+.pb-dbody > :first-child {
+  margin-top: 0;
+}
+
+.pb-dfacts {
+  background: rgba(12, 22, 80, 0.35);
+}
+
+.pb-dfacts dl {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 36px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px 24px;
+  font-size: 15px;
+}
+
+.pb-dfacts dt {
+  font-family: var(--pb-font-pixel);
+  font-size: 12px;
+  opacity: 0.85;
+  padding-top: 3px;
+}
+
+.pb-dfacts dd {
+  margin: 0;
+}
+
+/* Cronograma (fondo claro) */
+.pb-dsched {
+  position: relative;
+  display: flow-root;
+  background: #eceff6;
+  color: #13205a;
+}
+
+.pb-dsched__bg .pb-grain {
+  opacity: 0.5;
+}
+
+.pb-dsched__wrap {
+  position: relative;
+  padding-top: 120px;
+  padding-bottom: 120px;
+}
+
+.pb-dh2 {
+  margin: 0 0 64px;
+  font-weight: 800;
+  font-size: clamp(44px, 7vw, 112px);
+  letter-spacing: -0.075em;
+  line-height: 0.95;
+}
+
+.pb-sched {
+  position: relative;
+  margin: 0 0 0 6px;
+  padding: 0;
+  list-style: none;
+  border-left: 1px solid #13205a;
+}
+
+.pb-srow {
+  position: relative;
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 24px;
+  padding: 0 0 44px 32px;
+}
+
+.pb-srow::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 4px;
+  width: 11px;
+  height: 11px;
+  background: #13205a;
+}
+
+.pb-srow__date {
+  font-family: var(--pb-font-pixel);
+  font-size: 14px;
+}
+
+.pb-srow__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pb-srow__body h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.pb-srow__body p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #3a4677;
+}
+
+/* Inscripción */
+.pb-dreg {
+  padding-top: 120px;
+  padding-bottom: 140px;
+}
+
+.pb-dreg__panel {
+  background: rgba(12, 22, 80, 0.28);
+}
+
+.pb-dreg__body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding: clamp(40px, 7vw, 96px) clamp(20px, 6vw, 80px);
+  text-align: center;
+}
+
+.pb-dreg__body h2 {
+  margin: 0;
+  max-width: 840px;
+  font-weight: 800;
+  font-size: clamp(36px, 5.6vw, 84px);
+  letter-spacing: -0.065em;
+  line-height: 0.98;
+}
+
+.pb-dreg__body p {
+  margin: 0;
+  max-width: 480px;
+  font-size: 16px;
+  line-height: 1.65;
+  opacity: 0.95;
+}
+
+.pb-dreg__actions {
+  justify-content: center;
+}
+
+/* Las dos columnas se apilan en el punto de quiebre explícito (DESIGN §2.3). */
+@media (max-width: 960px) {
+  .pb-dgrid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .pb-srow {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 820px) {
+  .pb-thero {
+    padding-top: 120px;
+    padding-bottom: 80px;
+  }
+}

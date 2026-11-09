@@ -1,0 +1,33 @@
+---
+// Inscripción (design/EventoDetalle.dc.html #inscripcion). Solo para eventos no pasados con enlace.
+import Button from '../Button.astro';
+import GlassBackground from '../GlassBackground.astro';
+import Panel from '../Panel.astro';
+
+interface Props {
+  url: string;
+  type: 'club' | 'competition';
+  deadline?: string | undefined;
+}
+
+const { url, type, deadline } = Astro.props;
+---
+
+<section id="inscripcion" class="pb-glass" data-bg>
+  <GlassBackground image="join" />
+  <div class="pb-content pb-container pb-dreg">
+    <Panel class="pb-dreg__panel" draw pulse>
+      <div class="pb-dreg__body">
+        <h2>{type === 'competition' ? '¿Listo para competir?' : '¿Te sumas?'}</h2>
+        <p>
+          La inscripción se hace en el enlace oficial del evento{deadline ? `, hasta el ${deadline}` : ''}. Te ayudamos a formar
+          equipo si aún no tienes uno.
+        </p>
+        <div class="pb-dreg__actions">
+          <Button variant="primary" href={url} external>Inscribir a mi equipo</Button>
+          <Button variant="secondary" href="/eventos/">Ver todos los eventos</Button>
+        </div>
+      </div>
+    </Panel>
+  </div>
+</section>

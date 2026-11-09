@@ -1,0 +1,54 @@
+---
+// Detalle de evento (H6.1). Una página por evento en el build; slug inexistente → 404.
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import DetailAbout from '../../components/event/DetailAbout.astro';
+import DetailHero from '../../components/event/DetailHero.astro';
+import DetailRegistration from '../../components/event/DetailRegistration.astro';
+import DetailSchedule from '../../components/event/DetailSchedule.astro';
+import Base from '../../layouts/Base.astro';
+import { detailTiming, eventPaths, keyFacts, showRegistration } from '../../lib/event-detail';
+import { typeLine } from '../../lib/events';
+import { longDate } from '../../lib/next-event-view';
+import '../../styles/event-detail.css';
+
+export async function getStaticPaths() {
+  return eventPaths(await getCollection('events'));
+}
+
+interface Props {
+  entry: CollectionEntry<'events'>;
+}
+
+const { entry } = Astro.props;
+const e = entry.data;
+const { Content } = await render(entry);
+const now = new Date();
+const timing = detailTiming(e, now);
+const registration = showRegistration(e, now);
+---
+
+<Base title={`${e.title} · Eventos · PoliByte`} description={e.summary}>
+  <main>
+    <DetailHero
+      title={e.title}
+      typeLine={typeLine(e)}
+      date={e.date}
+      place={e.place}
+      mode={e.mode}
+      timing={timing}
+      registration={registration}
+    />
+    <DetailAbout pitch={e.pitch} summary={e.summary} facts={keyFacts(e)}><Content /></DetailAbout>
+    <DetailSchedule items={e.schedule} />
+    {
+      registration && e.registrationUrl && (
+        <DetailRegistration
+          url={e.registrationUrl}
+          type={e.type}
+          deadline={e.registrationDeadline && longDate(e.registrationDeadline)}
+        />
+      )
+    }
+  </main>
+</Base>
