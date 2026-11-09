@@ -20,11 +20,15 @@ test('la caja del primario nunca sobresale de su marco (textos largos)', async (
 });
 
 test('primario y secundario lado a lado tienen la misma altura', async ({ page }) => {
+  let checked = 0;
   for (const pair of await page.locator('[data-pair]').all()) {
-    const h1 = (await pair.locator('.pb-b1').boundingBox())!.height;
-    const h2 = (await pair.locator('.pb-b2').boundingBox())!.height;
-    expect(Math.abs(h1 - h2)).toBeLessThanOrEqual(0.5);
+    const b1 = (await pair.locator('.pb-b1').boundingBox())!;
+    const b2 = (await pair.locator('.pb-b2').boundingBox())!;
+    if (Math.abs(b1.y - b2.y) > 0.5) continue; // apilados: no están lado a lado
+    expect(Math.abs(b1.height - b2.height)).toBeLessThanOrEqual(0.5);
+    checked++;
   }
+  expect(checked).toBeGreaterThan(0);
 });
 
 test('sobre sección clara el primario se invierte', async ({ page }) => {

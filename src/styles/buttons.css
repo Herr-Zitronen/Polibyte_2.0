@@ -89,7 +89,7 @@
 .pb-actions {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: stretch; /* lado a lado: misma altura aunque uno parta su texto */
   gap: 12px;
 }
 
