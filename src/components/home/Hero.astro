@@ -4,14 +4,16 @@ import Button from '../Button.astro';
 import GlassBackground from '../GlassBackground.astro';
 import '../../styles/hero.css';
 
+interface Props { exp?: string }
+const { exp = '' } = Astro.props;
 const TITLE = 'Construimos software. Y a quienes lo construyen.';
 // Escalonado corto (por palabra + leve por letra): el h1 es el LCP y debe terminar de entrar pronto (presupuesto 2 s).
 const words = TITLE.split(' ').map((w, wi) => [...w].map((c, ci) => ({ c, delay: (0.1 + wi * 0.05 + ci * 0.012).toFixed(3) })));
 const line = 'position: absolute; left: 0; right: 0; height: 1.5px';
 ---
 
-<section id="top" class="pb-glass pb-hero-s" data-bg>
-  <GlassBackground image="hero" parallax="root" />
+<section id="top" class:list={["pb-glass pb-hero-s", exp]} data-bg>
+  {!exp.includes("noglass") && <GlassBackground image="hero" parallax="root" />}
   <div class="pb-hero pb-content">
     <div class="pb-hero__lines" aria-hidden="true">
       <div class="pb-tlg">
@@ -45,7 +47,7 @@ const line = 'position: absolute; left: 0; right: 0; height: 1.5px';
       </div>
     </div>
     <div class="pb-box pb-hx">
-      <h1 class="pb-h1" aria-label={TITLE} data-decode>
+      <h1 class="pb-h1" aria-label={TITLE} data-decode={exp.includes("nodecode") ? undefined : ""}>
         {
           words.map((w) => (
             <>

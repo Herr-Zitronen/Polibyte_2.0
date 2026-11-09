@@ -4,7 +4,7 @@ module.exports = {
   ci: {
     collect: {
       staticDistDir: './dist',
-      url: ['/'],
+      url: ['/', '/lab/x-nodecode/', '/lab/x-noglass/', '/lab/x-nomotion/', '/lab/x-nodecode-noglass-nomotion/'],
       numberOfRuns: 3, // Lighthouse varía entre ejecuciones: se usa la mediana.
     },
     assert: {
