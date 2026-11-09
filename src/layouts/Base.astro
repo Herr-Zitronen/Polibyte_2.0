@@ -29,7 +29,13 @@ const { title, description = 'PoliByte · Club de la Carrera de Software (ESPOCH
     <Fonts />
   </head>
   <body>
-    {header && <Header />}
+    {
+      header && (
+        <Header>
+          <slot name="chip" slot="chip" />
+        </Header>
+      )
+    }
     {header && <MobileMenu />}
     <slot />
   </body>

@@ -1,0 +1,20 @@
+---
+// Chip de la barra (solo ≥1180 px): recuerda el próximo evento cuando su panel ya pasó.
+import { countdown } from '../lib/events';
+import { eventStart } from '../lib/next-event-view';
+
+interface Props {
+  title: string;
+  date: Date;
+  time?: string | undefined;
+}
+
+const { title, date, time } = Astro.props;
+const days = countdown(eventStart({ date, time }), new Date()).days;
+---
+
+<a href="#proximo" class="pb-chip" aria-label={`Próximo evento: ${title}, faltan ${days} días`}>
+  <span class="pb-dot" aria-hidden="true"></span>
+  {title}
+  <span class="pb-chip-n"><span data-cd="chip-days">{days}d</span></span>
+</a>

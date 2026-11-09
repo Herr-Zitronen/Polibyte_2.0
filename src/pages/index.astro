@@ -1,12 +1,22 @@
 ---
-// Inicio: portada (H4.1). El resto de secciones llega en H4.2–H4.4.
+// Inicio: portada (H4.1) y panel del próximo evento (H4.2). El resto de secciones llega en H4.3–H4.4.
+import { getCollection } from 'astro:content';
+import HeaderChip from '../components/HeaderChip.astro';
 import Hero from '../components/home/Hero.astro';
+import NextEvent from '../components/home/NextEvent.astro';
 import Base from '../layouts/Base.astro';
+import { nextEvent } from '../lib/events';
+
+const events = (await getCollection('events')).map((e) => ({ ...e.data, id: e.id }));
+const next = nextEvent(events, new Date()) as ((typeof events)[number] & { date: Date }) | undefined;
 ---
 
 <Base title="PoliByte · Club de la Carrera de Software">
+  {next && <HeaderChip slot="chip" title={next.title} date={next.date} time={next.time} />}
   <main>
-    <Hero />
+    <Hero>
+      <NextEvent event={next} />
+    </Hero>
     <section class="pb-section pb-on-light" data-theme="light" style="min-height: 100vh">
       <div class="pb-container">
         <h2>Qué hacemos</h2>
