@@ -42,6 +42,17 @@ const wordmark = {
 </footer>
 
 <script>
-  import { initLantern } from '../scripts/lantern';
-  initLantern();
+  // La linterna se descarga solo cuando el pie se acerca: no compite con el LCP de la portada.
+  const lamp = document.querySelector('.pb-lamp');
+  if (lamp && matchMedia('(hover: hover)').matches) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        void import('../scripts/lantern').then((m) => m.initLantern());
+      },
+      { rootMargin: '400px' },
+    );
+    io.observe(lamp);
+  }
 </script>
