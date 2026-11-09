@@ -32,7 +32,7 @@ const filters = [
       </div>
       <div role="group" aria-label="Filtrar por tipo" class="pb-tabs">
         {filters.map(([key, label]) => (
-          <button type="button" class="pb-tab" data-filter={key} aria-pressed={String(key === 'all')}>{label}</button>
+          <button type="button" class="pb-tab" data-filter={key} aria-pressed={key === 'all' ? 'true' : 'false'}>{label}</button>
         ))}
       </div>
     </div>
