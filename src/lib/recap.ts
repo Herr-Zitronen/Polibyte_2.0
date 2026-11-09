@@ -1,7 +1,7 @@
 // Portada de Eventos: el último evento concluido y sus cifras (DESIGN §5, §5.2). Pura: el tiempo llega como `now`.
 import { lastConcluded, typeLine } from './events';
 
-type Stats = Partial<Record<StatKey, number>>;
+type Stats = { [K in StatKey]?: number | undefined };
 type RecapEvent = {
   id: string;
   title: string;
