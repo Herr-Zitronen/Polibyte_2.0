@@ -11,6 +11,11 @@ async function scrollToCover(page: Page, p: number): Promise<void> {
     const vh = innerHeight;
     const { top, height } = el.getBoundingClientRect();
     const absTop = top + scrollY;
+    // Mientras Inicio termine en esta sección (hasta H4.4) no hay scroll suficiente para llegar
+    // a cover 40%: un espaciador al final mide la animación sin depender del largo de la página.
+    const spacer = document.createElement('div');
+    spacer.style.height = `${vh}px`;
+    document.body.append(spacer);
     // cover 0%: borde superior en el borde inferior del viewport; 100%: borde inferior arriba.
     scrollTo({ top: absTop - vh + p * (vh + height), behavior: 'instant' });
   }, p);
