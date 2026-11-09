@@ -1,15 +1,19 @@
 ---
-// Eventos: portada con el último evento concluido (H5.1) y su vitrina (H5.2). Calendario y archivo: H5.3–H5.4.
+// Eventos: portada con el último evento concluido (H5.1) y su vitrina (H5.2). Archivo: H5.4. Calendario: H5.3.
 import { getCollection } from 'astro:content';
+import Archive from '../../components/events/Archive.astro';
 import Recap from '../../components/events/Recap.astro';
 import Showcase from '../../components/events/Showcase.astro';
 import Base from '../../layouts/Base.astro';
+import { archiveView } from '../../lib/archive';
 import { recapView } from '../../lib/recap';
 import { showcaseLayout } from '../../lib/showcase';
 
 const events = (await getCollection('events')).map((e) => ({ ...e.data, id: e.id }));
 const projects = (await getCollection('projects')).map((p) => ({ ...p.data, event: p.data.event.id }));
-const view = recapView(events, projects, new Date());
+const now = new Date();
+const view = recapView(events, projects, now);
+const archive = archiveView(events, projects, now);
 const showcase = view.kind === 'event' ? showcaseLayout(view.event, projects) : null;
 ---
 
@@ -17,5 +21,6 @@ const showcase = view.kind === 'event' ? showcaseLayout(view.event, projects) : 
   <main>
     <Recap view={view} />
     {showcase && view.kind === 'event' && <Showcase eventTitle={view.title} layout={showcase} />}
+    <Archive years={archive} />
   </main>
 </Base>
