@@ -1,0 +1,16 @@
+---
+// Fuentes de DESIGN.md §2.2. display=swap: el texto se pinta de inmediato con la fuente de respaldo.
+// Las hojas se cargan sin bloquear el render (media="print" → "all" al cargar) para cumplir el
+// presupuesto de LCP (H0.2). Instrument Sans solo con las letras de "PoliByte" (~2 KB).
+const MAIN = 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300..800&family=Silkscreen:wght@400;700&display=swap';
+const WORDMARK = 'https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@600&text=PoliByte&display=swap';
+---
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href={MAIN} media="print" onload="this.media='all'" />
+<link rel="stylesheet" href={WORDMARK} media="print" onload="this.media='all'" />
+<noscript>
+  <link rel="stylesheet" href={MAIN} />
+  <link rel="stylesheet" href={WORDMARK} />
+</noscript>

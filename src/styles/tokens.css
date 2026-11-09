@@ -1,0 +1,54 @@
+/* Tokens de DESIGN.md §2. Único lugar donde viven colores, tipografía y layout. */
+:root {
+  /* §2.1 Color */
+  --pb-navy-950: #0D1438;
+  --pb-navy-900: #0F1A4D;
+  --pb-ink: #13205A;
+  --pb-blue-800: #1A2C78;
+  --pb-blue-750: #1B2C78;
+  --pb-blue-700: #22389C;
+  --pb-blue-500: #2D4FC4;
+  --pb-paper: #ECEFF6;
+  --pb-white: #F2F4FA;
+  --pb-accent: #F2E0A0;
+  --pb-accent-strong: #E8CF73;
+  --pb-muted-light: #3A4677;
+  --pb-muted-dark: #AEB6D3;
+  --pb-code: #CFE3FF;
+  --pb-wordmark: #252D4F;
+  --pb-ghost: #D2D7E6;
+
+  /* Líneas sobre oscuro */
+  --pb-line-sep: rgba(242, 244, 250, 0.25);
+  --pb-line-frame: rgba(242, 244, 250, 0.45);
+  --pb-line-main: rgba(242, 244, 250, 0.7);
+
+  /* §2.2 Tipografía */
+  --pb-font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --pb-font-pixel: 'Silkscreen', var(--pb-font-mono);
+  --pb-font-wordmark: 'Instrument Sans', system-ui, sans-serif;
+  --pb-fs-hero: clamp(40px, 6.2vw, 96px);
+  --pb-fs-page: clamp(46px, 8vw, 128px);
+  --pb-fs-section: clamp(44px, 7vw, 112px);
+  --pb-fs-quote: clamp(26px, 3.4vw, 50px);
+  --pb-fs-list: clamp(20px, 2.2vw, 30px);
+  --pb-fs-body: 16px;
+  --pb-fs-label: 13px;
+
+  /* §2.3 Layout */
+  --pb-container: 1320px;
+  --pb-gutter: 32px;
+  --pb-section-y: 116px;
+
+  /* §4 Curvas */
+  --pb-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --pb-ease-stroke: cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+@media (max-width: 820px) {
+  :root {
+    --pb-fs-hero: 34px;
+    --pb-gutter: 16px;
+    --pb-section-y: 96px;
+  }
+}
