@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
 
-const root = resolve(__dirname, '..');
+const root = resolve(import.meta.dirname, '..');
 const read = (p: string) => readFileSync(resolve(root, p), 'utf8');
 const pkg = () => JSON.parse(read('package.json'));
 
