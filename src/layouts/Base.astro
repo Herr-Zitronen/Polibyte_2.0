@@ -1,5 +1,6 @@
 ---
 import Fonts from '../components/Fonts.astro';
+import Header from '../components/Header.astro';
 import { assertContentIntegrity } from '../content/integrity';
 import '../styles/global.css';
 
@@ -7,11 +8,13 @@ interface Props {
   title: string;
   description?: string;
   noindex?: boolean;
+  /** Las páginas de laboratorio lo apagan para que sus capturas no dependan de la barra. */
+  header?: boolean;
 }
 
 await assertContentIntegrity();
 
-const { title, description = 'PoliByte · Club de la Carrera de Software (ESPOCH)', noindex = false } = Astro.props;
+const { title, description = 'PoliByte · Club de la Carrera de Software (ESPOCH)', noindex = false, header = true } = Astro.props;
 ---
 
 <!doctype html>
@@ -25,6 +28,7 @@ const { title, description = 'PoliByte · Club de la Carrera de Software (ESPOCH
     <Fonts />
   </head>
   <body>
+    {header && <Header />}
     <slot />
   </body>
 </html>

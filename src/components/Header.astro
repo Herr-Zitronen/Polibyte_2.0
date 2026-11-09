@@ -1,0 +1,54 @@
+---
+// Barra superior (DESIGN §3.9). El view-transition-name va en .pb-bar-in, nunca en un ancestro del blur.
+import Button from './Button.astro';
+import Logo from './Logo.astro';
+import '../styles/header.css';
+
+const LINKS = [
+  { n: '01', label: 'club', href: '/' },
+  { n: '02', label: 'eventos', href: '/eventos/' },
+  { n: '03', label: 'equipo', href: '/equipo/' },
+];
+
+const path = Astro.url.pathname.replace(/\/?$/, '/');
+const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+
+<div class="pb-hdr" data-theme="dark" data-header>
+  <div class="pb-blur" aria-hidden="true">
+    <div class="l1"></div>
+    <div class="l2"></div>
+    <div class="l3"></div>
+    <div class="tint-dark"></div>
+    <div class="tint-light"></div>
+  </div>
+  <header class="pb-bar">
+    <div class="pb-bar-in">
+      <Logo />
+      <nav class="pb-nav" aria-label="Principal">
+        {
+          LINKS.map((l) => (
+            <a href={l.href} aria-current={isCurrent(l.href) ? 'page' : undefined}>
+              <span class="pb-n">{l.n}</span>
+              {l.label}
+              <span class="pb-arr" aria-hidden="true">
+                ↗
+              </span>
+            </a>
+          ))
+        }
+      </nav>
+      <div class="pb-right">
+        <Button variant="primary" size="sm" href="/unirme/" class="pb-join"><span class="pb-n">04</span> unirme</Button>
+        <slot name="right" />
+      </div>
+    </div>
+  </header>
+</div>
+
+<script>
+  import { initHeaderTheme } from '../scripts/header-theme';
+
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  if (header) initHeaderTheme(header);
+</script>
