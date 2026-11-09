@@ -1,14 +1,17 @@
 ---
-// Inicio: portada (H4.1), panel del próximo evento (H4.2) y Qué hacemos (H4.3). El resto llega en H4.4.
+// Inicio: portada (H4.1), panel del próximo evento (H4.2) y Qué hacemos (H4.3). Próximos eventos (H4.4).
 import { getCollection } from 'astro:content';
 import HeaderChip from '../components/HeaderChip.astro';
 import Hero from '../components/home/Hero.astro';
 import NextEvent from '../components/home/NextEvent.astro';
+import UpcomingEvents from '../components/home/UpcomingEvents.astro';
 import WhatWeDo from '../components/home/WhatWeDo.astro';
 import Base from '../layouts/Base.astro';
 import { nextEvent } from '../lib/events';
+import { upcomingRows } from '../lib/upcoming';
 
 const events = (await getCollection('events')).map((e) => ({ ...e.data, id: e.id }));
+const rows = upcomingRows(events, new Date());
 const next = nextEvent(events, new Date()) as ((typeof events)[number] & { date: Date }) | undefined;
 ---
 
@@ -19,5 +22,6 @@ const next = nextEvent(events, new Date()) as ((typeof events)[number] & { date:
       <NextEvent event={next} />
     </Hero>
     <WhatWeDo />
+    <UpcomingEvents rows={rows} />
   </main>
 </Base>

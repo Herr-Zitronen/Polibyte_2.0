@@ -1,0 +1,26 @@
+---
+// Laboratorio: Próximos eventos con un fixture fijo de 6 próximos (más uno pasado) para H4.4.
+import UpcomingEvents from '../../components/home/UpcomingEvents.astro';
+import Base from '../../layouts/Base.astro';
+import { upcomingRows } from '../../lib/upcoming';
+
+const now = new Date('2026-11-09T12:00:00-05:00');
+const at = (s: string) => new Date(`${s}T00:00:00-05:00`);
+const base = { organizer: 'PoliByte', summary: 'Resumen del evento de prueba para el laboratorio.' };
+const fixture = [
+  { ...base, id: 'f', title: 'Fixture F', type: 'club' as const, date: at('2027-04-01') },
+  { ...base, id: 'b', title: 'Fixture B', type: 'competition' as const, organizer: 'Microsoft', date: at('2026-12-07') },
+  { ...base, id: 'old', title: 'Pasado', type: 'club' as const, date: at('2026-01-10') },
+  { ...base, id: 'a', title: 'Fixture A', type: 'club' as const, ally: 'GDG', date: at('2026-11-20') },
+  { ...base, id: 'd', title: 'Fixture D', type: 'club' as const, date: at('2027-02-15') },
+  { ...base, id: 'e', title: 'Fixture E', type: 'club' as const, date: at('2027-03-01') },
+  { ...base, id: 'c', title: 'Fixture C con un nombre bastante largo', type: 'competition' as const, organizer: 'IEEE', date: at('2027-01-12') },
+];
+const rows = upcomingRows(fixture, now);
+---
+
+<Base title="Laboratorio · Próximos eventos" noindex header={false}>
+  <main>
+    <UpcomingEvents rows={rows} />
+  </main>
+</Base>
