@@ -1,0 +1,14 @@
+/* DESIGN §3.7 · Franja de píxeles entre secciones. */
+.pb-div {
+  position: relative;
+  display: block;
+  line-height: 0;
+  overflow: clip;
+}
+
+.pb-div svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 36 / 4;
+}

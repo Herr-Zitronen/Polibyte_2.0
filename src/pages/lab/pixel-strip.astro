@@ -1,0 +1,17 @@
+---
+// Laboratorio de pruebas visuales (no enlazado, noindex).
+import PixelStrip from '../../components/PixelStrip.astro';
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="Laboratorio · Franja de píxeles" noindex>
+  <main>
+    <section class="pb-section" style="background: var(--pb-blue-800)" data-strip-above>
+      <div class="pb-container"><h1>Franja de píxeles</h1></div>
+    </section>
+    <PixelStrip seed={3} top="#1A2C78" bottom="#ECEFF6" />
+    <section class="pb-section pb-on-light" data-strip-below>
+      <div class="pb-container"><p>Sección clara</p></div>
+    </section>
+  </main>
+</Base>
