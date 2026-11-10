@@ -153,6 +153,12 @@
   animation: pb-ch 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* F4: si el respaldo fijó el titular (data-settled), las letras quedan en su sitio aunque la animación no haya terminado. */
+[data-settled] .pb-ch {
+  transform: none;
+  animation: none;
+}
+
 .pb-sub {
   display: flex;
   flex-direction: column;
