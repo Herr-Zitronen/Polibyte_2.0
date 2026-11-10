@@ -125,12 +125,12 @@ test.describe('diagnóstico de costes', () => {
 
 // A/B intercalado (3 rondas) de la base contra el blur original: el runner compartido es ruidoso,
 // así que solo se comparan medianas dentro de la misma corrida.
-test('A/B: blur recortado vs blur original (medianas)', async ({ browser }, info) => {
+test('A/B: blur de 2 capas vs sin blur (cota superior) (medianas)', async ({ browser }, info) => {
   test.skip(info.project.name === 'mobile-390', 'solo escritorio y portátil');
   test.setTimeout(180_000);
-  const fps: Record<string, number[]> = { recortado: [], original: [] };
+  const fps: Record<string, number[]> = { recortado: [], sinblur: [] };
   for (let i = 0; i < 3; i++) {
-    for (const [label, key] of [['recortado', 'base'], ['original', 'blur-original']] as const) {
+    for (const [label, key] of [['recortado', 'base'], ['sinblur', 'sin-backdrop-filter']] as const) {
       const ctx = await browser.newContext(info.project.use as BrowserContextOptions);
       const page = await ctx.newPage();
       fps[label]!.push((await measure(page, VARIANTS[key])).fps);
@@ -138,5 +138,5 @@ test('A/B: blur recortado vs blur original (medianas)', async ({ browser }, info
     }
   }
   const med = (a: number[]) => [...a].sort((x, y) => x - y)[1]!;
-  console.log(`[F5-AB] ${info.project.name} recortado=${JSON.stringify(fps.recortado)} mediana=${med(fps.recortado!)} | original=${JSON.stringify(fps.original)} mediana=${med(fps.original!)}`);
+  console.log(`[F5-AB] ${info.project.name} recortado=${JSON.stringify(fps.recortado)} mediana=${med(fps.recortado!)} | sinblur=${JSON.stringify(fps.sinblur)} mediana=${med(fps.sinblur!)}`);
 });

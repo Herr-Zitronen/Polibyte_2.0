@@ -23,13 +23,6 @@
   inset: 0;
 }
 
-.pb-blur > .l1 {
-  -webkit-backdrop-filter: blur(2px);
-  backdrop-filter: blur(2px);
-  -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 35%);
-  mask-image: linear-gradient(to top, transparent 0%, #000 35%);
-}
-
 .pb-blur > .l2 {
   /* Solo la franja visible (el 30 % inferior estaba enmascarado): mismo resultado, menos área a desenfocar. */
   bottom: 30%;
