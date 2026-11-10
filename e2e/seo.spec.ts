@@ -10,6 +10,8 @@ const publicPaths = async (request: APIRequestContext): Promise<string[]> => {
     const xml = await (await request.get(m)).text();
     paths.push(...[...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((x) => new URL(x[1]!).pathname));
   }
+  // Sin rutas, las pruebas de abajo pasarían sin revisar nada.
+  expect(paths.length, "el sitemap tiene rutas").toBeGreaterThan(0);
   return paths;
 };
 
@@ -37,9 +39,9 @@ test("cada página pública tiene título único y metadatos para compartir", as
     expect(await meta('meta[property="og:description"]'), path).toBeTruthy();
     expect(await meta('meta[property="og:image"]'), path).toMatch(/^https?:\/\/[^/]+\/og\/.+\.png$/);
     expect(await meta('meta[name="twitter:card"]'), path).toBe("summary_large_image");
-    expect(await page.locator('link[rel="canonical"]').getAttribute("href"), path).toMatch(
-      new RegExp(`^https?://[^/]+${path.replace(/\//g, "\/")}$`),
-    );
+    const canonical = await page.locator('link[rel="canonical"]').getAttribute("href");
+    expect(canonical, path).toMatch(/^https?:\/\//);
+    expect(new URL(canonical!).pathname, path).toBe(path);
   }
 });
 
