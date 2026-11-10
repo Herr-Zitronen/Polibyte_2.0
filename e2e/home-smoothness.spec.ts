@@ -104,7 +104,7 @@ const VARIANTS: Record<string, Variant> = {
   'blur-original': {
     css: `.pb-blur>.l2{bottom:0!important;-webkit-mask-image:linear-gradient(to top,transparent 30%,#000 65%)!important;mask-image:linear-gradient(to top,transparent 30%,#000 65%)!important}.pb-blur>.l3{bottom:0!important;-webkit-mask-image:linear-gradient(to top,transparent 60%,#000 100%)!important;mask-image:linear-gradient(to top,transparent 60%,#000 100%)!important}`,
   },
-  'sin-lenis': { js: `window.lenis&&window.lenis.destroy()` },
+  'sin-lenis': { js: `try{window.lenis&&window.lenis.destroy()}catch(e){}` },
   'sin-backdrop-filter': { css: `*{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}` },
   'sin-grano': { css: `.pb-grain{display:none!important}` },
   'sin-fondos-paralaje': { css: `.pb-par{display:none!important}` },
