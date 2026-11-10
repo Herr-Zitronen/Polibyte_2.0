@@ -26,3 +26,20 @@ test('la página /eventos/ incluye el archivo', async ({ page }) => {
   await page.goto('/eventos/');
   await expect(page.locator('#archivo .pb-year').first()).toBeVisible();
 });
+
+test('el año cabe en su columna sin tocar la línea vertical', async ({ page }) => {
+  test.skip(page.viewportSize()!.width <= 960, 'en móvil el año va apilado sobre sus filas');
+  await page.goto('/lab/archive/');
+  for (const yl of await page.locator('#archivo .pb-yl').all()) {
+    const { text, box } = await yl.evaluate((el) => {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      // El rango incluye la cruz decorativa (posición absoluta): solo cuenta el nodo de texto.
+      const node = [...el.childNodes].find((n) => n.nodeType === Node.TEXT_NODE && n.textContent!.trim())!;
+      range.selectNodeContents(node);
+      return { text: range.getBoundingClientRect().right, box: el.getBoundingClientRect().right };
+    });
+    // Debe quedar al menos 16 px entre el último dígito y la línea de la columna.
+    expect(box - text).toBeGreaterThanOrEqual(16);
+  }
+});

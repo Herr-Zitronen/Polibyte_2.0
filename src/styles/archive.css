@@ -48,7 +48,8 @@
 .pb-year {
   position: relative;
   display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
+  /* La columna crece con el ancho: Silkscreen a 60 px mide ~200 px y no cabía en 200 fijos. */
+  grid-template-columns: clamp(200px, 17vw, 260px) minmax(0, 1fr);
   border-top: 1px solid rgba(242, 244, 250, 0.5);
 }
 
