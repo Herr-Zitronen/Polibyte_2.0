@@ -1,0 +1,25 @@
+---
+// Sección Directiva (H7.1): grid de 6 columnas, cada tarjeta ocupa 2 → 3 arriba y 2 centradas abajo.
+import MemberCard from './MemberCard.astro';
+import { boardMembers, type BoardMember } from '../../lib/board';
+import '../../styles/team.css';
+
+interface Props {
+  members: BoardMember[];
+  period: string;
+}
+const { members, period } = Astro.props;
+---
+
+<section id="directiva" class="pb-board" aria-labelledby="directiva-h">
+  <div class="pb-board-bg" aria-hidden="true"><div class="pb-grain"></div></div>
+  <div class="pb-container pb-board-in">
+    <header class="pb-board-head">
+      <h2 id="directiva-h">Directiva</h2>
+      <span class="pb-board-period">periodo {period}</span>
+    </header>
+    <div class="pb-dir">
+      {boardMembers(members).map((m) => <MemberCard member={m} />)}
+    </div>
+  </div>
+</section>

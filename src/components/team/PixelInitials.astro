@@ -1,0 +1,13 @@
+---
+// Iniciales en pixel art (H7.1) para miembros sin foto.
+import { initials } from '../../lib/initials';
+import { pixelText } from '../../lib/pixel-font';
+
+interface Props { name: string }
+const { name } = Astro.props;
+const t = pixelText(initials(name));
+---
+
+<svg class="pb-ini" role="img" aria-label={`Iniciales de ${name}`} viewBox={`0 0 ${t.width} ${t.height}`} shape-rendering="crispEdges">
+  {t.cells.map((c) => <rect x={c.x} y={c.y} width="1.02" height="1.02" />)}
+</svg>

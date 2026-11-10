@@ -1,0 +1,39 @@
+---
+// Tarjeta de la directiva (H7.1). Foto o iniciales en pixel art; redes como enlaces simples iguales.
+import { Image } from 'astro:assets';
+import Panel from '../Panel.astro';
+import PixelInitials from './PixelInitials.astro';
+import { socialLinks, type BoardMember } from '../../lib/board';
+
+interface Props {
+  member: BoardMember;
+}
+const { member: m } = Astro.props;
+const links = socialLinks(m);
+---
+
+<Panel as="article" hoverPulse class="pb-mem">
+  <div class="pb-photo">
+    <span class="pb-shade" aria-hidden="true"></span>
+    {
+      m.photo ? (
+        <Image src={m.photo} alt={m.name} widths={[360, 720]} sizes="(max-width: 520px) 100vw, 360px" class="pb-pic" />
+      ) : (
+        <PixelInitials name={m.name} />
+      )
+    }
+  </div>
+  <div class="pb-memb">
+    <span class="pb-role">{m.role}</span>
+    <h3 class="pb-mname">{m.name}</h3>
+    {
+      links.length > 0 && (
+        <div class="pb-social">
+          {links.map((l) => (
+            <a class="pb-slink" href={l.href} target="_blank" rel="noopener noreferrer">{l.label}</a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</Panel>
