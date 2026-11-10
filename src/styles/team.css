@@ -54,7 +54,8 @@
   font-size: 13px;
 }
 
-/* 6 columnas, cada tarjeta ocupa 2: 3 arriba y 2 centradas abajo, todas iguales. */
+/* 6 columnas, cada tarjeta ocupa 2: 3 arriba y 2 centradas abajo, todas iguales.
+   nth-of-type (no nth-child): Astro emite el <script> de Panel dentro de la grilla. */
 .pb-dir {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -71,7 +72,7 @@
   background: rgba(12, 22, 80, 0.3);
 }
 
-.pb-mem:nth-child(4) {
+.pb-mem:nth-of-type(4) {
   grid-column: 2 / span 2;
 }
 
@@ -179,11 +180,11 @@
   }
 
   .pb-mem,
-  .pb-mem:nth-child(4) {
+  .pb-mem:nth-of-type(4) {
     grid-column: span 2;
   }
 
-  .pb-mem:nth-child(5) {
+  .pb-mem:nth-of-type(5) {
     grid-column: 2 / span 2;
   }
 }
@@ -194,8 +195,8 @@
   }
 
   .pb-mem,
-  .pb-mem:nth-child(4),
-  .pb-mem:nth-child(5) {
+  .pb-mem:nth-of-type(4),
+  .pb-mem:nth-of-type(5) {
     grid-column: auto;
   }
 }
