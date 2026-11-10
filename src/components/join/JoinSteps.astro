@@ -1,0 +1,37 @@
+---
+// Pasos del ingreso (design/Unirme.dc.html, sección clara).
+import Button from '../Button.astro';
+import '../../styles/join.css';
+
+interface Props {
+  formUrl: string;
+}
+const { formUrl } = Astro.props;
+const steps = [
+  { n: '01', title: 'Llenas el formulario', text: 'Con tus datos y lo que te interesa construir.' },
+  { n: '02', title: 'Te sumamos al grupo', text: 'Te escribimos y te agregamos al grupo del club.' },
+  { n: '03', title: 'Asistes a tu primera reunión', text: 'Tu ingreso se concreta cuando asistes a las reuniones presenciales del club.' },
+];
+---
+
+<section id="pasos" class="pb-section pb-on-light pb-join-steps" data-theme="light">
+  <div class="pb-container">
+    <h2 class="pb-join-steps__title">Cómo es el ingreso</h2>
+    <ol class="pb-steps">
+      {
+        steps.map((s) => (
+          <li class="pb-step">
+            <span class="pb-node" aria-hidden="true" />
+            <span class="pb-stepn" aria-hidden="true">{s.n}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+    <div class="pb-join-steps__actions">
+      <Button variant="primary" href={formUrl} external>Llenar formulario de ingreso</Button>
+      <Button variant="secondary" href="/">Volver al inicio</Button>
+    </div>
+  </div>
+</section>

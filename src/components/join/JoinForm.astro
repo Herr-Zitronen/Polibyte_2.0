@@ -1,0 +1,39 @@
+---
+// Portada de /unirme/ (design/Unirme.dc.html): titular + panel del formulario de ingreso.
+import Button from '../Button.astro';
+import GlassBackground from '../GlassBackground.astro';
+import Panel from '../Panel.astro';
+import '../../styles/tags.css';
+import '../../styles/join.css';
+
+interface Props {
+  formUrl: string;
+}
+const { formUrl } = Astro.props;
+---
+
+<section id="top" class="pb-glass pb-join-hero" data-bg>
+  <GlassBackground image="join" parallax="root" />
+  <div class="pb-content pb-container pb-join-hero__in">
+    <div class="pb-join-hero__head">
+      <span class="pb-join-kicker">Ingreso al club</span>
+      <h1 class="pb-join-h1">Únete al club.</h1>
+      <p class="pb-join-lead">Abierto a toda la carrera y a todo público. Solo necesitas ganas de construir con otros.</p>
+    </div>
+    <Panel id="formulario" class="pb-join-form" draw pulse>
+      <div class="pb-join-form__grid">
+        <div class="pb-join-form__copy">
+          <span class="pb-join-open"><span class="pb-dot" aria-hidden="true"></span>inscripciones abiertas</span>
+          <h2 class="pb-join-h2">Formulario de ingreso</h2>
+          <p>Toma pocos minutos. Con tus respuestas te contactamos para sumarte al club.</p>
+        </div>
+        <div class="pb-join-form__cta">
+          <Button variant="primary" href={formUrl} external class="lg">
+            Llenar formulario de ingreso<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2h8v8M12 2L2 12" fill="none" stroke="currentColor" stroke-width="1.6"></path></svg>
+          </Button>
+          <span class="pb-join-note">Se abre en Microsoft Forms, en otra pestaña.</span>
+        </div>
+      </div>
+    </Panel>
+  </div>
+</section>
