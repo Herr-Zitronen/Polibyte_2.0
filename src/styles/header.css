@@ -31,17 +31,21 @@
 }
 
 .pb-blur > .l2 {
+  /* Solo la franja visible (el 30 % inferior estaba enmascarado): mismo resultado, menos área a desenfocar. */
+  bottom: 30%;
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
-  -webkit-mask-image: linear-gradient(to top, transparent 30%, #000 65%);
-  mask-image: linear-gradient(to top, transparent 30%, #000 65%);
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 50%);
+  mask-image: linear-gradient(to top, transparent 0%, #000 50%);
 }
 
 .pb-blur > .l3 {
+  /* Solo el 40 % superior (el resto estaba enmascarado). */
+  bottom: 60%;
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
-  -webkit-mask-image: linear-gradient(to top, transparent 60%, #000 100%);
-  mask-image: linear-gradient(to top, transparent 60%, #000 100%);
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 100%);
+  mask-image: linear-gradient(to top, transparent 0%, #000 100%);
 }
 
 .pb-blur > .tint-dark {
