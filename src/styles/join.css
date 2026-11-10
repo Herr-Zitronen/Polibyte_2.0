@@ -25,7 +25,7 @@
 .pb-step + .pb-step { padding-left: 32px; border-left: 1px solid rgba(19, 32, 90, 0.3); }
 .pb-step .pb-node { position: absolute; left: 0; top: 0; width: 12px; height: 12px; margin: -6px 0 0 -6px; background: var(--pb-ink); }
 .pb-stepn { font-family: var(--pb-font-pixel); font-weight: 700; font-size: 56px; line-height: 0.85; }
-.pb-step h3 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.04em; }
+.pb-step h3 { margin: 0; line-height: 1.15; font-size: 24px; font-weight: 700; letter-spacing: -0.04em; }
 .pb-step p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--pb-muted-light); }
 .pb-join-steps__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 72px; }
 
