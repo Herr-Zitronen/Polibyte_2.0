@@ -1,8 +1,9 @@
 ---
-// /equipo/ · H7.1 Directiva. El tutor y el resto de la página llegan con H7.2.
+// /equipo/ · H7.1 Directiva y H7.2 Tutor responsable.
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Board from '../../components/team/Board.astro';
+import Tutor from '../../components/team/Tutor.astro';
 import site from '../../content/site.json';
 
 const members = (await getCollection('members')).map((m) => m.data);
@@ -17,5 +18,6 @@ const members = (await getCollection('members')).map((m) => m.data);
       </div>
     </section>
     <Board members={members} period={site.period} />
+    <Tutor members={members} />
   </main>
 </Base>
