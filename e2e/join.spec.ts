@@ -1,6 +1,11 @@
 // H8.1 · Unirme: formulario. No depende de fechas: usa la página real.
 import { expect, test } from "@playwright/test";
-import site from "../src/content/site.json";
+import { readFileSync } from "node:fs";
+
+// Se lee como texto: Node exige atributo de importación para JSON y Playwright no lo propaga.
+const site = JSON.parse(
+  readFileSync(new URL("../src/content/site.json", import.meta.url), "utf8"),
+) as { joinFormUrl: string };
 
 test("el botón del formulario abre site.joinFormUrl en otra pestaña segura", async ({
   page,
