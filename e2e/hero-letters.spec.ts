@@ -1,7 +1,8 @@
 // F4 · Titular de Inicio sin letras perdidas: pase lo que pase, a los ~3 s el h1 está completo.
 import { expect, test, type Page } from "@playwright/test";
 
-const TITLE = "Construimos software. Y a quienes lo construyen.";
+// Los espacios no son .pb-ch: se comparan solo las letras.
+const LETTERS = "Construimos software. Y a quienes lo construyen.".replace(/ /g, "");
 
 const letters = (page: Page) =>
   page.evaluate(() => {
@@ -28,7 +29,7 @@ test("si el decodificado y la animación CSS no terminan, igual se fija el titul
     .poll(async () => (await letters(page)).hidden, { timeout: 5000 })
     .toBe(0);
   const { text } = await letters(page);
-  expect(text.replace(/\s+/g, " ").trim()).toBe(TITLE);
+  expect(text).toBe(LETTERS);
   await expect(page.locator("[data-decode]")).toHaveAttribute("data-decoded", "");
 });
 
@@ -42,5 +43,5 @@ test("scroll rápido durante la entrada y regreso: titular completo", async ({ p
   }
   await page.evaluate(() => window.scrollTo(0, 0));
   await expect.poll(async () => (await letters(page)).hidden, { timeout: 8000 }).toBe(0);
-  expect((await letters(page)).text.replace(/\s+/g, " ").trim()).toBe(TITLE);
+  expect((await letters(page)).text).toBe(LETTERS);
 });
