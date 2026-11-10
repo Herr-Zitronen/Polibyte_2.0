@@ -1,0 +1,25 @@
+---
+// Detalle de evento (H6.1). Una página por evento en el build; slug inexistente → 404.
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import EventDetail from '../../components/event/EventDetail.astro';
+import Base from '../../layouts/Base.astro';
+import { eventPaths } from '../../lib/event-detail';
+
+export async function getStaticPaths() {
+  return eventPaths(await getCollection('events'));
+}
+
+interface Props {
+  entry: CollectionEntry<'events'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<Base title={`${entry.data.title} · Eventos · PoliByte`} description={entry.data.summary}>
+  <main>
+    <EventDetail event={entry.data} now={new Date()}><Content /></EventDetail>
+  </main>
+</Base>

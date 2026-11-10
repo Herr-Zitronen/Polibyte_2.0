@@ -49,11 +49,26 @@ const columns = (page: import('@playwright/test').Page) =>
 test('a 1000 px la fila sigue en columnas; a 960 se apila', async ({ page }) => {
   await page.setViewportSize({ width: 1000, height: 900 });
   await page.goto('/lab/calendar/');
-  expect(await columns(page)).toBe(4);
+  expect(await columns(page)).toBe(5);
   await page.setViewportSize({ width: 960, height: 900 });
   expect(await columns(page)).toBe(2);
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await columns(page)).toBe(2);
+});
+
+test('cada fila enlaza a su detalle con "Ver detalles" (secundario sm)', async ({ page }) => {
+  await page.goto('/eventos/');
+  const rows = page.locator('#calendario .pb-urow');
+  await expect(rows).not.toHaveCount(0);
+  for (const r of await rows.all()) {
+    const link = r.getByRole('link', { name: 'Ver detalles' });
+    await expect(link).toHaveClass(/pb-b2/);
+    await expect(link).toHaveClass(/(^| )sm( |$)/);
+    await expect(link).toHaveAttribute('href', /^\/eventos\/[a-z0-9-]+\/$/);
+  }
+  await rows.first().getByRole('link', { name: 'Ver detalles' }).click();
+  await expect(page).toHaveURL(/\/eventos\/[a-z0-9-]+\/$/);
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 });
 
 test('en /eventos/ el calendario va antes del archivo', async ({ page }) => {

@@ -64,7 +64,7 @@
 
 .pb-urow {
   display: grid;
-  grid-template-columns: 96px minmax(0, 1fr) minmax(0, 0.6fr) auto;
+  grid-template-columns: 96px minmax(0, 1fr) minmax(0, 0.6fr) auto auto;
   gap: 24px;
   align-items: center;
   padding: 26px 8px;
@@ -145,7 +145,8 @@
   }
 
   .pb-uplace,
-  .pb-ustat {
+  .pb-ustat,
+  .pb-ulink {
     grid-column: 2;
     justify-self: start;
   }

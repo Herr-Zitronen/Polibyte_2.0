@@ -2,6 +2,7 @@
 // Calendario con filtros (DESIGN §5, design/Eventos.dc.html #calendario). La lógica vive en lib/filter.ts;
 // la isla calendar-filter.ts solo oculta filas. Sin JS se ven todas.
 import type { CalendarRow } from '../../lib/filter';
+import Button from '../Button.astro';
 import Cross from '../Cross.astro';
 import LiveLine from '../LiveLine.astro';
 import Status from '../Status.astro';
@@ -53,6 +54,9 @@ const filters = [
             </div>
             <span class="pb-uplace">{r.place}</span>
             <span class="pb-ustat"><Status status={r.status} /></span>
+            <span class="pb-ulink">
+              <Button variant="secondary" size="sm" href={`/eventos/${r.id}/`}>Ver detalles</Button>
+            </span>
           </li>
         ))}
       </ul>

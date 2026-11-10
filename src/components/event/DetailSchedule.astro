@@ -1,0 +1,30 @@
+---
+// Cronograma (design/EventoDetalle.dc.html #cronograma). Fondo claro.
+interface Props {
+  items: { date: string; title: string; detail: string }[];
+}
+
+const { items } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <section id="cronograma" class="pb-on-light pb-dsched">
+      <div class="pb-dsched__bg" aria-hidden="true"><div class="pb-grain" /></div>
+      <div class="pb-container pb-dsched__wrap">
+        <h2 class="pb-dh2">Cronograma</h2>
+        <ol class="pb-sched">
+          {items.map((s) => (
+            <li class="pb-srow">
+              <span class="pb-srow__date">{s.date}</span>
+              <div class="pb-srow__body">
+                <h3>{s.title}</h3>
+                <p>{s.detail}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )
+}

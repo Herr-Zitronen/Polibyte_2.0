@@ -1,0 +1,43 @@
+---
+// Detalle completo de un evento. El "ahora" llega como prop: la página real pasa la hora del build
+// y los laboratorios (/lab/event-detail/*) un reloj fijo, para que las pruebas no caduquen.
+import type { EventData } from '../../content/schemas';
+import { detailTiming, keyFacts, showRegistration } from '../../lib/event-detail';
+import { typeLine } from '../../lib/events';
+import { longDate } from '../../lib/next-event-view';
+import DetailAbout from './DetailAbout.astro';
+import DetailHero from './DetailHero.astro';
+import DetailRegistration from './DetailRegistration.astro';
+import DetailSchedule from './DetailSchedule.astro';
+import '../../styles/event-detail.css';
+
+interface Props {
+  event: EventData;
+  now: Date;
+}
+
+const { event: e, now } = Astro.props;
+const registration = showRegistration(e, now);
+---
+
+<DetailHero
+  title={e.title}
+  typeLine={typeLine(e)}
+  date={e.date}
+  place={e.place}
+  mode={e.mode}
+  timing={detailTiming(e, now)}
+  now={now}
+  registration={registration}
+/>
+<DetailAbout pitch={e.pitch} summary={e.summary} facts={keyFacts(e)}><slot /></DetailAbout>
+<DetailSchedule items={e.schedule} />
+{
+  registration && e.registrationUrl && (
+    <DetailRegistration
+      url={e.registrationUrl}
+      type={e.type}
+      deadline={e.registrationDeadline && longDate(e.registrationDeadline)}
+    />
+  )
+}
