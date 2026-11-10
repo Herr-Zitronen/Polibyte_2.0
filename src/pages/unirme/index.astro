@@ -1,15 +1,14 @@
 ---
-// Página provisional (H2.1): la completa su historia del backlog.
+// /unirme/ · H8.1. La URL del formulario vive en site.json (cambiarla no toca código).
 import Base from '../../layouts/Base.astro';
+import JoinForm from '../../components/join/JoinForm.astro';
+import JoinSteps from '../../components/join/JoinSteps.astro';
+import site from '../../content/site.json';
 ---
 
-<Base title="Unirme · PoliByte" description="Cómo ser parte de PoliByte.">
+<Base title="Unirme · PoliByte" description="Cómo ser parte de PoliByte: formulario de ingreso, grupo y primera reunión presencial.">
   <main>
-    <section class="pb-section pb-page-top">
-      <div class="pb-container">
-        <h1>Unirme</h1>
-        <p>Cómo ser parte de PoliByte.</p>
-      </div>
-    </section>
+    <JoinForm formUrl={site.joinFormUrl} />
+    <JoinSteps formUrl={site.joinFormUrl} />
   </main>
 </Base>
