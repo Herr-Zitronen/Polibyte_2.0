@@ -14,6 +14,8 @@ async function rgbAt(page: Page, x: number, y: number): Promise<number[]> {
 
 test('la franja empalma con ambas secciones sin costura', async ({ page }) => {
   await page.goto('/lab/pixel-strip/');
+  // El grano (0,6) varía cada píxel: aquí se mide solo la geometría del color plano.
+  await page.addStyleTag({ content: '.pb-grain{display:none!important}' });
   const strip = page.locator('.pb-div');
   await strip.scrollIntoViewIfNeeded();
   const box = (await strip.boundingBox())!;

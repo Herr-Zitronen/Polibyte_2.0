@@ -4,10 +4,12 @@
 import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
 import GlassBackground from '../components/GlassBackground.astro';
+import PixelStrip from '../components/PixelStrip.astro';
+import { EDGE } from '../lib/pixel-strip';
 import '../styles/not-found.css';
 ---
 
-<Base title="Página no encontrada · PoliByte" description="Esta página no existe." noindex>
+<Base title="Página no encontrada · PoliByte" description="Esta página no existe." noindex cover="hero">
   <main>
     <section id="top" class="pb-glass pb-nf" data-bg>
       <GlassBackground image="hero" parallax="root" />
@@ -22,5 +24,6 @@ import '../styles/not-found.css';
         </div>
       </div>
     </section>
+    <PixelStrip seed={191} top={EDGE.cover} bottom={EDGE.footer} />
   </main>
 </Base>

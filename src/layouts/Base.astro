@@ -7,9 +7,17 @@ import Seo from '../components/Seo.astro';
 import { assertContentIntegrity } from '../content/integrity';
 import '../styles/global.css';
 import '../styles/transitions.css';
+// `?url` pasa por el mismo pipeline de Vite que los `url()` del CSS: misma ruta con hash, sin doble descarga.
+import heroBg from '../assets/backgrounds/chimborazo-hero.webp?url';
+import joinBg from '../assets/backgrounds/chimborazo-join.webp?url';
+import recapBg from '../assets/backgrounds/chimborazo-recap.webp?url';
+
+const COVERS = { hero: heroBg, join: joinBg, recap: recapBg } as const;
 
 interface Props {
   title: string;
+  /** Fondo de la portada de la página: se precarga para que no aparezca a media transición. */
+  cover?: keyof typeof COVERS;
   description?: string;
   noindex?: boolean;
   /** Las páginas de laboratorio lo apagan para que sus capturas no dependan de la barra. */
@@ -18,7 +26,11 @@ interface Props {
 
 await assertContentIntegrity();
 
-const { title, description = 'PoliByte · Club de la Carrera de Software (ESPOCH)', noindex = false, header = true } = Astro.props;
+const { title, cover, description = 'PoliByte · Club de la Carrera de Software (ESPOCH)', noindex = false, header = true } = Astro.props;
+// Prerender de la página siguiente (Chromium): la transición arranca con ella ya renderizada. Fuera /lab/.
+const speculation = JSON.stringify({
+  prerender: [{ where: { and: [{ href_matches: '/*' }, { not: { href_matches: '/lab/*' } }] }, eagerness: 'moderate' }],
+});
 ---
 
 <!doctype html>
@@ -29,6 +41,8 @@ const { title, description = 'PoliByte · Club de la Carrera de Software (ESPOCH
     <Seo title={title} description={description} />
     {noindex && <meta name="robots" content="noindex" />}
     <Fonts />
+    {cover && <link rel="preload" as="image" href={COVERS[cover]} />}
+    {header && <script type="speculationrules" is:inline set:html={speculation} />}
   </head>
   <body>
     {

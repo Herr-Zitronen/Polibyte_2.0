@@ -5,15 +5,30 @@ import Base from '../../layouts/Base.astro';
 import Board from '../../components/team/Board.astro';
 import TeamHero from '../../components/team/TeamHero.astro';
 import Tutor from '../../components/team/Tutor.astro';
+import PixelStrip from '../../components/PixelStrip.astro';
 import site from '../../content/site.json';
+import { EDGE } from '../../lib/pixel-strip';
+import { findTutor } from '../../lib/tutor';
 
 const members = (await getCollection('members')).map((m) => m.data);
+const hasTutor = Boolean(findTutor(members));
 ---
 
-<Base title="Equipo · PoliByte" description="Directiva y tutor del club.">
+<Base title="Equipo · PoliByte" description="Directiva y tutor del club." cover="join">
   <main>
     <TeamHero period={site.period} />
+    <PixelStrip seed={131} top={EDGE.cover} bottom={EDGE.navy} />
     <Board members={members} period={site.period} />
-    <Tutor members={members} />
+    {
+      hasTutor ? (
+        <>
+          <PixelStrip seed={137} top={EDGE.navy} bottom={EDGE.paper} />
+          <Tutor members={members} />
+          <PixelStrip seed={149} top={EDGE.paper} bottom={EDGE.footer} />
+        </>
+      ) : (
+        <PixelStrip seed={137} top={EDGE.navy} bottom={EDGE.footer} />
+      )
+    }
   </main>
 </Base>

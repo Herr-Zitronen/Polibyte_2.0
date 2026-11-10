@@ -81,6 +81,16 @@
   background: linear-gradient(180deg, transparent, var(--pb-fade-to, var(--pb-blue-750)));
 }
 
+/* Degradado desde sólido en el borde superior: empalma con la franja que viene de arriba. */
+.pb-fade-top {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 240px;
+  background: linear-gradient(180deg, var(--pb-fade-from), transparent);
+}
+
 /* Una sola capa de grano por sección, siempre arriba. */
 .pb-grain {
   position: absolute;

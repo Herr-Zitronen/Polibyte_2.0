@@ -1,6 +1,7 @@
 ---
 // Pasos del ingreso (design/Unirme.dc.html, sección clara).
 import Button from '../Button.astro';
+import '../../styles/glass.css';
 import '../../styles/join.css';
 
 interface Props {
@@ -15,6 +16,7 @@ const steps = [
 ---
 
 <section id="pasos" class="pb-section pb-on-light pb-join-steps" data-theme="light">
+  <div class="pb-grain" aria-hidden="true"></div>
   <div class="pb-container">
     <h2 class="pb-join-steps__title" data-reveal>Cómo es el ingreso</h2>
     <ol class="pb-steps">

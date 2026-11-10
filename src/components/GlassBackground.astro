@@ -9,17 +9,24 @@ interface Props {
   parallax?: 'root' | 'view';
   /** Color sólido del borde inferior (debe coincidir con la franja). */
   fadeTo?: string;
+  /** Color sólido del borde superior (secciones que vienen después de una franja). */
+  fadeFrom?: string;
   grainOpacity?: number;
 }
 
-const { image, parallax = 'view', fadeTo = 'var(--pb-blue-750)', grainOpacity = 0.6 } = Astro.props;
+const { image, parallax = 'view', fadeTo = 'var(--pb-blue-750)', fadeFrom, grainOpacity = 0.6 } = Astro.props;
 ---
 
-<div class="pb-bg" aria-hidden="true" style={`--pb-fade-to: ${fadeTo}; --pb-grain-opacity: ${grainOpacity}`}>
+<div
+  class="pb-bg"
+  aria-hidden="true"
+  style={`--pb-fade-to: ${fadeTo}; --pb-grain-opacity: ${grainOpacity}${fadeFrom ? `; --pb-fade-from: ${fadeFrom}` : ''}`}
+>
   <div class={`pb-par far img-${image} ${parallax}`}></div>
   <div class={`pb-par near ${parallax}`}></div>
   <div class="pb-sheen"></div>
   <div class="pb-reed"></div>
   <div class="pb-fade"></div>
+  {fadeFrom && <div class="pb-fade-top"></div>}
   <div class="pb-grain" aria-hidden="true"></div>
 </div>

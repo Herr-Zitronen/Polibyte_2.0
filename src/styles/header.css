@@ -23,22 +23,18 @@
   inset: 0;
 }
 
+/* Una sola capa de blur con máscara progresiva (antes eran dos: 6 y 12 px). El backdrop-filter es lo más caro
+   del scroll; se apaga mientras la barra está sobre una portada (data-blur="off"), donde el fondo ya es un nevado difuminado. */
 .pb-blur > .l2 {
-  /* Solo la franja visible (el 30 % inferior estaba enmascarado): mismo resultado, menos área a desenfocar. */
-  bottom: 30%;
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 50%);
-  mask-image: linear-gradient(to top, transparent 0%, #000 50%);
+  bottom: 20%;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 70%);
+  mask-image: linear-gradient(to top, transparent 0%, #000 70%);
 }
 
-.pb-blur > .l3 {
-  /* Solo el 40 % superior (el resto estaba enmascarado). */
-  bottom: 60%;
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 100%);
-  mask-image: linear-gradient(to top, transparent 0%, #000 100%);
+.pb-hdr[data-blur='off'] .pb-blur > .l2 {
+  visibility: hidden;
 }
 
 .pb-blur > .tint-dark {
