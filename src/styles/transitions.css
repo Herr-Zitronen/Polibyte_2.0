@@ -1,0 +1,66 @@
+/* H2.4 · Transiciones entre páginas (DESIGN §4.1) y apariciones al hacer scroll.
+   View Transitions nativas entre documentos: cero JS, el navegador anima.
+   pb-header (.pb-bar-in) y pb-navcur viven en header.css; pb-evtitle en next-event.css y event-detail.css. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: pb-vt-out 0.22s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(root) {
+  animation: pb-vt-in 0.32s cubic-bezier(0, 0, 0.2, 1) 0.06s both;
+}
+
+::view-transition-group(pb-navcur),
+::view-transition-group(pb-evtitle) {
+  animation-duration: 0.45s;
+  animation-timing-function: var(--pb-ease-out);
+}
+
+@keyframes pb-vt-out {
+  to { opacity: 0; }
+}
+
+@keyframes pb-vt-in {
+  from { opacity: 0; }
+}
+
+/* Aparición al entrar en pantalla, ligada al scroll (sin JS). */
+@supports (animation-timeline: view()) {
+  [data-reveal] {
+    animation: pb-reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 24%;
+  }
+}
+
+@keyframes pb-reveal {
+  from { opacity: 0; transform: translateY(70px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Lenis: el documento conserva su altura natural mientras Lenis gobierna el scroll. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+
+  [data-reveal] {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

@@ -58,4 +58,19 @@ describe('reglas de CSS', () => {
     expect(glass!.css).toMatch(/\.pb-glass\s*\{[^}]*overflow:\s*clip/);
     expect(glass!.css).not.toMatch(/overflow(-[xy])?\s*:\s*hidden/);
   });
+
+  it('el bloque prefers-reduced-motion es el último de cada hoja de estilos', () => {
+    for (const { f, css } of all) {
+      const at = css.lastIndexOf('@media (prefers-reduced-motion');
+      if (at < 0) continue;
+      let depth = 0;
+      let i = css.indexOf('{', at);
+      for (; i < css.length; i++) {
+        if (css[i] === '{') depth++;
+        else if (css[i] === '}' && --depth === 0) break;
+      }
+      const rest = css.slice(i + 1).replace(/\/\*[\s\S]*?\*\//g, '').trim();
+      expect(rest, `${f}: hay CSS después de prefers-reduced-motion`).toBe('');
+    }
+  });
 });

@@ -1,0 +1,18 @@
+---
+// Laboratorio H2.4: panel del próximo evento con un fixture fijo (Imagine Cup), para probar que
+// su título comparte view-transition-name con el h1 de /lab/event-detail/upcoming/.
+import NextEvent from '../../components/home/NextEvent.astro';
+import Base from '../../layouts/Base.astro';
+import { detailEvents } from '../../lib/event-detail-fixtures';
+
+// Fecha lejana: el panel solo se pinta si el evento es futuro.
+const event = { ...detailEvents.upcoming, id: 'imagine-cup', date: new Date('2099-12-05T00:00:00-05:00') };
+---
+
+<Base title="Laboratorio · Transiciones" noindex header={false}>
+  <main>
+    <section class="pb-section">
+      <NextEvent event={event} />
+    </section>
+  </main>
+</Base>

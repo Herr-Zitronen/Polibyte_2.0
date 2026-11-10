@@ -6,6 +6,7 @@ import Footer from '../components/Footer.astro';
 import Seo from '../components/Seo.astro';
 import { assertContentIntegrity } from '../content/integrity';
 import '../styles/global.css';
+import '../styles/transitions.css';
 
 interface Props {
   title: string;
@@ -40,5 +41,9 @@ const { title, description = 'PoliByte · Club de la Carrera de Software (ESPOCH
     {header && <MobileMenu />}
     <slot />
     {header && <Footer />}
+    <script>
+      import { initLenis } from '../scripts/lenis';
+      initLenis();
+    </script>
   </body>
 </html>

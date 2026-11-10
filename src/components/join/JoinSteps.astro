@@ -16,11 +16,11 @@ const steps = [
 
 <section id="pasos" class="pb-section pb-on-light pb-join-steps" data-theme="light">
   <div class="pb-container">
-    <h2 class="pb-join-steps__title">Cómo es el ingreso</h2>
+    <h2 class="pb-join-steps__title" data-reveal>Cómo es el ingreso</h2>
     <ol class="pb-steps">
       {
         steps.map((s) => (
-          <li class="pb-step">
+          <li class="pb-step" data-reveal>
             <span class="pb-node" aria-hidden="true" />
             <span class="pb-stepn" aria-hidden="true">{s.n}</span>
             <h3>{s.title}</h3>
