@@ -18,7 +18,7 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 ---
 
-<Base title={`${entry.data.title} · Eventos · PoliByte`} description={entry.data.summary}>
+<Base title={`${entry.data.title} · Eventos · PoliByte`} description={entry.data.summary} cover="recap">
   <main>
     <EventDetail event={entry.data} now={new Date()}><Content /></EventDetail>
   </main>

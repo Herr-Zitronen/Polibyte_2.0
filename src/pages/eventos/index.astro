@@ -5,8 +5,10 @@ import Calendar from '../../components/events/Calendar.astro';
 import Archive from '../../components/events/Archive.astro';
 import Recap from '../../components/events/Recap.astro';
 import Showcase from '../../components/events/Showcase.astro';
+import PixelStrip from '../../components/PixelStrip.astro';
 import Base from '../../layouts/Base.astro';
 import { archiveView } from '../../lib/archive';
+import { EDGE } from '../../lib/pixel-strip';
 import { calendarRows } from '../../lib/filter';
 import { recapView } from '../../lib/recap';
 import { showcaseLayout } from '../../lib/showcase';
@@ -21,11 +23,31 @@ const year = now.getFullYear();
 const showcase = view.kind === 'event' ? showcaseLayout(view.event, projects) : null;
 ---
 
-<Base title="Eventos · PoliByte" description="Calendario, archivo y proyectos del club.">
+<Base title="Eventos · PoliByte" description="Calendario, archivo y proyectos del club." cover="recap">
   <main>
     <Recap view={view} />
-    {showcase && view.kind === 'event' && <Showcase eventTitle={view.title} layout={showcase} />}
+    {
+      showcase && view.kind === 'event' ? (
+        <>
+          <PixelStrip seed={61} top={EDGE.cover} bottom={EDGE.navy} />
+          <Showcase eventTitle={view.title} layout={showcase} />
+          <PixelStrip seed={73} top={EDGE.navy} bottom={EDGE.paper} />
+        </>
+      ) : (
+        <PixelStrip seed={67} top={EDGE.cover} bottom={EDGE.paper} />
+      )
+    }
     <Calendar rows={calendar} span={`${year}–${year + 1}`} />
-    <Archive years={archive} />
+    {
+      archive.length > 0 ? (
+        <>
+          <PixelStrip seed={89} top={EDGE.paper} bottom={EDGE.image} />
+          <Archive years={archive} />
+          <PixelStrip seed={97} top={EDGE.archive} bottom={EDGE.footer} />
+        </>
+      ) : (
+        <PixelStrip seed={89} top={EDGE.paper} bottom={EDGE.footer} />
+      )
+    }
   </main>
 </Base>

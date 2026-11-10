@@ -1,6 +1,7 @@
 ---
 // Franja de píxeles: la lógica vive en src/lib/pixel-strip.ts; aquí solo se imprime.
 import { pixelStrip } from '../lib/pixel-strip';
+import '../styles/glass.css';
 import '../styles/pixel-strip.css';
 
 interface Props {
@@ -12,4 +13,7 @@ interface Props {
 const { seed, top, bottom } = Astro.props;
 ---
 
-<div class="pb-div" aria-hidden="true" data-seed={seed} set:html={pixelStrip({ seed, top, bottom })} />
+<div class="pb-div" aria-hidden="true" data-seed={seed}>
+  <Fragment set:html={pixelStrip({ seed, top, bottom })} />
+  {top !== 'transparent' && <div class="pb-grain" style="--pb-grain-opacity: 0.6"></div>}
+</div>

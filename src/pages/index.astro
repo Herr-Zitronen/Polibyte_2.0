@@ -7,8 +7,10 @@ import Hero from '../components/home/Hero.astro';
 import NextEvent from '../components/home/NextEvent.astro';
 import UpcomingEvents from '../components/home/UpcomingEvents.astro';
 import WhatWeDo from '../components/home/WhatWeDo.astro';
+import PixelStrip from '../components/PixelStrip.astro';
 import Base from '../layouts/Base.astro';
 import { nextEvent } from '../lib/events';
+import { EDGE } from '../lib/pixel-strip';
 import { upcomingRows } from '../lib/upcoming';
 
 const events = (await getCollection('events')).map((e) => ({ ...e.data, id: e.id }));
@@ -16,14 +18,17 @@ const rows = upcomingRows(events, new Date());
 const next = nextEvent(events, new Date()) as ((typeof events)[number] & { date: Date }) | undefined;
 ---
 
-<Base title="PoliByte · Club de la Carrera de Software">
+<Base title="PoliByte · Club de la Carrera de Software" cover="hero">
   {next && <HeaderChip slot="chip" title={next.title} date={next.date} time={next.time} />}
   <main>
     <Hero>
       <NextEvent event={next} />
     </Hero>
+    <PixelStrip seed={11} top={EDGE.cover} bottom={EDGE.paper} />
     <WhatWeDo />
     <UpcomingEvents rows={rows} />
+    <PixelStrip seed={37} top={EDGE.navy} bottom={EDGE.image} />
     <JoinCta />
+    <PixelStrip seed={51} top={EDGE.cover} bottom={EDGE.footer} />
   </main>
 </Base>
