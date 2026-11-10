@@ -135,7 +135,8 @@
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.06em;
-  text-shadow: 0 2px 40px rgba(15, 26, 77, 0.35);
+  /* F5: la sombra grande se pinta cuando el texto ya no cambia (data-decoded), no en cada cuadro del decodificado. */
+  text-shadow: none;
 }
 
 .pb-word {
@@ -145,6 +146,10 @@
   padding: 0.2em 0.02em 0.14em;
   vertical-align: top;
   white-space: nowrap;
+}
+
+.pb-h1[data-decoded] {
+  text-shadow: 0 2px 40px rgba(15, 26, 77, 0.35);
 }
 
 .pb-ch {
