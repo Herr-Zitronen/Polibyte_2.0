@@ -1,0 +1,22 @@
+---
+// Portada de /equipo/ (design/Equipo.dc.html #top): vidrio, kicker con el período, titular y texto.
+import GlassBackground from '../GlassBackground.astro';
+import '../../styles/glass.css';
+import '../../styles/team-hero.css';
+
+interface Props {
+  period: string;
+}
+const { period } = Astro.props;
+---
+
+<section id="top" class="pb-glass pb-teamhero" data-bg>
+  <GlassBackground image="join" parallax="root" />
+  <div class="pb-content pb-container pb-teamhero__in">
+    <div class="pb-teamhero__head">
+      <span class="pb-teamhero__kicker">Directiva {period}</span>
+      <h1 class="pb-teamhero__h1">Las personas detrás del club.</h1>
+      <p>Estudiantes de la carrera que organizan los eventos, preparan a los equipos y mantienen viva la comunidad.</p>
+    </div>
+  </div>
+</section>
