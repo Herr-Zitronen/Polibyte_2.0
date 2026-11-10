@@ -25,9 +25,19 @@ export default defineConfig({
     name,
     use: { ...devices['Desktop Chrome'], viewport },
   })),
-  webServer: {
-    command: 'npm run preview',
-    url: 'http://localhost:4321',
-    reuseExistingServer: !process.env['CI'],
-  },
+  webServer: [
+    {
+      command: 'npm run preview',
+      url: 'http://localhost:4321',
+      reuseExistingServer: !process.env['CI'],
+    },
+    {
+      // Cloudflare en local (sin cuenta ni secretos): prueba códigos de estado reales (H9.2).
+      command: 'npx wrangler dev --port 8787 --ip 127.0.0.1',
+      url: 'http://localhost:8787',
+      reuseExistingServer: !process.env['CI'],
+      env: { WRANGLER_SEND_METRICS: 'false' },
+      timeout: 120_000,
+    },
+  ],
 });
