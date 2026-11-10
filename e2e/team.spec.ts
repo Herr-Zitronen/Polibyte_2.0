@@ -97,5 +97,7 @@ test("captura de la directiva", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/equipo/");
   await page.evaluate(() => document.fonts.ready);
+  // La barra fija se superpone al recorte según el scroll: se oculta para una captura estable.
+  await page.addStyleTag({ content: ".pb-hdr { display: none !important; }" });
   await expect(page.locator("#directiva")).toHaveScreenshot("directiva.png");
 });
