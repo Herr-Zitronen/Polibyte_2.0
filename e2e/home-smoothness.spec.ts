@@ -1,0 +1,84 @@
+// F5 · Fluidez y carga de Inicio: presupuesto medido con CDP (CPU ×4). Solo corre en Actions.
+// Mide: LCP, tareas largas tras la carga y fotogramas durante un scroll programado.
+// El informe completo se imprime y se adjunta a la prueba (ver `test-results`).
+import { expect, test, type Page } from '@playwright/test';
+
+const BUDGET = {
+  lcpMs: 1800, // meta de WOR-91 (margen 10 % sobre los 2,0 s de Lighthouse)
+  maxLongTaskMs: 50, // sin tareas > 50 ms tras la carga
+  minFpsDesktop: 55, // media durante el scroll en escritorio
+  minFpsMobile: 30,
+};
+
+interface Report {
+  lcp: number;
+  longTasksAfterLoad: { start: number; duration: number }[];
+  loadAt: number;
+  fps: number;
+  worstFrameMs: number;
+  droppedPct: number;
+  frames: number;
+}
+
+async function measure(page: Page): Promise<Report> {
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+  await page.addInitScript(() => {
+    const w = window as unknown as { __m: { lcp: number; long: { start: number; duration: number }[] } };
+    w.__m = { lcp: 0, long: [] };
+    new PerformanceObserver((l) => {
+      for (const e of l.getEntries()) w.__m.lcp = e.startTime;
+    }).observe({ type: 'largest-contentful-paint', buffered: true });
+    new PerformanceObserver((l) => {
+      for (const e of l.getEntries()) w.__m.long.push({ start: e.startTime, duration: e.duration });
+    }).observe({ type: 'longtask', buffered: true });
+  });
+  await page.goto('/', { waitUntil: 'load' });
+  // Deja pasar la entrada del titular y la carga ociosa de Lenis.
+  await page.waitForTimeout(3500);
+  const loadAt = await page.evaluate(() => performance.timing.loadEventEnd - performance.timing.navigationStart);
+
+  // Scroll programado de arriba abajo en ~4 s, midiendo cada fotograma con rAF.
+  const scroll = await page.evaluate(async () => {
+    const total = document.documentElement.scrollHeight - innerHeight;
+    const dur = 4000;
+    const stamps: number[] = [];
+    await new Promise<void>((done) => {
+      const t0 = performance.now();
+      const tick = (t: number) => {
+        stamps.push(t);
+        const p = Math.min((t - t0) / dur, 1);
+        scrollTo(0, total * p);
+        if (p < 1) requestAnimationFrame(tick);
+        else done();
+      };
+      requestAnimationFrame(tick);
+    });
+    const deltas = stamps.slice(1).map((t, i) => t - stamps[i]!);
+    return { deltas };
+  });
+  const { deltas } = scroll;
+  const sum = deltas.reduce((a, b) => a + b, 0);
+  const m = await page.evaluate(() => (window as unknown as { __m: { lcp: number; long: { start: number; duration: number }[] } }).__m);
+  const longs = m.long.filter((t) => t.start > loadAt && t.start < loadAt + 3500 && t.duration > BUDGET.maxLongTaskMs);
+  return {
+    lcp: Math.round(m.lcp),
+    longTasksAfterLoad: longs,
+    loadAt: Math.round(loadAt),
+    fps: Math.round((deltas.length / sum) * 1000 * 10) / 10,
+    worstFrameMs: Math.round(Math.max(...deltas)),
+    droppedPct: Math.round((deltas.filter((d) => d > 20).length / deltas.length) * 1000) / 10,
+    frames: deltas.length,
+  };
+}
+
+test('Inicio cumple el presupuesto de fluidez y carga (CPU ×4)', async ({ page }, info) => {
+  const isMobile = info.project.name === 'mobile-390';
+  const r = await measure(page);
+  const line = `[F5] ${info.project.name} ${JSON.stringify(r)}`;
+  console.log(line);
+  await info.attach('smoothness-report.json', { body: JSON.stringify(r, null, 2), contentType: 'application/json' });
+  expect.soft(r.lcp, `LCP ${r.lcp} ms (presupuesto ${BUDGET.lcpMs})`).toBeLessThanOrEqual(BUDGET.lcpMs);
+  expect.soft(r.longTasksAfterLoad, 'tareas largas tras la carga').toEqual([]);
+  expect.soft(r.fps, `fps medio ${r.fps}`).toBeGreaterThanOrEqual(isMobile ? BUDGET.minFpsMobile : BUDGET.minFpsDesktop);
+});
