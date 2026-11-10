@@ -11,7 +11,6 @@ import '../styles/transitions.css';
 import heroBg from '../assets/backgrounds/chimborazo-hero.webp?url';
 import joinBg from '../assets/backgrounds/chimborazo-join.webp?url';
 import recapBg from '../assets/backgrounds/chimborazo-recap.webp?url';
-import monoFont from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
 
 const COVERS = { hero: heroBg, join: joinBg, recap: recapBg } as const;
 
@@ -42,7 +41,6 @@ const speculation = JSON.stringify({
     <Seo title={title} description={description} />
     {noindex && <meta name="robots" content="noindex" />}
     <Fonts />
-    <link rel="preload" as="font" type="font/woff2" href={monoFont} crossorigin />
     {cover && <link rel="preload" as="image" href={COVERS[cover]} />}
     {header && <script type="speculationrules" is:inline set:html={speculation} />}
   </head>
