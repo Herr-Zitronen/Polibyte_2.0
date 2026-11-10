@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { findTutor, mailtoHref } from './tutor';
 
-const m = (role: string, extra = {}) => ({ role, name: role, ...extra });
+type M = { role: string; name: string; title?: string };
+const m = (role: string, extra: Partial<M> = {}): M => ({ role, name: role, ...extra });
 
 describe('findTutor', () => {
   it('devuelve el miembro con rol Tutor', () => {
