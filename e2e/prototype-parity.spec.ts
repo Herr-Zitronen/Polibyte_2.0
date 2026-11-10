@@ -5,17 +5,22 @@ import { expect, test } from "@playwright/test";
 
 const read = (f: string) => readFileSync(new URL(`../design/${f}.dc.html`, import.meta.url), "utf8");
 
-/** Prototipo → página real (el detalle usa el fixture completo de /lab/). */
+/** Prototipo → página real. */
 const PAIRS: Record<string, string> = {
   Main: "/",
   Eventos: "/eventos/",
-  EventoDetalle: "/lab/event-detail/upcoming/",
+  EventoDetalle: "/eventos/imagine-cup-2027/",
   Equipo: "/equipo/",
   Unirme: "/unirme/",
   NoEncontrado: "/no-existe/",
 };
 /** Secciones condicionales (dependen de los datos): se aceptan si existen en su fixture de /lab/. */
-const FIXTURE: Record<string, string> = { recap: "/lab/recap/", destacados: "/lab/showcase/" };
+const FIXTURE: Record<string, string> = {
+  recap: "/lab/recap/",
+  destacados: "/lab/showcase/",
+  cronograma: "/lab/event-detail/upcoming/",
+  inscripcion: "/lab/event-detail/upcoming/",
+};
 
 const sectionIds = (html: string) =>
   [...html.matchAll(/<(?:section|footer|main)\b[^>]*\sid="([^"]+)"/g)].map((m) => m[1]!);
