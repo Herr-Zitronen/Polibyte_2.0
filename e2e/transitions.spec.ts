@@ -78,10 +78,11 @@ test.describe("con movimiento reducido", () => {
   });
 
   test("capturas con movimiento reducido", async ({ page }) => {
-    for (const [name, p] of [["inicio", "/"], ["unirme", "/unirme/"]] as const) {
+    // Solo páginas que no dependen de la fecha (Inicio cambia cada día con la cuenta regresiva).
+    for (const [name, p] of [["equipo", "/equipo/"], ["unirme", "/unirme/"]] as const) {
       await page.goto(p);
       await page.evaluate(() => document.fonts.ready);
-      await expect(page).toHaveScreenshot(`${name}-reduced.png`, { fullPage: true, mask: [page.locator("[data-countdown]")] });
+      await expect(page).toHaveScreenshot(`${name}-reduced.png`, { fullPage: true });
     }
   });
 });
