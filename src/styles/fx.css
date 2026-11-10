@@ -274,6 +274,11 @@
   animation: pb-xg 10s linear 4.8s infinite;
 }
 
+.pb-hl.is-off::after,
+.pb-vl.is-off::after {
+  animation-play-state: paused;
+}
+
 /* Fuera de pantalla (o sin hover en .pb-hp) las animaciones infinitas quedan en pausa. */
 .pb-fx.is-off .pb-e::after,
 .pb-fx.is-off .pb-x > i,
