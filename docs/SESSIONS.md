@@ -41,8 +41,24 @@ Lee CLAUDE.md, docs/SESSIONS.md y el issue WOR-XX de Linear (proyecto PoliByte 2
 Crea la rama indicada en el issue desde staging. Escribe primero las pruebas y muéstrame que fallan
 (Vitest local; E2E/Lighthouse solo en GitHub Actions, nunca en mi laptop). Implementa hasta verde,
 refactoriza y abre el PR hacia staging. Pregúntame antes de cada push.
+Si la prueba depende de la fecha, usa fixtures con reloj fijo en /lab/ (no el contenido real).
+Espera a que la corrida en rojo termine en Actions antes del siguiente push (un push nuevo la cancela).
 Al terminar, actualiza el issue con lo aprendido y muévelo a Done.
 ```
+
+## Pruebas con fixtures en `/lab/`
+Una prueba **no debe caducar** porque pase el tiempo ni depender del contenido real (que cambia).
+- **Datos**: `src/lib/<tema>-fixtures.ts`, con una fecha fija exportada (por ejemplo `DETAIL_NOW = 2026-11-09`). La lógica pura recibe "ahora" como parámetro, nunca llama a `new Date()` por dentro.
+- **Página**: `src/pages/lab/<tema>.astro`, con `noindex` y sin cabecera. Una página por estado (próximo, pasado, por confirmar, sin foto…).
+- **Pruebas**: las unitarias (Vitest) usan los mismos fixtures; las E2E abren `/lab/…` y no la página real.
+- **Cuándo no hace falta**: si lo probado no depende de fechas ni de contenido variable, basta la página real (ej. el layout de la directiva).
+- **Cuidado con Astro**: el `<script>` de un componente se emite dentro del contenedor donde aparece primero. Usa `:nth-of-type`, no `:nth-child`, en cuadrículas de componentes con script.
+
+## Rojo y verde en Actions
+- **Rojo** = las pruebas fallan porque aún no existe el código. Es la prueba de que sirven.
+- **Verde** = pasan tras implementar.
+- Actions tarda ~5 min y **un push nuevo cancela la corrida anterior de la rama**: espera a que termine la corrida en rojo antes del siguiente push.
+- Las capturas base nuevas salen como artefacto (`playwright-report`): descárgalas, revísalas y versiónalas en `e2e/*-snapshots`.
 
 ## Orden recomendado (respeta dependencias)
 | Sprint | Issues |
