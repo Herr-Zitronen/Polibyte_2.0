@@ -1,0 +1,43 @@
+/* /unirme/ (design/Unirme.dc.html) */
+.pb-join-hero { position: relative; overflow: clip; display: flow-root; }
+.pb-join-hero__in { position: relative; padding-top: 168px; padding-bottom: 112px; }
+.pb-join-hero__head { display: flex; flex-direction: column; gap: 28px; max-width: 980px; }
+.pb-join-kicker { font-family: var(--pb-font-pixel); font-size: 15px; }
+.pb-join-h1 { margin: 0; font-weight: 800; font-size: var(--pb-fs-page); letter-spacing: -0.075em; line-height: 0.94; }
+.pb-join-lead { margin: 0; max-width: 600px; font-size: 18px; line-height: 1.6; }
+
+.pb-join-form { margin-top: 72px; background: rgba(12, 22, 80, 0.32); }
+.pb-join-form__grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+.pb-join-form__grid > div { padding: 44px; }
+.pb-join-form__cta {
+  border-left: 1px solid rgba(242, 244, 250, 0.28);
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 14px;
+}
+.pb-join-open { font-family: var(--pb-font-pixel); font-size: 13px; display: inline-flex; align-items: center; gap: 12px; }
+.pb-join-h2 { margin: 18px 0 14px; font-weight: 800; font-size: clamp(26px, 3.6vw, 52px); letter-spacing: -0.06em; line-height: 1; }
+.pb-join-form__copy p { margin: 0; max-width: 460px; font-size: 16px; line-height: 1.6; }
+.pb-join-note { font-size: 13px; opacity: 0.85; }
+.pb-b1.lg > .pb-b1__box { padding: 20px 28px; font-size: 17px; }
+
+.pb-join-steps__title { margin: 0 0 72px; font-weight: 800; font-size: var(--pb-fs-section); letter-spacing: -0.075em; line-height: 0.95; }
+.pb-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--pb-ink); }
+.pb-step { position: relative; padding: 48px 32px 0 0; display: flex; flex-direction: column; gap: 14px; }
+.pb-step + .pb-step { padding-left: 32px; border-left: 1px solid rgba(19, 32, 90, 0.3); }
+.pb-step .pb-node { position: absolute; left: 0; top: 0; width: 12px; height: 12px; margin: -6px 0 0 -6px; background: var(--pb-ink); }
+.pb-stepn { font-family: var(--pb-font-pixel); font-weight: 700; font-size: 56px; line-height: 0.85; }
+.pb-step h3 { margin: 0; line-height: 1.15; font-size: 24px; font-weight: 700; letter-spacing: -0.04em; }
+.pb-step p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--pb-muted-light); }
+.pb-join-steps__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 72px; }
+
+/* Dos columnas: se apilan en un punto de quiebre explícito. */
+@media (max-width: 960px) {
+  .pb-join-form__grid { grid-template-columns: 1fr; }
+  .pb-join-form__grid > div { padding: 28px 20px; }
+  .pb-join-form__cta { border-left: 0; border-top: 1px solid rgba(242, 244, 250, 0.28); }
+  .pb-steps { grid-template-columns: 1fr; border-top: 0; border-left: 1px solid var(--pb-ink); }
+  .pb-step, .pb-step + .pb-step { padding: 0 0 40px 28px; border-left: 0; }
+  .pb-step .pb-node { left: -1px; top: 4px; }
+}
+@media (max-width: 820px) {
+  .pb-join-hero__in { padding-top: 120px; padding-bottom: 80px; }
+}
