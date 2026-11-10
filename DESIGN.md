@@ -131,7 +131,7 @@ Cursor light (C) en cada fila. La fila seleccionada es un poco más clara, con b
 - Fija arriba, de lado a lado, altura 0 en el flujo (no empuja la página).
 - Tres columnas: logo | 01 club · 02 eventos · 03 equipo (centrado siempre) | 04 unirme (botón primario pequeño).
 - Solo en Inicio, al pasar el panel del próximo evento aparece un **chip** a la izquierda de "unirme" (barrido de máscara + dígitos que suben). Oculto en ≤1180.
-- **Blur progresivo** de 2 capas (6px → 16px; se quitó la de 2px en F5 por coste de scroll) con máscaras escalonadas, 92px de alto, y un tinte. Sobre secciones claras el tinte y el texto cambian a tema claro (botón invertido).
+- **Blur progresivo** de 2 capas (6px → 12px; se quitó la de 2px en F5 por coste de scroll) con máscaras escalonadas, 92px de alto, y un tinte. Sobre secciones claras el tinte y el texto cambian a tema claro (botón invertido).
 - **Importante:** ningún ancestro del blur puede tener `view-transition-name` (lo convierte en "backdrop root" y el blur deja de verse). El nombre de transición va en la fila de contenido, no en el contenedor.
 - Celular (≤820): logo + "unirme" + botón de menú; el menú abre una hoja a pantalla completa con vidrio y links grandes numerados.
 
