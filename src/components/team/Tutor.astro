@@ -1,0 +1,60 @@
+---
+// Sección Tutor responsable (H7.2, design/Equipo.dc.html #tutor). Sin tutor no se renderiza.
+import { Image } from 'astro:assets';
+import Cross from '../Cross.astro';
+import TagPair from '../TagPair.astro';
+import Tag from '../Tag.astro';
+import PixelInitials from './PixelInitials.astro';
+import { findTutor, mailtoHref } from '../../lib/tutor';
+import type { BoardMember } from '../../lib/board';
+import '../../styles/tutor.css';
+
+type TutorMember = BoardMember & {
+  title?: string | undefined;
+  faculty?: string | undefined;
+  about?: string | undefined;
+  email?: string | undefined;
+};
+interface Props {
+  members: TutorMember[];
+}
+const t = findTutor(Astro.props.members);
+---
+
+{
+  t && (
+    <section id="tutor" class="pb-tutor-s pb-on-light" aria-labelledby="tutor-h">
+      <div class="pb-grain" aria-hidden="true" />
+      <div class="pb-container pb-tutor-in">
+        <div class="pb-tutor-rule">
+          <Cross x="0" y="0" />
+          <Cross x="100%" y="0" />
+          <div class="pb-tutor">
+            <div class="pb-tutor-photo">
+              {t.photo ? (
+                <Image src={t.photo} alt={t.name} widths={[300, 600]} sizes="300px" class="pb-pic" />
+              ) : (
+                <PixelInitials name={t.name} />
+              )}
+            </div>
+            <div class="pb-tutor-body">
+              <span class="pb-tutor-kicker">Tutor responsable</span>
+              <h2 id="tutor-h">{t.name}</h2>
+              {t.title && t.faculty ? (
+                <TagPair label={t.title} pill={t.faculty} />
+              ) : (
+                (t.title || t.faculty) && <Tag>{t.title ?? t.faculty}</Tag>
+              )}
+              {t.about && <p class="pb-tutor-about">{t.about}</p>}
+              {t.email && (
+                <a class="pb-tutor-mail" href={mailtoHref(t.email)}>
+                  {t.email}
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}

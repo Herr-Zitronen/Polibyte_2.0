@@ -1,0 +1,22 @@
+---
+// Laboratorio H7.2: directiva mínima + tutor con todos los datos.
+import Base from '../../layouts/Base.astro';
+import Board from '../../components/team/Board.astro';
+import Tutor from '../../components/team/Tutor.astro';
+
+const members = [
+  { role: 'Presidencia', name: 'María José Pérez' },
+  {
+    role: 'Tutor',
+    name: 'Carlos Ramírez',
+    title: 'Docente titular',
+    faculty: 'Facultad de Informática y Electrónica',
+    about: 'Acompaña a la directiva y avala las actividades.',
+    email: 'tutor@example.com',
+  },
+];
+---
+
+<Base title="Laboratorio · Tutor" noindex header={false}>
+  <main><Board members={members} period="2026–2027" /><Tutor members={members} /></main>
+</Base>
