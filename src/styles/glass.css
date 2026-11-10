@@ -28,7 +28,6 @@
   inset: -180px 0;
   background-repeat: no-repeat;
   background-size: cover;
-  will-change: transform;
 }
 
 .pb-par.far.img-hero {

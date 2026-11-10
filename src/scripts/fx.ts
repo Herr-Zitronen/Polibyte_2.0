@@ -49,6 +49,15 @@ export function initFx(): void {
   );
   for (const el of panels) io.observe(el);
 
+  // F5: el hero y las líneas vivas pausan sus animaciones infinitas fuera de pantalla.
+  const live = document.querySelectorAll<HTMLElement>('.pb-hero, .pb-hl, .pb-vl');
+  if (live.length) {
+    const liveIo = new IntersectionObserver((entries) => {
+      for (const e of entries) e.target.classList.toggle('is-off', !e.isIntersecting);
+    });
+    live.forEach((el) => liveIo.observe(el));
+  }
+
   // C: sin cursor (táctil) no se registra nada.
   if (reduce || !matchMedia('(hover: hover)').matches) return;
   let px = 0;

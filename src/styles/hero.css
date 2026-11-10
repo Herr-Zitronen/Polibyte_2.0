@@ -368,6 +368,16 @@
   }
 }
 
+/* F5: barridos y pulsos infinitos esperan a que el titular termine y se pausan fuera de pantalla (fx.ts). */
+@media (prefers-reduced-motion: no-preference) {
+  .pb-hero:not(:has([data-decoded])) .pb-flow::after,
+  .pb-hero:not(:has([data-decoded])) .pb-node,
+  .pb-hero.is-off .pb-flow::after,
+  .pb-hero.is-off .pb-node {
+    animation-play-state: paused;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pb-line,
   .pb-vline,
