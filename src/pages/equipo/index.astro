@@ -1,6 +1,11 @@
 ---
-// Página provisional (H2.1): la completa su historia del backlog.
+// /equipo/ · H7.1 Directiva. El tutor y el resto de la página llegan con H7.2.
+import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import Board from '../../components/team/Board.astro';
+import site from '../../content/site.json';
+
+const members = (await getCollection('members')).map((m) => m.data);
 ---
 
 <Base title="Equipo · PoliByte" description="Directiva y tutor del club.">
@@ -11,5 +16,6 @@ import Base from '../../layouts/Base.astro';
         <p>Directiva y tutor del club.</p>
       </div>
     </section>
+    <Board members={members} period={site.period} />
   </main>
 </Base>
