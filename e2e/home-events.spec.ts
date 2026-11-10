@@ -36,7 +36,7 @@ for (const how of ['click', 'Enter'] as const) {
 test('en Inicio la sección existe y enlaza al calendario', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#calendario')).toBeVisible();
-  await expect(page.locator('#calendario').getByRole('link', { name: 'Calendario completo' }).first()).toHaveAttribute('href', '/eventos/');
+  await expect(page.locator('#calendario').getByRole('link', { name: 'Calendario completo' }).first()).toHaveAttribute('href', '/eventos/#calendario');
 });
 
 test('961–1200 px: columnas sin encimarse y la fecha bajo el nombre', async ({ page }) => {

@@ -2,6 +2,7 @@
 // Inicio: portada (H4.1), panel del próximo evento (H4.2) y Qué hacemos (H4.3). Próximos eventos (H4.4).
 import { getCollection } from 'astro:content';
 import HeaderChip from '../components/HeaderChip.astro';
+import JoinCta from '../components/home/JoinCta.astro';
 import Hero from '../components/home/Hero.astro';
 import NextEvent from '../components/home/NextEvent.astro';
 import UpcomingEvents from '../components/home/UpcomingEvents.astro';
@@ -23,5 +24,6 @@ const next = nextEvent(events, new Date()) as ((typeof events)[number] & { date:
     </Hero>
     <WhatWeDo />
     <UpcomingEvents rows={rows} />
+    <JoinCta />
   </main>
 </Base>
