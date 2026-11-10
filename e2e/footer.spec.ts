@@ -8,13 +8,9 @@ test('wordmark sólido: color #252D4F, opacidad 1 y cruce "yt" sin mancha', asyn
   await expect(base).toHaveAttribute('fill', '#252D4F');
   await expect(page.locator('.pb-foot .pb-lamp')).toHaveCSS('opacity', '1');
   await expect(page.locator('.pb-foot .pb-lamp .pb-lamp__base')).toHaveCSS('opacity', '1');
-  const lamp = page.locator('.pb-foot .pb-lamp');
-  await lamp.scrollIntoViewIfNeeded();
-  const box = (await lamp.boundingBox())!;
-  // "yt" de "PoliByte" ocupa aprox. el 48–72 % del ancho del viewBox.
-  await expect(page).toHaveScreenshot('footer-yt.png', {
-    clip: { x: box.x + box.width * 0.44, y: box.y, width: box.width * 0.3, height: box.height },
-  });
+  // Captura del elemento completo: Playwright espera a que su caja deje de moverse y hace el scroll.
+  // Antes se recortaba con una caja medida a mano; si la página seguía asentándose, el recorte cambiaba de tamaño.
+  await expect(page.locator('.pb-foot .pb-lamp')).toHaveScreenshot('footer-lamp.png');
 });
 
 test('textos del pie y fondo #0D1438', async ({ page }) => {
