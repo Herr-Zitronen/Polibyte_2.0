@@ -3,6 +3,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Board from '../../components/team/Board.astro';
+import TeamHero from '../../components/team/TeamHero.astro';
 import Tutor from '../../components/team/Tutor.astro';
 import site from '../../content/site.json';
 
@@ -11,12 +12,7 @@ const members = (await getCollection('members')).map((m) => m.data);
 
 <Base title="Equipo · PoliByte" description="Directiva y tutor del club.">
   <main>
-    <section class="pb-section pb-page-top">
-      <div class="pb-container">
-        <h1>Equipo</h1>
-        <p>Directiva y tutor del club.</p>
-      </div>
-    </section>
+    <TeamHero period={site.period} />
     <Board members={members} period={site.period} />
     <Tutor members={members} />
   </main>
