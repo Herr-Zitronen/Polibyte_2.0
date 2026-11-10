@@ -12,9 +12,7 @@ const stallDecode = (page: Page) =>
   });
 
 test.describe('Inicio: animaciones y carga', () => {
-  test.beforeEach((_args, info) => {
-    test.skip(info.project.name === 'mobile-390', 'las líneas del marco del hero son de escritorio');
-  });
+  test.skip(({ viewport }) => (viewport?.width ?? 0) < 600, 'las líneas del marco del hero son de escritorio');
 
   test('los barridos del hero esperan a que termine el titular', async ({ page }) => {
     await stallDecode(page);
