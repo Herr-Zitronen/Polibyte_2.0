@@ -3,8 +3,8 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const PAGES = ["/", "/eventos/", "/equipo/", "/unirme/", "/eventos/imagine-cup-2027/"];
-const vtn = (page: Page, sel: string) =>
-  page.locator(sel).first().evaluate((el) => getComputedStyle(el).viewTransitionName);
+const vtn = (page: Page, sel: string, pseudo?: string) =>
+  page.locator(sel).first().evaluate((el, ps) => getComputedStyle(el, ps).viewTransitionName, pseudo ?? null);
 const evTitles = (page: Page) =>
   page.evaluate(
     () => [...document.querySelectorAll("body *")].filter((el) => getComputedStyle(el).viewTransitionName === "pb-evtitle").length,
@@ -16,7 +16,8 @@ test("View Transitions entre documentos: barra quieta y subrayado que se desliza
   expect(css).toContain("@view-transition{navigation:auto");
   expect(await vtn(page, ".pb-bar-in")).toBe("pb-header");
   test.skip(page.viewportSize()!.width < 821, "el menú de escritorio se oculta en móvil");
-  expect(await vtn(page, '.pb-nav a[aria-current="page"]')).toBe("pb-navcur");
+  // El nombre va en el subrayado (::after) del enlace actual: es lo que se desliza al link nuevo.
+  expect(await vtn(page, '.pb-nav a[aria-current="page"]', "::after")).toBe("pb-navcur");
 });
 
 test("el título del evento viaja del panel de Inicio al h1 del detalle", async ({ page }) => {
@@ -55,7 +56,12 @@ test.describe("con movimiento reducido", () => {
               (r) =>
                 r instanceof CSSMediaRule &&
                 /prefers-reduced-motion:\s*reduce/.test(r.conditionText) &&
-                /::view-transition-[\s\S]*animation:\s*none/.test(r.cssText),
+                [...r.cssRules].some(
+                  (x) =>
+                    x instanceof CSSStyleRule &&
+                    x.selectorText.includes("::view-transition-group(*)") &&
+                    x.style.getPropertyValue("animation-name") === "none",
+                ),
             );
           } catch {
             return false;
