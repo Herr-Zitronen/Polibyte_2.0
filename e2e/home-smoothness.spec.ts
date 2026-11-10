@@ -20,7 +20,12 @@ interface Report {
   frames: number;
 }
 
-async function measure(page: Page): Promise<Report> {
+interface Variant {
+  css?: string;
+  js?: string;
+}
+
+async function measure(page: Page, variant: Variant = {}): Promise<Report> {
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   await page.addInitScript(() => {
@@ -36,6 +41,9 @@ async function measure(page: Page): Promise<Report> {
   await page.goto('/', { waitUntil: 'load' });
   // Deja pasar la entrada del titular y la carga ociosa de Lenis.
   await page.waitForTimeout(3500);
+  if (variant.css) await page.addStyleTag({ content: variant.css });
+  if (variant.js) await page.evaluate(variant.js);
+  await page.waitForTimeout(300);
   const loadAt = await page.evaluate(() => performance.timing.loadEventEnd - performance.timing.navigationStart);
 
   // Scroll programado de arriba abajo en ~4 s, midiendo cada fotograma con rAF.
@@ -81,4 +89,32 @@ test('Inicio cumple el presupuesto de fluidez y carga (CPU ×4)', async ({ page 
   expect.soft(r.lcp, `LCP ${r.lcp} ms (presupuesto ${BUDGET.lcpMs})`).toBeLessThanOrEqual(BUDGET.lcpMs);
   expect.soft(r.longTasksAfterLoad, 'tareas largas tras la carga').toEqual([]);
   expect.soft(r.fps, `fps medio ${r.fps}`).toBeGreaterThanOrEqual(isMobile ? BUDGET.minFpsMobile : BUDGET.minFpsDesktop);
+});
+
+// Diagnóstico (no falla): cuánto cuesta cada ingrediente. Apaga uno a uno y compara los fps del scroll.
+const VARIANTS: Record<string, Variant> = {
+  base: {},
+  'sin-animaciones-infinitas': {
+    js: `document.getAnimations().filter(a=>a.effect&&a.effect.getComputedTiming().iterations===Infinity).forEach(a=>a.cancel())`,
+  },
+  'sin-scroll-timelines': {
+    js: `document.getAnimations().filter(a=>a.timeline&&a.timeline!==document.timeline).forEach(a=>a.cancel())`,
+  },
+  'sin-lenis': { js: `window.lenis&&window.lenis.destroy()` },
+  'sin-backdrop-filter': { css: `*{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}` },
+  'sin-grano': { css: `.pb-grain{display:none!important}` },
+  'sin-fondos-paralaje': { css: `.pb-par{display:none!important}` },
+  'sin-sombras': { css: `*{text-shadow:none!important;box-shadow:none!important}` },
+  'sin-content-visibility': { css: `*{content-visibility:visible!important}` },
+  'sin-will-change': { css: `*{will-change:auto!important}` },
+};
+
+test.describe('diagnóstico de costes', () => {
+  test.skip(({}, info) => info.project.name === 'mobile-390', 'solo escritorio y portátil');
+  for (const [name, variant] of Object.entries(VARIANTS)) {
+    test(`variante: ${name}`, async ({ page }, info) => {
+      const r = await measure(page, variant);
+      console.log(`[F5-DIAG] ${info.project.name} ${name} fps=${r.fps} dropped=${r.droppedPct}% worst=${r.worstFrameMs}ms long=${r.longTasksAfterLoad.length}`);
+    });
+  }
 });
