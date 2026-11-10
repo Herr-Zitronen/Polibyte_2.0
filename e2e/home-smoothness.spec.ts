@@ -110,9 +110,9 @@ const VARIANTS: Record<string, Variant> = {
 };
 
 test.describe('diagnóstico de costes', () => {
-  test.skip(({}, info) => info.project.name === 'mobile-390', 'solo escritorio y portátil');
   for (const [name, variant] of Object.entries(VARIANTS)) {
     test(`variante: ${name}`, async ({ page }, info) => {
+      test.skip(info.project.name === 'mobile-390', 'solo escritorio y portátil');
       const r = await measure(page, variant);
       console.log(`[F5-DIAG] ${info.project.name} ${name} fps=${r.fps} dropped=${r.droppedPct}% worst=${r.worstFrameMs}ms long=${r.longTasksAfterLoad.length}`);
     });
