@@ -1,0 +1,142 @@
+// F5 · Fluidez y carga de Inicio: presupuesto medido con CDP (CPU ×4). Solo corre en Actions.
+// Mide: LCP, tareas largas tras la carga y fotogramas durante un scroll programado.
+// El informe completo se imprime y se adjunta a la prueba (ver `test-results`).
+import { expect, test, type BrowserContextOptions, type Page } from '@playwright/test';
+
+const BUDGET = {
+  lcpMs: 1800, // meta de WOR-91 (margen 10 % sobre los 2,0 s de Lighthouse)
+  maxLongTaskMs: 50, // sin tareas > 50 ms tras la carga
+  minFpsDesktop: 55, // media durante el scroll en escritorio
+  minFpsMobile: 30,
+};
+
+interface Report {
+  lcp: number;
+  longTasksAfterLoad: { start: number; duration: number }[];
+  loadAt: number;
+  fps: number;
+  worstFrameMs: number;
+  droppedPct: number;
+  frames: number;
+}
+
+interface Variant {
+  css?: string;
+  js?: string;
+}
+
+async function measure(page: Page, variant: Variant = {}): Promise<Report> {
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+  await page.addInitScript(() => {
+    const w = window as unknown as { __m: { lcp: number; long: { start: number; duration: number }[] } };
+    w.__m = { lcp: 0, long: [] };
+    new PerformanceObserver((l) => {
+      for (const e of l.getEntries()) w.__m.lcp = e.startTime;
+    }).observe({ type: 'largest-contentful-paint', buffered: true });
+    new PerformanceObserver((l) => {
+      for (const e of l.getEntries()) w.__m.long.push({ start: e.startTime, duration: e.duration });
+    }).observe({ type: 'longtask', buffered: true });
+  });
+  await page.goto('/', { waitUntil: 'load' });
+  // Deja pasar la entrada del titular y la carga ociosa de Lenis.
+  await page.waitForTimeout(3500);
+  if (variant.css) await page.addStyleTag({ content: variant.css });
+  if (variant.js) await page.evaluate(variant.js);
+  await page.waitForTimeout(300);
+  const loadAt = await page.evaluate(() => performance.timing.loadEventEnd - performance.timing.navigationStart);
+
+  // Scroll programado de arriba abajo en ~4 s, midiendo cada fotograma con rAF.
+  const scroll = await page.evaluate(async () => {
+    const total = document.documentElement.scrollHeight - innerHeight;
+    const dur = 4000;
+    const stamps: number[] = [];
+    await new Promise<void>((done) => {
+      const t0 = performance.now();
+      const tick = (t: number) => {
+        stamps.push(t);
+        const p = Math.min((t - t0) / dur, 1);
+        scrollTo(0, total * p);
+        if (p < 1) requestAnimationFrame(tick);
+        else done();
+      };
+      requestAnimationFrame(tick);
+    });
+    const deltas = stamps.slice(1).map((t, i) => t - stamps[i]!);
+    return { deltas };
+  });
+  const { deltas } = scroll;
+  const sum = deltas.reduce((a, b) => a + b, 0);
+  const m = await page.evaluate(() => (window as unknown as { __m: { lcp: number; long: { start: number; duration: number }[] } }).__m);
+  const longs = m.long.filter((t) => t.start > loadAt && t.start < loadAt + 3500 && t.duration > BUDGET.maxLongTaskMs);
+  return {
+    lcp: Math.round(m.lcp),
+    longTasksAfterLoad: longs,
+    loadAt: Math.round(loadAt),
+    fps: Math.round((deltas.length / sum) * 1000 * 10) / 10,
+    worstFrameMs: Math.round(Math.max(...deltas)),
+    droppedPct: Math.round((deltas.filter((d) => d > 20).length / deltas.length) * 1000) / 10,
+    frames: deltas.length,
+  };
+}
+
+test('Inicio cumple el presupuesto de fluidez y carga (CPU ×4)', async ({ page }, info) => {
+  const isMobile = info.project.name === 'mobile-390';
+  const r = await measure(page);
+  const line = `[F5] ${info.project.name} ${JSON.stringify(r)}`;
+  console.log(line);
+  await info.attach('smoothness-report.json', { body: JSON.stringify(r, null, 2), contentType: 'application/json' });
+  expect.soft(r.lcp, `LCP ${r.lcp} ms (presupuesto ${BUDGET.lcpMs})`).toBeLessThanOrEqual(BUDGET.lcpMs);
+  expect.soft(r.longTasksAfterLoad, 'tareas largas tras la carga').toEqual([]);
+  expect.soft(r.fps, `fps medio ${r.fps}`).toBeGreaterThanOrEqual(isMobile ? BUDGET.minFpsMobile : BUDGET.minFpsDesktop);
+});
+
+// Diagnóstico (no falla): cuánto cuesta cada ingrediente. Apaga uno a uno y compara los fps del scroll.
+const VARIANTS: Record<string, Variant> = {
+  base: {},
+  'sin-animaciones-infinitas': {
+    js: `document.getAnimations().filter(a=>a.effect&&a.effect.getComputedTiming().iterations===Infinity).forEach(a=>a.cancel())`,
+  },
+  'sin-scroll-timelines': {
+    js: `document.getAnimations().filter(a=>a.timeline&&a.timeline!==document.timeline).forEach(a=>a.cancel())`,
+  },
+  // A/B en la misma corrida: restaura las capas de blur a pantalla completa (versión previa a F5).
+  'blur-original': {
+    css: `.pb-blur>.l2{bottom:0!important;-webkit-mask-image:linear-gradient(to top,transparent 30%,#000 65%)!important;mask-image:linear-gradient(to top,transparent 30%,#000 65%)!important}.pb-blur>.l3{bottom:0!important;-webkit-mask-image:linear-gradient(to top,transparent 60%,#000 100%)!important;mask-image:linear-gradient(to top,transparent 60%,#000 100%)!important}`,
+  },
+  'sin-lenis': { js: `window.lenis&&window.lenis.destroy()` },
+  'sin-backdrop-filter': { css: `*{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}` },
+  'sin-grano': { css: `.pb-grain{display:none!important}` },
+  'sin-fondos-paralaje': { css: `.pb-par{display:none!important}` },
+  'sin-sombras': { css: `*{text-shadow:none!important;box-shadow:none!important}` },
+  'sin-content-visibility': { css: `*{content-visibility:visible!important}` },
+  'sin-will-change': { css: `*{will-change:auto!important}` },
+};
+
+test.describe('diagnóstico de costes', () => {
+  for (const [name, variant] of Object.entries(VARIANTS)) {
+    test(`variante: ${name}`, async ({ page }, info) => {
+      test.skip(info.project.name === 'mobile-390', 'solo escritorio y portátil');
+      const r = await measure(page, variant);
+      console.log(`[F5-DIAG] ${info.project.name} ${name} fps=${r.fps} dropped=${r.droppedPct}% worst=${r.worstFrameMs}ms long=${r.longTasksAfterLoad.length}`);
+    });
+  }
+});
+
+// A/B intercalado (3 rondas) de la base contra el blur original: el runner compartido es ruidoso,
+// así que solo se comparan medianas dentro de la misma corrida.
+test('A/B: blur de 2 capas vs sin blur (cota superior) (medianas)', async ({ browser }, info) => {
+  test.skip(info.project.name === 'mobile-390', 'solo escritorio y portátil');
+  test.setTimeout(180_000);
+  const fps: Record<string, number[]> = { recortado: [], sinblur: [] };
+  for (let i = 0; i < 3; i++) {
+    for (const [label, key] of [['recortado', 'base'], ['sinblur', 'sin-backdrop-filter']] as const) {
+      const ctx = await browser.newContext(info.project.use as BrowserContextOptions);
+      const page = await ctx.newPage();
+      fps[label]!.push((await measure(page, VARIANTS[key])).fps);
+      await ctx.close();
+    }
+  }
+  const med = (a: number[]) => [...a].sort((x, y) => x - y)[1]!;
+  console.log(`[F5-AB] ${info.project.name} recortado=${JSON.stringify(fps.recortado)} mediana=${med(fps.recortado!)} | sinblur=${JSON.stringify(fps.sinblur)} mediana=${med(fps.sinblur!)}`);
+});
