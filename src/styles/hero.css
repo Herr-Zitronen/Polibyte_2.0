@@ -488,8 +488,9 @@
   .pb-box {
     position: relative;
     inset: auto;
-    min-height: calc(var(--pb-hero-h) - 336px);
-    margin: 168px 16px;
+    /* Arriba la línea interior está a 168 px; abajo, el grupo mide 170: 172 deja el mismo aire a los dos lados. */
+    min-height: calc(var(--pb-hero-h) - 340px);
+    margin: 168px 16px 172px;
     gap: 24px;
     padding: 12px 10px;
   }
