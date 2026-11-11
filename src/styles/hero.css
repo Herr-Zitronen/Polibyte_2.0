@@ -479,6 +479,12 @@
   /* La caja define su alto y empuja al marco: en un celular el titular, el subtítulo y los dos botones apilados
      no caben en el hueco fijo entre líneas (alto − 2 × 168 px) y, centrados, se salían encima de ellas. Los grupos
      de líneas están anclados arriba y abajo de .pb-hero, así que rodean al contenido sea cual sea su alto. */
+  /* flow-root: sin él, el margen de 168 px de la caja (primer hijo en flujo) colapsaba hacia afuera y bajaba la
+     portada entera en vez de separar el texto de las líneas. */
+  .pb-hero {
+    display: flow-root;
+  }
+
   .pb-box {
     position: relative;
     inset: auto;
