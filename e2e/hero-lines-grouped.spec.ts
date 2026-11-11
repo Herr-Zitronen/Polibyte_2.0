@@ -1,13 +1,13 @@
-// perf/scroll-fino · Las líneas verticales centrales del hero viven dentro del grupo con el que viajan
-// (una animación de scroll y una capa menos por línea). El dibujo no puede cambiar: en la misma corrida se
-// captura la estructura nueva, se reconstruye en el DOM la anterior (línea aparte con la clase del grupo)
-// y se compara, en 3 posiciones del recorrido (0, 40 y 90 %) y en los 3 anchos (proyectos de Playwright).
+// perf/scroll-fino · Las líneas verticales cortas del centro del hero viven dentro del grupo con el que viajan
+// (.pb-tlg / .pb-blg): una animación de scroll y una capa menos por línea.
+// Reemplaza a la prueba que comparaba contra una reconstrucción de la estructura anterior, que ya no existe y
+// cuyo resultado dependía de cómo se rearmaba en el DOM. Aquí se comprueba la estructura actual y su geometría;
+// el dibujo lo protegen las capturas base al 0, 40 y 90 % del recorrido.
 import { expect, test, type Page } from '@playwright/test';
-import sharp from 'sharp';
 
 const POSITIONS = [0, 0.4, 0.9] as const;
 
-// Lo que cambia con el tiempo (barridos, nodos, trazos de entrada) se congela igual en las dos capturas.
+// Lo que cambia con el tiempo (barridos, nodos, trazos de entrada) se congela para que la captura sea estable.
 const FREEZE = `
   .pb-hero .pb-flow::after, .pb-hero .pb-node { display: none !important; }
   .pb-hero .pb-line, .pb-hero .pb-vline { animation: none !important; transform: none !important; }
@@ -23,94 +23,38 @@ const scrollToLines = (page: Page, p: number) =>
     await new Promise((d) => requestAnimationFrame(() => requestAnimationFrame(d)));
   }, p);
 
-const cvlRects = (page: Page) =>
-  page.evaluate(() =>
-    [...document.querySelectorAll('.pb-hero .pb-cvl, .pb-hero .pb-cvl-old')].map((el) => {
-      const r = el.getBoundingClientRect();
-      return { x: r.x, y: r.y, w: r.width, h: r.height };
-    }),
-  );
-
-type Rect = { x: number; y: number; w: number; h: number };
-
-/** Píxeles que difieren en más de 24 niveles en algún canal, FUERA de las líneas (cajas + 2 px).
- *  Dentro de las líneas solo cambia el antialiasing de un trazo de 1.5 px (grupo vs. capa propia: ~1 columna
- *  por línea); su geometría se compara aparte, con ±0.1 px. Fuera de ellas, el dibujo debe ser el mismo. */
-async function diffPixelsOutside(a: Buffer, b: Buffer, lines: Rect[], cssWidth: number): Promise<number> {
-  const [ia, ib] = await Promise.all([sharp(a).raw().toBuffer({ resolveWithObject: true }), sharp(b).raw().toBuffer()]);
-  const { data: ra, info } = ia;
-  expect(ra.length).toBe(ib.length);
-  const scale = info.width / cssWidth;
-  const pad = 2 * scale;
-  const boxes = lines.map((r) => ({ x0: r.x * scale - pad, x1: (r.x + r.w) * scale + pad, y0: r.y * scale - pad, y1: (r.y + r.h) * scale + pad }));
-  let n = 0;
-  for (let i = 0, px = 0; i < ra.length; i += info.channels, px++) {
-    const x = px % info.width;
-    const y = Math.floor(px / info.width);
-    if (boxes.some((b) => x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1)) continue;
-    if (Math.abs(ra[i]! - ib[i]!) > 24 || Math.abs(ra[i + 1]! - ib[i + 1]!) > 24 || Math.abs(ra[i + 2]! - ib[i + 2]!) > 24) n++;
+test('las líneas centrales viven en su grupo y no tienen animación de scroll propia', async ({ page }) => {
+  await page.goto('/');
+  const cvl = page.locator('.pb-hero .pb-cvl');
+  await expect(cvl).toHaveCount(2);
+  await expect(page.locator('.pb-hero .pb-tlg > .pb-cvl')).toHaveCount(1);
+  await expect(page.locator('.pb-hero .pb-blg > .pb-cvl')).toHaveCount(1);
+  for (const name of await cvl.evaluateAll((els) => els.map((el) => getComputedStyle(el).animationName))) {
+    expect(name).toBe('none');
   }
-  return n;
-}
+});
 
-test('agrupar las líneas centrales no cambia el dibujo del hero (0, 40 y 90 % del recorrido)', async ({ page }) => {
+test('las líneas centrales siguen a su grupo en todo el recorrido', async ({ page }) => {
   test.setTimeout(60_000);
   await page.goto('/');
   await page.waitForSelector('[data-decode][data-decoded]', { timeout: 6000 });
-  // Con data-drawn el hero suelta sus entradas y quedan las animaciones de salida con el scroll. Sin esperarlo,
-  // la primera tanda de capturas salía sin ellas y la segunda (segundos después) con ellas: el titular se veía
-  // desplazado y atenuado al 40 % y la comparación fallaba por el momento, no por el dibujo.
-  await page.waitForSelector('.pb-hero[data-drawn]', { timeout: 6000 });
   await page.addStyleTag({ content: FREEZE });
   await page.waitForTimeout(1200); // entradas de la barra y del titular
-
-  // Las dos estructuras se capturan una tras otra en cada posición (no en dos tandas separadas por segundos):
-  // así nada que dependa del tiempo entra en la comparación, solo la estructura de las líneas.
-  const toOld = () =>
-    page.evaluate(() => {
-      const w = window as unknown as { __cvl?: { el: HTMLElement; parent: Node; next: Node | null; cls: string; style: string }[] };
-      const lines = document.querySelector('.pb-hero__lines')!;
-      w.__cvl = [...document.querySelectorAll<HTMLElement>('.pb-hero .pb-cvl')].map((el) => ({
-        el,
-        parent: el.parentNode!,
-        next: el.nextSibling,
-        cls: el.className,
-        style: el.getAttribute('style') ?? '',
-      }));
-      for (const { el } of w.__cvl) {
-        const top = !!el.closest('.pb-tlg');
-        el.className = `${top ? 'pb-tlg' : 'pb-blg'} pb-cvl-old`;
-        el.setAttribute('style', top ? 'left: 50%; top: 80px; width: 1.5px; height: 80px' : 'left: 50%; bottom: 82px; width: 1.5px; height: 80px');
-        lines.appendChild(el);
-      }
-    });
-  const toNew = () =>
-    page.evaluate(() => {
-      const w = window as unknown as { __cvl?: { el: HTMLElement; parent: Node; next: Node | null; cls: string; style: string }[] };
-      for (const { el, parent, next, cls, style } of w.__cvl ?? []) {
-        el.className = cls;
-        el.setAttribute('style', style);
-        parent.insertBefore(el, next);
-      }
-    });
-  const frame = () => page.evaluate(() => new Promise((d) => requestAnimationFrame(() => requestAnimationFrame(d))));
 
   for (const p of POSITIONS) {
     await scrollToLines(page, p);
     await page.waitForTimeout(300);
-    const after = { shot: await page.screenshot(), rects: await cvlRects(page) };
-    expect(after.rects).toHaveLength(2);
-    await expect(page, `captura base del hero al ${p * 100} %`).toHaveScreenshot(`hero-lines-${p * 100}.png`, { maxDiffPixelRatio: 0.002 });
-    await toOld();
-    await frame();
-    const before = { shot: await page.screenshot(), rects: await cvlRects(page) };
-    await toNew();
-    await frame();
-    for (const [j, r] of before.rects.entries()) {
-      const q = after.rects[j]!;
-      for (const k of ['x', 'y', 'w', 'h'] as const) expect(Math.abs(q[k] - r[k]), `línea ${j}, ${k} al ${p * 100} %`).toBeLessThanOrEqual(0.1);
+    // Cada línea va en left: 10/9 del ancho de su grupo (hero.css): viaja con el grupo, sea cual sea su transform.
+    const geo = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>('.pb-hero .pb-cvl')].map((el) => {
+        const r = el.getBoundingClientRect();
+        const g = el.parentElement!.getBoundingClientRect();
+        return { x: r.x, expected: g.x + (g.width * 10) / 9 };
+      }),
+    );
+    for (const [j, l] of geo.entries()) {
+      expect(Math.abs(l.x - l.expected), `línea ${j} sigue a su grupo al ${p * 100} %`).toBeLessThanOrEqual(1);
     }
-    const lines = [...before.rects, ...after.rects];
-    expect(await diffPixelsOutside(after.shot, before.shot, lines, page.viewportSize()!.width), `píxeles distintos fuera de las líneas al ${p * 100} %`).toBeLessThanOrEqual(40);
+    await expect(page, `captura base del hero al ${p * 100} %`).toHaveScreenshot(`hero-lines-${p * 100}.png`, { maxDiffPixelRatio: 0.002 });
   }
 });
