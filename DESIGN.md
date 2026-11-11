@@ -169,7 +169,7 @@ Animado por piezas (bits, llaves, núcleo), con pasos secos (`steps`):
 | Celdas de progreso se llenan, la actual parpadea; los 8 bits se teclean | Entrada del panel (`.is-in`) | `scaleY` con `steps(2)` escalonado 15 ms por celda; bits con opacidad + `translateY`, 80 ms entre bits; parpadeo pausado fuera de pantalla |
 | "soft" + "ware" se unen | Scroll | `view()`, rango `cover 0% → 40%` |
 | Apariciones de bloques | Scroll | `view()`, `entry 0% → cover 24%` |
-| Scroll | Rueda / táctil | **Nativo**, sin Lenis ni ninguna librería que mueva el scroll con JS. Saltos a anclas con `scroll-behavior: smooth` solo sin movimiento reducido (`global.css`) |
+| Scroll con inercia | Rueda | **Lenis** en escritorio (no se carga en táctiles ni con movimiento reducido: ahí el scroll es nativo); se pausa al salir de la página. Su rAF solo corre mientras hay movimiento (`createOnDemandLoop`). Lenis también suaviza los saltos a anclas: `global.css` no pone `scroll-behavior: smooth` |
 
 Curvas: `cubic-bezier(.16,1,.3,1)` (entrada suave), `cubic-bezier(.7,0,.2,1)` (trazos). Pixel art: `steps()`.
 
@@ -178,7 +178,7 @@ Curvas: `cubic-bezier(.16,1,.3,1)` (entrada suave), `cubic-bezier(.7,0,.2,1)` (t
 - `overflow: clip` no aísla márgenes: toda sección debe ser `display: flow-root`.
 - El bloque de `prefers-reduced-motion` debe ir **al final** del CSS de cada página; si no, los estilos de la página vuelven a ocultar lo que debía mostrarse.
 - Fuera de Chrome/Edge (y Safari reciente), las animaciones de scroll no existen: el estado por defecto de cada elemento debe ser su estado final visible.
-- **Nada mueve el scroll con JS** (perf/scroll-fino, se quitó Lenis). Con scroll nativo, las animaciones `scroll()`/`view()` las calcula el compositor sin pasar por el hilo principal; si un script fija la posición en cada cuadro (como Lenis), todas pasan a depender de ese hilo y cualquier trabajo de JS se nota como tirón. La rueda ya llega suavizada por el navegador (Chrome/Edge en Windows animan cada paso de la rueda en el compositor).
+- **Lenis vuelve, con su coste a la vista** (perf/fluidez-real). Mientras Lenis mueve el scroll con JS, las animaciones `scroll()`/`view()` dependen del hilo principal y cualquier trabajo de JS se nota como tirón. Mitigación: su rAF solo corre en movimiento (en reposo no hay ningún cuadro forzado), no se carga en táctiles ni con movimiento reducido, y nada más hace trabajo por cuadro durante el scroll. Ningún otro script mueve el scroll.
 - Un elemento dentro de una columna `sticky` no debe usar su propia `view()`: mientras está pegado su progreso no avanza. Usa la línea de tiempo con nombre de un ancestro que sí cruce la pantalla (`view-timeline-name`), como el cubo iso con `--pb-cal` de `.pb-calgrid`.
 
 ### 4.1 Transiciones entre páginas
@@ -250,8 +250,8 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 
 ## 7. Rendimiento
 
-- Presupuesto: LCP < 2.2s (temporal, WOR-101; objetivo original 2.0s), CLS < 0.05, INP < 200ms, JS de la página < 20 KB (sin excepciones).
-- Scroll nativo, sin Lenis (perf/scroll-fino): ningún script por cuadro durante el scroll, así las animaciones de scroll se quedan en el compositor (§4).
+- Presupuesto: LCP < 2.2s (temporal, WOR-101; objetivo original 2.0s), CLS < 0.05, INP < 200ms, JS de la página < 20 KB (sin contar Lenis).
+- Lenis (escritorio) se carga en tiempo ocioso tras `load` y su rAF solo corre en movimiento (§4). En táctil y con movimiento reducido el scroll es nativo.
 - Fondos estáticos (WebP 8–36 KB), grano en mosaico (21 KB).
 - Blur solo en la barra (1 capa). El menú móvil usa fondo sólido (F13). Nunca se anima `filter` ni `backdrop-filter`.
 - Grano: una sola capa fija por página (§3.8).

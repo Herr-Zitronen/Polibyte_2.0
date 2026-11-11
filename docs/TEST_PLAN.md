@@ -10,7 +10,7 @@ Detalle de cada caso: en el issue de Linear correspondiente.
 | H0.1 | `tests/project-setup.test.ts` ✅ escrito (rojo) | U | scripts, TS estricto, ESLint, estructura, workflow CI, 3 anchos, axe, LHCI, wrangler |
 | H0.1 | `e2e/a11y.spec.ts` | A | Inicio sin violaciones |
 | H0.2 | `tests/lighthouse-budget.test.ts`, `lighthouserc.cjs` | U/P | LCP < 2s, CLS < 0.05, perf ≥ 90 como `error` |
-| H0.2 | `tests/js-budget.test.ts` | U | JS por página < 20 KB |
+| H0.2 | `tests/js-budget.test.ts` | U | JS por página < 20 KB (sin Lenis) |
 | H1.1 | `src/styles/tokens.test.ts` | U | 16 tokens y escala de DESIGN §2 |
 | H1.1 | `e2e/fonts.spec.ts` | E | solo 3 familias; `text=PoliByte`; `display=swap` |
 | H1.2 | `e2e/visual/buttons.spec.ts` | V | caja dentro del marco, misma altura, invertido en claro |

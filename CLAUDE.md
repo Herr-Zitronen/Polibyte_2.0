@@ -12,7 +12,7 @@ Sitio del club **PoliByte · Club de la Carrera de Software** (ESPOCH). Copia es
 ## Stack
 - Astro + TypeScript estricto, CSS propio (sin framework de UI). Islas solo donde haya interacción (filtros, menú, conmutador de vitrina, cuenta regresiva).
 - Content collections + Zod para eventos, proyectos y miembros.
-- Scroll nativo (sin Lenis: ver `DESIGN.md §4`). View Transitions nativas (`@view-transition`).
+- Lenis para el scroll con inercia, solo en escritorio y con su rAF solo en movimiento (ver `DESIGN.md §4`). View Transitions nativas (`@view-transition`).
 - Despliegue en Cloudflare (Workers con assets estáticos), con previews por rama.
 - Pruebas: Vitest (unitarias), Playwright (E2E y capturas a 1440/1000/390), @axe-core/playwright, Lighthouse CI.
 
