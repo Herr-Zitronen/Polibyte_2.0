@@ -12,6 +12,12 @@ export function initDecode(h1: HTMLElement): void {
     document.addEventListener('prerenderingchange', () => initDecode(h1), { once: true });
     return;
   }
+  // Pantalla de entrada (Intro.astro): mientras tapa la portada, el titular espera pintado en su sitio.
+  // Los temporizadores arrancan cuando se retira, junto con las animaciones CSS.
+  if (document.documentElement.classList.contains('pb-intro-on')) {
+    addEventListener('pb:intro-done', () => initDecode(h1), { once: true });
+    return;
+  }
   const finish = () => h1.setAttribute('data-decoded', '');
   // perf/fluidez-real: cuando termina el último trazo de la entrada (el subtítulo, pb-up), el hero se marca
   // data-drawn y el CSS suelta las animaciones forwards (líneas, letras, subtítulo): menos capas en el scroll.

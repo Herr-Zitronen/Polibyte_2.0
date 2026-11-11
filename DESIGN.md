@@ -184,6 +184,17 @@ Curvas: `cubic-bezier(.16,1,.3,1)` (entrada suave), `cubic-bezier(.7,0,.2,1)` (t
 - **Lenis vuelve, con su coste a la vista** (perf/fluidez-real). Mientras Lenis mueve el scroll con JS, las animaciones `scroll()`/`view()` dependen del hilo principal y cualquier trabajo de JS se nota como tirón. Mitigación: su rAF solo corre en movimiento (en reposo no hay ningún cuadro forzado), no se carga en táctiles ni con movimiento reducido, y nada más hace trabajo por cuadro durante el scroll. Ningún otro script mueve el scroll.
 - Un elemento dentro de una columna `sticky` no debe usar su propia `view()`: mientras está pegado su progreso no avanza. Usa la línea de tiempo con nombre de un ancestro que sí cruce la pantalla (`view-timeline-name`), como el cubo iso con `--pb-cal` de `.pb-calgrid`.
 
+### 4.0 Pantalla de entrada (solo Inicio)
+
+Tapa el primer segundo, cuando el navegador decodifica el nevado, carga las fuentes y crea las capas de la portada (quien hacía scroll en ese momento notaba el peor tirón). No arregla el scroll: solo cubre el calentamiento.
+
+- **Dibujo**: fondo `#0F1A4D`; el isotipo se ensambla en una rejilla de 9 × 12 píxeles (los bits caen, las llaves entran por los lados, el núcleo parpadea en amarillo) y debajo se teclean los 8 bits `01010000` (la «P» en ASCII). Sale hacia arriba con el borde de la franja de píxeles (§3.7). Todo con `steps()`, solo `transform` y `opacity`.
+- **Duración**: 1.2–1.8 s en total. Espera a fuentes y carga con un mínimo de 0.8 s y un tope de 1.4 s, más 0.4 s de salida (`src/lib/intro.ts`).
+- **Una vez por visita** (`sessionStorage`; cualquier página la da por vista). No aparece con movimiento reducido, en páginas pre-renderizadas ni en navegadores automatizados (salvo `?intro`, para su prueba). Se salta con un clic o una tecla.
+- **Sin red**: CSS y script en línea, sin imágenes. Queda bajo el grano fijo de la página (no pinta el suyo); la barra espera oculta y entra al terminar.
+- **LCP**: debajo, el titular está pintado en su sitio desde el primer cuadro; su decodificado y el resto de la entrada de la portada arrancan cuando la pantalla se retira (`pb:intro-done`).
+- Al retirarse se elimina del DOM: no queda ninguna capa viva.
+
 ### 4.1 Transiciones entre páginas
 
 View Transitions API nativa (`@view-transition { navigation: auto; }`), sin JS:

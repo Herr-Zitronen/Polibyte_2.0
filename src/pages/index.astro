@@ -19,7 +19,7 @@ const rows = upcomingRows(events, new Date());
 const next = nextEvent(events, new Date()) as ((typeof events)[number] & { date: Date }) | undefined;
 ---
 
-<Base title={HOME_TITLE} cover="hero">
+<Base title={HOME_TITLE} cover="hero" intro>
   {next && <HeaderChip slot="chip" title={next.title} date={next.date} time={next.time} />}
   <main>
     <Hero>

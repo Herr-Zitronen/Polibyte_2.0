@@ -4,6 +4,8 @@ import Header from '../components/Header.astro';
 import MobileMenu from '../components/MobileMenu.astro';
 import Footer from '../components/Footer.astro';
 import Seo from '../components/Seo.astro';
+import Intro from '../components/Intro.astro';
+import { INTRO } from '../lib/intro';
 import { assertContentIntegrity } from '../content/integrity';
 import '../styles/global.css';
 import '../styles/glass.css';
@@ -23,11 +25,13 @@ interface Props {
   noindex?: boolean;
   /** Las páginas de laboratorio lo apagan para que sus capturas no dependan de la barra. */
   header?: boolean;
+  /** Pantalla de entrada (solo Inicio): una vez por visita, ver Intro.astro. */
+  intro?: boolean;
 }
 
 await assertContentIntegrity();
 
-const { title, cover, description = 'PoliByte · Club de la Carrera de Software (ESPOCH)', noindex = false, header = true } = Astro.props;
+const { title, cover, description = 'PoliByte · Club de la Carrera de Software (ESPOCH)', noindex = false, header = true, intro = false } = Astro.props;
 // Prerender de la página siguiente (Chromium): la transición arranca con ella ya renderizada. Fuera /lab/.
 // perf/fluidez-real: 'conservative' pre-renderiza al pulsar el enlace, no al dejar el cursor encima (con
 // 'moderate' se pre-renderizaba una página entera en mitad del scroll si el puntero caía sobre un enlace).
@@ -37,7 +41,7 @@ const speculation = JSON.stringify({
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="es" data-intro={intro ? '' : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -57,8 +61,65 @@ const speculation = JSON.stringify({
         if (e.viewTransition) document.documentElement.classList.add('pb-vt-nav');
       });
     </script>
+    {/* Pantalla de entrada (Intro.astro). Aquí, en <head> y en línea, para decidir antes del primer pintado.
+         Una vez por visita (sessionStorage; cualquier página la da por vista), nunca con movimiento reducido
+         ni en una página pre-renderizada. Sale cuando fuentes y carga están listas, entre minMs y capMs,
+         o al primer clic o tecla. Al terminar se elimina del DOM y avisa con pb:intro-done. */}
+    <script is:inline define:vars={{ INTRO }}>
+      (() => {
+        const root = document.documentElement;
+        let first = false;
+        try {
+          first = !sessionStorage.getItem('pb-intro');
+          sessionStorage.setItem('pb-intro', '1');
+        } catch {
+          /* sin almacenamiento: sin entrada */
+        }
+        if (!first || !root.hasAttribute('data-intro') || document.prerendering) return;
+        // Navegador automatizado (Playwright): sin entrada, para que las E2E midan la página de siempre.
+        // La prueba de la propia entrada la fuerza con ?intro (e2e/intro.spec.ts). Lighthouse sí la ve.
+        if (navigator.webdriver && !new URLSearchParams(location.search).has('intro')) return;
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        root.classList.add('pb-intro-on');
+        const t0 = performance.now();
+        let timer = 0;
+        let ended = false;
+        let finished = false;
+        const finish = () => {
+          if (finished) return;
+          finished = true;
+          document.querySelector('.pb-intro')?.remove();
+          root.classList.remove('pb-intro-on');
+          dispatchEvent(new Event('pb:intro-done'));
+        };
+        const end = () => {
+          if (ended) return;
+          ended = true;
+          clearTimeout(timer);
+          removeEventListener('pointerdown', end);
+          removeEventListener('keydown', end);
+          const el = document.querySelector('.pb-intro');
+          if (!el) return finish();
+          el.classList.add('is-out');
+          el.addEventListener('animationend', (e) => e.target === el && finish());
+          setTimeout(finish, INTRO.exitMs + 150);
+        };
+        const endAt = (ms) => {
+          clearTimeout(timer);
+          timer = setTimeout(end, Math.max(0, ms - (performance.now() - t0)));
+        };
+        endAt(INTRO.capMs);
+        addEventListener('pointerdown', end);
+        addEventListener('keydown', end);
+        const loaded = new Promise((r) => (document.readyState === 'complete' ? r() : addEventListener('load', r, { once: true })));
+        Promise.all([loaded, document.fonts ? document.fonts.ready : null]).then(() => {
+          if (!ended) endAt(Math.min(INTRO.capMs, Math.max(INTRO.minMs, performance.now() - t0)));
+        });
+      })();
+    </script>
   </head>
   <body>
+    {intro && <Intro />}
     {
       header && (
         <Header>
