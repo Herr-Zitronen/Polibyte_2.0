@@ -1,10 +1,21 @@
 // Lighthouse CI (solo en GitHub Actions). Presupuestos de DESIGN.md §7:
 // si Inicio no los cumple, el job falla y no se despliega.
+/* eslint-disable @typescript-eslint/no-require-imports -- archivo CommonJS que carga Lighthouse CI */
+const { readdirSync } = require('node:fs');
+const { join } = require('node:path');
+
+// Un detalle de evento real, tomado del contenido (no escrito a mano: cambia cuando Joel carga eventos).
+const detail = readdirSync(join(__dirname, 'src/content/events'))
+  .filter((f) => f.endsWith('.md'))
+  .sort()[0]
+  .replace(/\.md$/, '');
+
 module.exports = {
   ci: {
     collect: {
       staticDistDir: './dist',
-      url: ['/'],
+      // L1 (WOR-85): Inicio, Eventos, un detalle, Equipo y Unirme.
+      url: ['/', '/eventos/', `/eventos/${detail}/`, '/equipo/', '/unirme/'],
       numberOfRuns: 3, // Lighthouse varía entre ejecuciones: se usa la mediana.
     },
     assert: {

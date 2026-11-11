@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 const require = createRequire(import.meta.url);
 type Assertion = [string, { minScore?: number; maxNumericValue?: number }];
 const lhrc = require('../lighthouserc.cjs') as {
-  ci: { collect: { numberOfRuns: number }; assert: { assertions: Record<string, Assertion> } };
+  ci: { collect: { numberOfRuns: number; url: string[] }; assert: { assertions: Record<string, Assertion> } };
 };
 const a = lhrc.ci.assert.assertions;
 
@@ -21,6 +21,14 @@ describe('H0.2 · presupuestos en lighthouserc.cjs', () => {
 
   it('rendimiento ≥ 0.9 es error', () => {
     expect(a['categories:performance']).toEqual(['error', expect.objectContaining({ minScore: 0.9 })]);
+  });
+
+  // L1 (WOR-85): no solo Inicio.
+  it('mide Inicio, Eventos, un detalle, Equipo y Unirme', () => {
+    const urls = lhrc.ci.collect.url;
+    expect(urls).toEqual(expect.arrayContaining(['/', '/eventos/', '/equipo/', '/unirme/']));
+    expect(urls.filter((u) => /^\/eventos\/[^/]+\/$/.test(u))).toHaveLength(1);
+    expect(urls).toHaveLength(5);
   });
 
   it('usa la mediana de 3 ejecuciones', () => {
