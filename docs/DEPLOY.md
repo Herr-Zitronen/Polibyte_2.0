@@ -36,6 +36,8 @@ Workers & Pages → `polibyte-site` → *Settings* → *Build* → *Connect* →
 
 La versión de Node sale de `.node-version` (la misma que usa CI). Si el dominio definitivo ya existe, se añade la variable de build `SITE_URL` (ver `docs/CONTENIDO.md`).
 
+**Caché.** `public/_headers` se copia a `dist/` y Cloudflare lo aplica al servir. Los archivos de `/_astro/` (fuentes, fondos, JS) llevan un hash en el nombre, así que se guardan un año en el navegador (`immutable`): al pasar de una página a otra no se vuelven a pedir. El HTML no lleva hash y revalida en cada visita, por eso un despliegue nuevo se ve al momento. Para comprobarlo: `curl -I <url>/_astro/<archivo>` debe mostrar `cache-control: public, max-age=31536000, immutable`.
+
 Las URL de preview tienen la forma `<rama>-polibyte-site.<subdominio>.workers.dev`. La de `staging` es la que se revisa antes de pasar a `main`.
 
 ## Reconstrucción semanal
