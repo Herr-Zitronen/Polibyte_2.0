@@ -37,9 +37,9 @@ describe('archiveView', () => {
     expect(view[0]!.items.map((i) => i.id)).toEqual(['hack', 'git']);
   });
 
-  it('"Ver proyectos" solo si showcaseLayout() publica vitrina (publicada + destacados)', () => {
+  it('"Ver proyectos" solo si showcaseLayout() publica vitrina; lleva a los proyectos de ESE evento', () => {
     const [hack, git] = view[0]!.items;
-    expect(hack!.projectsHref).toBe('#destacados');
+    expect(hack!.projectsHref).toBe('/eventos/hack/#proyectos');
     expect(git!.projectsHref).toBeNull(); // publicada pero sin destacados → nunca vitrina vacía
     expect(view[1]!.items[0]!.projectsHref).toBeNull();
   });

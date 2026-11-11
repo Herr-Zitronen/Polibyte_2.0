@@ -10,6 +10,8 @@ interface Props {
 }
 
 const { pitch, summary, facts } = Astro.props;
+// PR B: sin cuerpo Markdown no se pinta un .pb-dbody vacío.
+const body = Astro.slots.has('default') ? (await Astro.slots.render('default')).trim() : '';
 ---
 
 <section id="sobre" class="pb-dabout">
@@ -19,7 +21,7 @@ const { pitch, summary, facts } = Astro.props;
       <div class="pb-dabout__text">
         <span class="pb-dlabel">sobre el evento</span>
         <h2 class="pb-dabout__lead">{pitch ?? summary}</h2>
-        <div class="pb-dbody"><slot /></div>
+        {body && <div class="pb-dbody" set:html={body} />}
       </div>
       <Panel class="pb-dfacts" draw pulse>
         <dl>

@@ -5,6 +5,7 @@ import type { CollectionEntry } from 'astro:content';
 import EventDetail from '../../components/event/EventDetail.astro';
 import Base from '../../layouts/Base.astro';
 import { eventPaths } from '../../lib/event-detail';
+import { showcaseLayout } from '../../lib/showcase';
 
 export async function getStaticPaths() {
   return eventPaths(await getCollection('events'));
@@ -16,10 +17,13 @@ interface Props {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
+// PR B: cada evento con vitrina publicada muestra sus proyectos en su detalle (#proyectos).
+const projects = (await getCollection('projects')).map((p) => ({ ...p.data, event: p.data.event.id }));
+const showcase = showcaseLayout({ id: entry.id, showcase: entry.data.showcase }, projects);
 ---
 
 <Base title={`${entry.data.title} · Eventos · PoliByte`} description={entry.data.summary} cover="recap">
   <main>
-    <EventDetail event={entry.data} now={new Date()}><Content /></EventDetail>
+    <EventDetail event={entry.data} now={new Date()} showcase={showcase}><Content /></EventDetail>
   </main>
 </Base>

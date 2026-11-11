@@ -11,7 +11,7 @@ import { archiveView } from '../../lib/archive';
 import { EDGE } from '../../lib/pixel-strip';
 import { calendarRows } from '../../lib/filter';
 import { recapView } from '../../lib/recap';
-import { showcaseLayout } from '../../lib/showcase';
+import { latestShowcase } from '../../lib/showcase';
 
 const events = (await getCollection('events')).map((e) => ({ ...e.data, id: e.id }));
 const projects = (await getCollection('projects')).map((p) => ({ ...p.data, event: p.data.event.id }));
@@ -20,24 +20,25 @@ const view = recapView(events, projects, now);
 const archive = archiveView(events, projects, now);
 const calendar = calendarRows(events, now);
 const year = now.getFullYear();
-const showcase = view.kind === 'event' ? showcaseLayout(view.event, projects) : null;
+// PR B: la vitrina es la del evento concluido más reciente que la tenga (no necesariamente el del resumen).
+const showcase = latestShowcase(events, projects, now);
 ---
 
 <Base title="Eventos · PoliByte" description="Calendario, archivo y proyectos del club." cover="recap">
   <main>
     <Recap view={view} />
     {
-      showcase && view.kind === 'event' ? (
+      showcase ? (
         <>
           <PixelStrip seed={61} top={EDGE.cover} bottom={EDGE.navy} />
-          <Showcase eventTitle={view.title} layout={showcase} />
+          <Showcase eventTitle={showcase.event.title} layout={showcase.layout} />
           <PixelStrip seed={73} top={EDGE.navy} bottom={EDGE.paper} />
         </>
       ) : (
         <PixelStrip seed={67} top={EDGE.cover} bottom={EDGE.paper} />
       )
     }
-    <Calendar rows={calendar} span={`${year}–${year + 1}`} />
+    <Calendar rows={calendar} span={`${year}–${year + 1}`} hasArchive={archive.length > 0} />
     {
       archive.length > 0 ? (
         <>

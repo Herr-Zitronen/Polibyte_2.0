@@ -1,6 +1,6 @@
 // Portada de Eventos: el último evento concluido y sus cifras (DESIGN §5, §5.2). Pura: el tiempo llega como `now`.
 import { lastConcluded, typeLine } from './events';
-import { showcaseLayout } from './showcase';
+import { latestShowcase } from './showcase';
 
 type Stats = { [K in StatKey]?: number | undefined };
 type RecapEvent = {
@@ -52,7 +52,8 @@ export function recapView<E extends RecapEvent>(events: readonly E[], projects: 
       primary: CALENDAR,
     };
   }
-  const showcase = showcaseLayout(last, projects) !== null;
+  // PR B: la vitrina puede ser de un evento anterior al último (un taller posterior no la apaga).
+  const showcase = latestShowcase(events, projects, now) !== null;
   return {
     kind: 'event',
     title: last.title,

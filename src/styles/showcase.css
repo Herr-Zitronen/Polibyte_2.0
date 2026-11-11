@@ -279,6 +279,25 @@
   margin-top: auto;
 }
 
+/* PR B · Un solo destacado además del panel: tarjeta horizontal a ancho completo (nunca media columna vacía). */
+.pb-pgrid2.is-one {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.pb-pgrid2.is-one .pb-pcard {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+}
+
+.pb-pgrid2.is-one .pb-pcard .pb-browser {
+  border-bottom: 0;
+  border-right: 1px solid rgba(242, 244, 250, 0.35);
+}
+
+.pb-pgrid2.is-one .pb-pcardb {
+  justify-content: center;
+}
+
 /* Filas */
 .pb-more {
   margin-top: 96px;
@@ -315,8 +334,11 @@
   transition: transform 0.6s var(--pb-ease-out);
 }
 
-.pb-prow:hover .pb-pn {
-  transform: translateX(12px);
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-prow:hover .pb-pn {
+    transform: translateX(12px);
+  }
 }
 
 .pb-pn__title {
@@ -342,8 +364,14 @@
   }
 
   .pb-pgrid2,
-  .pb-prow {
+  .pb-prow,
+  .pb-pgrid2.is-one .pb-pcard {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pb-pgrid2.is-one .pb-pcard .pb-browser {
+    border-right: 0;
+    border-bottom: 1px solid rgba(242, 244, 250, 0.35);
   }
 
   .pb-prow {

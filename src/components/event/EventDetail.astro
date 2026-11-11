@@ -1,64 +1,69 @@
 ---
 // Detalle completo de un evento. El "ahora" llega como prop: la página real pasa la hora del build
 // y los laboratorios (/lab/event-detail/*) un reloj fijo, para que las pruebas no caduquen.
+// PR B: si el evento tiene vitrina publicada, sus proyectos van aquí (#proyectos). Las franjas entre
+// secciones las decide detailSections() según qué secciones aparecen.
 import type { EventData } from '../../content/schemas';
+import { detailSections } from '../../lib/detail-sections';
 import { detailTiming, keyFacts, showRegistration } from '../../lib/event-detail';
 import { typeLine } from '../../lib/events';
 import { longDate } from '../../lib/next-event-view';
+import type { ShowcaseLayout } from '../../lib/showcase';
+import Showcase, { type ShowcaseItem } from '../events/Showcase.astro';
 import DetailAbout from './DetailAbout.astro';
 import DetailHero from './DetailHero.astro';
 import DetailRegistration from './DetailRegistration.astro';
 import DetailSchedule from './DetailSchedule.astro';
 import PixelStrip from '../PixelStrip.astro';
-import { EDGE } from '../../lib/pixel-strip';
 import '../../styles/event-detail.css';
 
 interface Props {
   event: EventData;
   now: Date;
+  /** Vitrina del evento (showcaseLayout); null u omitida → sin sección de proyectos. */
+  showcase?: ShowcaseLayout<ShowcaseItem> | null;
 }
 
-const { event: e, now } = Astro.props;
+const { event: e, now, showcase = null } = Astro.props;
 const registration = showRegistration(e, now);
-const hasSchedule = e.schedule.length > 0;
 const registrationUrl = registration ? e.registrationUrl : undefined;
-const hasRegistration = Boolean(registrationUrl);
+const sections = detailSections({
+  schedule: e.schedule.length > 0,
+  showcase: showcase !== null,
+  registration: Boolean(registrationUrl),
+});
 ---
 
-<DetailHero
-  title={e.title}
-  typeLine={typeLine(e)}
-  date={e.date}
-  place={e.place}
-  mode={e.mode}
-  timing={detailTiming(e, now)}
-  now={now}
-  registration={registration}
-/>
-<PixelStrip seed={171} top={EDGE.cover} bottom={EDGE.navy} />
-<DetailAbout pitch={e.pitch} summary={e.summary} facts={keyFacts(e)}><slot /></DetailAbout>
 {
-  hasSchedule ? (
+  sections.map(({ key, strip }) => (
     <>
-      <PixelStrip seed={173} top={EDGE.navy} bottom={EDGE.paper} />
-      <DetailSchedule items={e.schedule} />
+      {key === 'hero' && (
+        <DetailHero
+          title={e.title}
+          typeLine={typeLine(e)}
+          date={e.date}
+          place={e.place}
+          mode={e.mode}
+          timing={detailTiming(e, now)}
+          now={now}
+          registration={registration}
+        />
+      )}
+      {key === 'about' && (
+        <DetailAbout pitch={e.pitch} summary={e.summary} facts={keyFacts(e)}>
+          <slot />
+        </DetailAbout>
+      )}
+      {key === 'schedule' && <DetailSchedule items={e.schedule} />}
+      {key === 'showcase' && showcase && <Showcase id="proyectos" eventTitle={e.title} layout={showcase} />}
+      {key === 'registration' && (
+        <DetailRegistration
+          url={registrationUrl ?? ''}
+          type={e.type}
+          deadline={e.registrationDeadline && longDate(e.registrationDeadline)}
+        />
+      )}
+      {strip && <PixelStrip seed={strip.seed} top={strip.top} bottom={strip.bottom} />}
     </>
-  ) : (
-    <PixelStrip seed={173} top={EDGE.navy} bottom={hasRegistration ? EDGE.image : EDGE.footer} />
-  )
-}
-{
-  hasRegistration ? (
-    <>
-      {hasSchedule && <PixelStrip seed={179} top={EDGE.paper} bottom={EDGE.image} />}
-      <DetailRegistration
-        url={registrationUrl ?? ''}
-        type={e.type}
-        deadline={e.registrationDeadline && longDate(e.registrationDeadline)}
-      />
-      <PixelStrip seed={181} top={EDGE.cover} bottom={EDGE.footer} />
-    </>
-  ) : (
-    hasSchedule && <PixelStrip seed={179} top={EDGE.paper} bottom={EDGE.footer} />
-  )
+  ))
 }

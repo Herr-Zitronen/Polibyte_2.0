@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { showcaseLayout } from './showcase';
+import { latestShowcase, showcaseLayout } from './showcase';
 
 const ev = (showcase: 'hidden' | 'published') => ({ id: 'hack', showcase });
 const p = (id: string, order: number, featured: boolean, event = 'hack') => ({ id, event, order, featured });
@@ -41,5 +41,33 @@ describe('showcaseLayout', () => {
     expect(l?.hero.id).toBe('a');
     expect(l?.cards).toEqual([]);
     expect(l?.rows.map((r) => r.id)).toEqual(['e']);
+  });
+});
+
+describe('latestShowcase (PR B: la vitrina no desaparece por un evento posterior sin proyectos)', () => {
+  const d = (s: string) => new Date(`${s}T10:00:00-05:00`);
+  const now = d('2026-11-09');
+  const e = (id: string, date: string, showcase: 'hidden' | 'published') => ({ id, date: d(date), showcase });
+  const events = [
+    e('icpc', '2025-10-18', 'published'),
+    e('hack', '2026-05-16', 'published'),
+    e('git', '2026-06-14', 'hidden'), // taller posterior al hackathon, sin vitrina
+    e('codefest', '2027-02-20', 'published'), // próximo: aún no tiene vitrina
+  ];
+  const projects = [p('a', 1, true, 'hack'), p('b', 1, true, 'icpc'), p('c', 1, true, 'codefest')];
+
+  it('elige el evento concluido más reciente que tenga vitrina válida', () => {
+    const s = latestShowcase(events, projects, now);
+    expect(s?.event.id).toBe('hack');
+    expect(s?.layout.hero.id).toBe('a');
+  });
+
+  it('ignora eventos próximos aunque estén publicados', () => {
+    expect(latestShowcase(events, projects, now)?.event.id).not.toBe('codefest');
+  });
+
+  it('sin ninguna vitrina válida → null', () => {
+    expect(latestShowcase(events, [p('z', 1, false, 'hack')], now)).toBeNull();
+    expect(latestShowcase([], projects, now)).toBeNull();
   });
 });
