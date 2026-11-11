@@ -24,7 +24,9 @@
 }
 
 /* Una sola capa de blur con máscara progresiva (antes eran dos: 6 y 12 px). El backdrop-filter es lo más caro
-   del scroll; se apaga mientras la barra está sobre una portada (data-blur="off"), donde el fondo ya es un nevado difuminado. */
+   del scroll; se apaga mientras la barra está sobre una portada (data-blur="off"), donde el fondo ya es un nevado difuminado.
+   perf/fluidez-real: se apaga con opacidad, no con visibility: la capa existe siempre y no se crea ni destruye
+   de golpe al cruzar el final de la portada (era un pico de cuadro justo en la zona de las líneas). */
 .pb-blur > .l2 {
   bottom: 20%;
   -webkit-backdrop-filter: blur(8px);
@@ -34,7 +36,7 @@
 }
 
 .pb-hdr[data-blur='off'] .pb-blur > .l2 {
-  visibility: hidden;
+  opacity: 0;
 }
 
 .pb-blur > .tint-dark {

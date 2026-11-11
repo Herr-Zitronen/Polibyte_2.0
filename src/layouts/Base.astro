@@ -29,8 +29,10 @@ await assertContentIntegrity();
 
 const { title, cover, description = 'PoliByte · Club de la Carrera de Software (ESPOCH)', noindex = false, header = true } = Astro.props;
 // Prerender de la página siguiente (Chromium): la transición arranca con ella ya renderizada. Fuera /lab/.
+// perf/fluidez-real: 'conservative' pre-renderiza al pulsar el enlace, no al dejar el cursor encima (con
+// 'moderate' se pre-renderizaba una página entera en mitad del scroll si el puntero caía sobre un enlace).
 const speculation = JSON.stringify({
-  prerender: [{ where: { and: [{ href_matches: '/*' }, { not: { href_matches: '/lab/*' } }] }, eagerness: 'moderate' }],
+  prerender: [{ where: { and: [{ href_matches: '/*' }, { not: { href_matches: '/lab/*' } }] }, eagerness: 'conservative' }],
 });
 ---
 

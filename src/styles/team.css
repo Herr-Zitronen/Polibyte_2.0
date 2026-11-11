@@ -4,8 +4,6 @@
   display: flow-root;
   background: var(--pb-navy-900);
   /* F12: bajo el pliegue, el navegador no la pinta hasta que se acerca. */
-  content-visibility: auto;
-  contain-intrinsic-size: auto 1400px;
 }
 
 .pb-board-bg {

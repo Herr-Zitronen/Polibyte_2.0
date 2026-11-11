@@ -45,9 +45,9 @@ test.describe('Inicio: animaciones y carga', () => {
     await expect.poll(() => sweepState(page)).toBe('running');
   });
 
-  // perf/scroll-fino: fuera de pantalla el marco solo se oculta; sus animaciones de scroll siguen enganchadas
-  // (soltarlas y recrearlas al volver era un tirón).
-  test('lejos de la pantalla el hero se oculta sin soltar sus animaciones de scroll', async ({ page }) => {
+  // perf/fluidez-real: fuera de pantalla el marco ni se oculta ni suelta sus animaciones de scroll
+  // (ocultarlo hacía que las líneas aparecieran tarde al volver rápido).
+  test('lejos de la pantalla el hero sigue visible y con sus animaciones de scroll', async ({ page }) => {
     await page.goto('/');
     const state = () =>
       page.evaluate(() => ({
@@ -56,9 +56,23 @@ test.describe('Inicio: animaciones y carga', () => {
         split: getComputedStyle(document.querySelector('.pb-tlg')!).animationName,
       }));
     await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
-    await expect.poll(state).toEqual({ off: true, visibility: 'hidden', split: 'pb-split-tl' });
+    await expect.poll(state).toEqual({ off: true, visibility: 'visible', split: 'pb-split-tl' });
     await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
     await expect.poll(state).toEqual({ off: false, visibility: 'visible', split: 'pb-split-tl' });
+  });
+
+  test('al terminar la entrada el hero suelta sus animaciones forwards sin cambiar el dibujo', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('.pb-hero[data-drawn]', { timeout: 6000 });
+    const state = await page.evaluate(() => {
+      const cs = (s: string) => getComputedStyle(document.querySelector(s)!);
+      return {
+        line: [cs('.pb-line').animationName, cs('.pb-line').transform],
+        vline: [cs('.pb-vline').animationName, cs('.pb-vline').transform],
+        sub: [cs('.pb-sub').animationName, cs('.pb-sub').opacity],
+      };
+    });
+    expect(state).toEqual({ line: ['none', 'none'], vline: ['none', 'none'], sub: ['none', '1'] });
   });
 
   test('las capas de paralaje no fijan will-change (la animación de scroll ya las promueve)', async ({ page }) => {

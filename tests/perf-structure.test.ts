@@ -60,16 +60,51 @@ describe('A3 · efectos y pausa fuera de pantalla', () => {
     if (early > -1) expect(early).toBeGreaterThan(hero);
   });
 
-  // perf/scroll-fino: soltar y retomar las animaciones de scroll al cruzar el margen recreaba de golpe
-  // todas las animaciones y capas del marco (un tirón al volver). Ahora siguen enganchadas: fuera de
-  // pantalla solo se ocultan (visibility, sin repintar nada visible) y se pausan las infinitas.
-  it('fuera de pantalla el hero oculta su marco sin soltar sus animaciones de scroll', () => {
+  // perf/scroll-fino: soltar y retomar las animaciones de scroll al cruzar el margen recreaba de golpe todas
+  // las animaciones y capas del marco. perf/fluidez-real: tampoco se oculta con visibility (al volver rápido
+  // las líneas aparecían tarde, cuando llegaba el aviso del observador). Fuera de pantalla solo se pausa lo infinito.
+  it('fuera de pantalla el hero no oculta ni suelta nada: solo pausa barridos y nodos', () => {
     const css = read('src/styles/hero.css');
     const off = [...css.matchAll(/([^{}]*\.pb-hero\.is-off[^{]*)\{([^}]*)\}/g)];
     expect(off.length).toBeGreaterThan(0);
-    for (const [, sel, body] of off) expect(body, sel).not.toMatch(/animation(-name)?:\s*none/);
-    expect(css).toMatch(/\.pb-hero\.is-off[^{]*\{[^}]*visibility:\s*hidden/);
+    for (const [, sel, body] of off) {
+      expect(body, sel).not.toMatch(/animation(-name)?:\s*none/);
+      expect(body, sel).not.toMatch(/visibility|display|content-visibility/);
+    }
     expect(css).toMatch(/\.pb-hero\.is-off \.pb-flow::after[^{]*\{[^}]*animation-play-state:\s*paused/);
+  });
+
+  it('al terminar la entrada (data-drawn) se sueltan las animaciones forwards de trazos, letras y subtítulo', () => {
+    const css = read('src/styles/hero.css');
+    const drawn = [...css.matchAll(/([^{}]*\.pb-hero\[data-drawn\][^{]*)\{([^}]*)\}/g)];
+    const all = drawn.map(([, sel]) => sel).join(',');
+    for (const cls of ['.pb-line', '.pb-vline', '.pb-ch', '.pb-sub']) expect(all, cls).toContain(`.pb-hero[data-drawn] ${cls}`);
+    for (const [, sel, body] of drawn) expect(body, sel).toMatch(/animation:\s*none/);
+    expect(css).toMatch(/\.pb-hero\[data-drawn\] \.pb-line[^{]*\{[^}]*transform:\s*none/);
+    expect(css).toMatch(/\.pb-hero\[data-drawn\] \.pb-sub[^{]*\{[^}]*opacity:\s*1/);
+    const decode = read('src/scripts/decode.ts');
+    expect(decode).toMatch(/animationend/);
+    expect(decode).toMatch(/data-drawn/);
+  });
+
+  it('ningún will-change depende de :hover (crearía y destruiría capas con el contenido pasando bajo el cursor)', () => {
+    for (const f of files(resolve(ROOT, 'src/styles'), /\.css$/)) {
+      const css = readFileSync(f, 'utf8');
+      expect(css, relative(ROOT, f)).not.toMatch(/:hover[^{}]*\{[^}]*will-change/);
+    }
+  });
+
+  it('la barra apaga su blur con opacidad: la capa existe siempre, no se crea ni destruye al cruzar la portada', () => {
+    const css = read('src/styles/header.css');
+    const rule = css.match(/\.pb-hdr\[data-blur='off'\] \.pb-blur > \.l2\s*\{([^}]*)\}/)?.[1] ?? '';
+    expect(rule).toMatch(/opacity:\s*0/);
+    expect(rule).not.toMatch(/visibility|display/);
+  });
+
+  it('la especulación es conservadora: pre-renderiza al pulsar, no al pasar el cursor', () => {
+    const base = read('src/layouts/Base.astro');
+    expect(base).toMatch(/eagerness:\s*'conservative'/);
+    expect(base).not.toMatch(/eagerness:\s*'(moderate|eager)'/);
   });
 
   it('el hero se marca fuera de pantalla con medio viewport de margen, lejos de donde se mira', () => {
@@ -82,9 +117,10 @@ describe('A3 · efectos y pausa fuera de pantalla', () => {
     expect(css).toMatch(/@media \(max-width: 820px\)\s*\{[^@]*\.pb-par\.view[^{]*\{[^}]*animation:\s*none/);
   });
 
-  it('las secciones bajo el pliegue usan content-visibility: auto', () => {
-    for (const f of ['what-we-do', 'upcoming', 'calendar', 'team', 'tutor', 'join', 'footer'])
-      expect(read(`src/styles/${f}.css`), f).toMatch(/content-visibility:\s*auto/);
+  // perf/fluidez-real: content-visibility: auto dejaba huecos al volver y un cuadro largo en cada reentrada.
+  it('ninguna hoja usa content-visibility ni contain-intrinsic-size', () => {
+    for (const f of files(resolve(ROOT, 'src/styles'), /\.css$/))
+      expect(readFileSync(f, 'utf8'), relative(ROOT, f)).not.toMatch(/content-visibility|contain-intrinsic-size/);
   });
 });
 

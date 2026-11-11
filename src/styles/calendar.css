@@ -5,8 +5,6 @@
   background: #eceff6;
   color: #13205a;
   /* F12: bajo el pliegue, el navegador no la pinta hasta que se acerca. */
-  content-visibility: auto;
-  contain-intrinsic-size: auto 1200px;
 }
 
 .pb-calendar__bg {

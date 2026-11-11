@@ -27,12 +27,8 @@
   transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* will-change solo mientras el cursor está sobre la portada: no se reserva una capa todo el tiempo. */
-@media (hover: hover) {
-  .pb-hero-s:hover .pb-mouse {
-    will-change: transform;
-  }
-}
+/* perf/fluidez-real: sin will-change ligado al cursor (creaba y destruía la capa mientras el contenido pasaba
+   bajo el puntero). El translate3d en línea de fx.ts ya mantiene la capa. */
 
 .pb-tlg,
 .pb-trg,
@@ -443,13 +439,22 @@
   }
 }
 
-/* Hero lejos de la pantalla (fx.ts, medio viewport de margen): el marco y el titular solo se ocultan, sin
-   pintarse. perf/scroll-fino: antes también se soltaban sus animaciones de scroll (animation: none), y al
-   volver se recreaban todas con sus capas de golpe: era el tirón al pasar por la portada. Siguen enganchadas;
-   el compositor las mantiene sin trabajo del hilo principal. Los barridos infinitos se pausan más abajo. */
-.pb-hero.is-off .pb-hx,
-.pb-hero.is-off .pb-hero__lines {
-  visibility: hidden;
+/* Hero lejos de la pantalla (fx.ts marca .is-off con medio viewport de margen): no se oculta nada ni se
+   sueltan las animaciones de scroll. perf/fluidez-real: ocultar el marco con visibility hacía que las líneas
+   aparecieran tarde al volver rápido. Solo se pausan los barridos y nodos infinitos (más abajo). */
+
+/* perf/fluidez-real: terminada la entrada (decode.ts pone data-drawn), las animaciones forwards se sueltan.
+   Misma imagen, pero sin mantener vivas las animaciones ni sus capas durante todo el scroll. */
+.pb-hero[data-drawn] .pb-line,
+.pb-hero[data-drawn] .pb-vline,
+.pb-hero[data-drawn] .pb-ch {
+  transform: none;
+  animation: none;
+}
+
+.pb-hero[data-drawn] .pb-sub {
+  opacity: 1;
+  animation: none;
 }
 
 @media (max-width: 820px) {

@@ -40,11 +40,11 @@ describe('F7 · líneas del hero y vidrio siguen al cursor', () => {
     expect(body).toMatch(/prefers-reduced-motion/);
   });
 
-  it('transición de transform suave; will-change solo mientras el cursor está sobre el hero', () => {
+  it('transición de transform suave; sin will-change (el translate3d en línea de fx.ts ya mantiene la capa)', () => {
     const hero = read('src/styles/hero.css');
     expect(rule(hero, '.pb-mouse')).toMatch(/transition:\s*transform 0\.9s/);
     expect(rule(hero, '.pb-mouse')).not.toMatch(/will-change/);
-    expect(hero).toMatch(/\.pb-hero-s:hover \.pb-mouse\s*\{[^}]*will-change:\s*transform/);
+    expect(hero).not.toMatch(/\.pb-mouse[^{]*\{[^}]*will-change/);
     expect(reduced(hero)).toMatch(/\.pb-mouse/);
   });
 

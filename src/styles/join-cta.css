@@ -1,6 +1,6 @@
 /* Inicio · «Abierto a todos» (design/Main.dc.html #unirme) */
 /* Bajo el pliegue: no se pinta ni pide su imagen hasta acercarse (igual que .pb-cv del prototipo). */
-.pb-joincta { position: relative; overflow: clip; display: flow-root; content-visibility: auto; contain-intrinsic-size: auto 760px; }
+.pb-joincta { position: relative; overflow: clip; display: flow-root; }
 .pb-joincta__in { position: relative; padding-top: 120px; padding-bottom: 140px; }
 .pb-joincta__panel { background: rgba(12, 22, 80, 0.28); }
 .pb-joincta__body {

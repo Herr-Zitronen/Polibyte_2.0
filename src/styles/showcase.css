@@ -4,8 +4,6 @@
   display: flow-root;
   background: var(--pb-navy-900);
   color: var(--pb-white);
-  content-visibility: auto;
-  contain-intrinsic-size: auto 1600px;
 }
 
 .pb-showcase__bg {

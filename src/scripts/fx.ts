@@ -22,9 +22,9 @@ export function onPointer(sub: PointerSub): void {
   );
 }
 
-/** F5/F12: el hero y las líneas vivas pausan lo infinito fuera de pantalla; el hero además se oculta (sin
- *  soltar sus animaciones de scroll, perf/scroll-fino). Medio viewport de margen: el cambio ocurre lejos de
- *  donde se mira y el hero ya está listo antes de asomar. */
+/** F5/F12: el hero y las líneas vivas pausan lo infinito fuera de pantalla. El hero no se oculta ni suelta
+ *  sus animaciones de scroll (perf/fluidez-real). Medio viewport de margen: el cambio ocurre lejos de donde
+ *  se mira y los barridos ya corren antes de asomar. */
 function initOffscreen(): void {
   const toggle: IntersectionObserverCallback = (entries) => {
     for (const e of entries) e.target.classList.toggle('is-off', !e.isIntersecting);

@@ -13,12 +13,23 @@ export function initDecode(h1: HTMLElement): void {
     return;
   }
   const finish = () => h1.setAttribute('data-decoded', '');
+  // perf/fluidez-real: cuando termina el último trazo de la entrada (el subtítulo, pb-up), el hero se marca
+  // data-drawn y el CSS suelta las animaciones forwards (líneas, letras, subtítulo): menos capas en el scroll.
+  const hero = h1.closest<HTMLElement>('.pb-hero');
+  const drawn = () => hero?.setAttribute('data-drawn', '');
   /** Respaldo: además apaga las animaciones CSS (data-settled) para que ninguna letra quede escondida. */
   const settle = () => {
     finish();
     h1.setAttribute('data-settled', '');
+    drawn();
   };
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return finish();
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    drawn();
+    return finish();
+  }
+  hero?.addEventListener('animationend', (e) => {
+    if (e.animationName === 'pb-up') drawn();
+  });
   const ms = Number(h1.dataset['decodeMs']) || 0;
   setTimeout(finish, ms);
   setTimeout(settle, SETTLE_MS);

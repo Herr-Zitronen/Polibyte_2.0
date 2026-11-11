@@ -6,8 +6,6 @@
   background: var(--pb-paper);
   color: var(--pb-ink);
   /* F12: bajo el pliegue, el navegador no la pinta hasta que se acerca. */
-  content-visibility: auto;
-  contain-intrinsic-size: auto 1000px;
 }
 
 .pb-wwd-in {
