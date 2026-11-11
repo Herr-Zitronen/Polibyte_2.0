@@ -1,5 +1,7 @@
 /* Portada de Inicio (DESIGN §4). Estado por defecto = estado final visible; el scroll solo añade movimiento. */
 .pb-hero-s {
+  /* Altura del hero: los rangos de las animaciones de scroll se escalan con ella (no px fijos de escritorio). */
+  --pb-hero-h: 960px;
   display: flow-root;
   position: relative;
   overflow: clip;
@@ -8,7 +10,7 @@
 
 .pb-hero {
   position: relative;
-  min-height: 960px;
+  min-height: var(--pb-hero-h);
   max-width: var(--pb-container);
   margin: 64px auto 0;
 }
@@ -129,14 +131,35 @@
   text-align: center;
 }
 
+.pb-h1w {
+  position: relative;
+  isolation: isolate;
+}
+
 .pb-h1 {
   margin: 0;
   font-size: clamp(40px, 6.2vw, 96px);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.06em;
-  /* F5: la sombra grande se pinta cuando el texto ya no cambia (data-decoded), no en cada cuadro del decodificado. */
-  text-shadow: none;
+}
+
+/* WOR-101: la sombra grande vive en una copia detrás del titular y aparece por opacidad al terminar el
+   decodificado. Antes se encendía text-shadow en el h1 y se repintaba el titular entero. */
+.pb-h1-shadow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  color: transparent;
+  text-shadow: 0 2px 40px rgba(15, 26, 77, 0.35);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+  user-select: none;
+}
+
+.pb-h1[data-decoded] + .pb-h1-shadow {
+  opacity: 1;
 }
 
 .pb-word {
@@ -148,18 +171,42 @@
   white-space: nowrap;
 }
 
-.pb-h1[data-decoded] {
-  text-shadow: 0 2px 40px rgba(15, 26, 77, 0.35);
-}
-
 .pb-ch {
   display: inline-block;
   transform: translateY(112%);
   animation: pb-ch 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* WOR-101: carrete de glifos encima de cada letra. .pb-ci baja n pasos de 1.5em y sube uno por cuadro
+   (transform + steps, en el compositor); al final queda la letra real, que nunca se reescribe.
+   El carrete empieza 0.25em por encima de la letra: así el glifo de al lado nunca asoma por la ranura. */
+.pb-ci {
+  position: relative;
+  display: inline-block;
+  animation: pb-spin linear both;
+  animation-timing-function: steps(var(--n), end);
+}
+
+.pb-reel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.25em);
+  left: 0;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+[data-decoded] .pb-ci {
+  animation: none;
+}
+
+[data-decoded] .pb-reel {
+  display: none;
+}
+
 /* F4: si el respaldo fijó el titular (data-settled), las letras quedan en su sitio aunque la animación no haya terminado. */
-[data-settled] .pb-ch {
+[data-settled] .pb-ch,
+[data-settled] .pb-ci {
   transform: none;
   animation: none;
 }
@@ -224,6 +271,15 @@
   }
   100% {
     opacity: 1;
+  }
+}
+
+@keyframes pb-spin {
+  from {
+    transform: translateY(calc(var(--n) * 1.5em));
+  }
+  to {
+    transform: none;
   }
 }
 
@@ -331,26 +387,40 @@
     animation-timeline: scroll(root);
   }
 
+  /* Proporciones de los rangos originales sobre 960 px (120–760, 0–900, 60–820). */
   .pb-hx {
-    animation-range: 120px 760px;
+    animation-range: calc(var(--pb-hero-h) * 0.125) calc(var(--pb-hero-h) * 0.79);
   }
 
   .pb-tlg,
   .pb-trg,
   .pb-blg,
   .pb-brg {
-    animation-range: 0px 900px;
+    animation-range: 0px calc(var(--pb-hero-h) * 0.9375);
   }
 
   .pb-flg,
   .pb-frg {
-    animation-range: 60px 820px;
+    animation-range: calc(var(--pb-hero-h) * 0.0625) calc(var(--pb-hero-h) * 0.854);
   }
 }
 
+/* F12: con el hero fuera de pantalla se sueltan sus 7 animaciones de scroll y las capas de las líneas.
+   fx.ts marca .is-off con 200 px de margen, así que nunca se ve el estado sin animar. */
+.pb-hero.is-off .pb-hx,
+.pb-hero.is-off .pb-tlg,
+.pb-hero.is-off .pb-trg,
+.pb-hero.is-off .pb-blg,
+.pb-hero.is-off .pb-brg,
+.pb-hero.is-off .pb-flg,
+.pb-hero.is-off .pb-frg {
+  visibility: hidden;
+  animation: none;
+}
+
 @media (max-width: 820px) {
-  .pb-hero {
-    min-height: 860px;
+  .pb-hero-s {
+    --pb-hero-h: 860px;
   }
 
   .pb-flg {
@@ -387,6 +457,7 @@
   .pb-line,
   .pb-vline,
   .pb-ch,
+  .pb-ci,
   .pb-hx,
   .pb-tlg,
   .pb-trg,
@@ -406,5 +477,14 @@
 
   .pb-flow::after {
     animation: none;
+  }
+
+  .pb-reel {
+    display: none;
+  }
+
+  .pb-h1-shadow {
+    opacity: 1;
+    transition: none;
   }
 }

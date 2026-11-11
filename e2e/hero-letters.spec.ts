@@ -7,20 +7,24 @@ const LETTERS = "Construimos software. Y a quienes lo construyen.".replace(/ /g,
 const letters = (page: Page) =>
   page.evaluate(() => {
     const h1 = document.querySelector("[data-decode]")!;
-    const spans = [...h1.querySelectorAll<HTMLElement>(".pb-ch")];
+    const spans = [...h1.querySelectorAll<HTMLElement>(".pb-ch, .pb-ci")];
+    // Letra real = texto propio de .pb-ci; el carrete de glifos (WOR-101) es un hijo aparte, .pb-reel.
+    const real = [...h1.querySelectorAll<HTMLElement>(".pb-ci")].map((ci) =>
+      [...ci.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join(""),
+    );
     return {
-      text: spans.map((s) => s.textContent).join(""),
+      text: real.join(""),
       hidden: spans.filter((s) => getComputedStyle(s).transform !== "none").length,
     };
   });
 
 test("si el decodificado y la animación CSS no terminan, igual se fija el titular", async ({ page }) => {
-  // Simula lo peor: rAF detenido (pestaña ocupada/oculta) y animaciones de letra en pausa.
+  // Simula lo peor: rAF detenido (pestaña ocupada/oculta) y animaciones de letra y carrete en pausa.
   await page.addInitScript(() => {
     window.requestAnimationFrame = () => 0;
     document.addEventListener("DOMContentLoaded", () => {
       const st = document.createElement("style");
-      st.textContent = ".pb-ch{animation-play-state:paused !important}";
+      st.textContent = ".pb-ch,.pb-ci{animation-play-state:paused !important}";
       document.head.append(st);
     });
   });

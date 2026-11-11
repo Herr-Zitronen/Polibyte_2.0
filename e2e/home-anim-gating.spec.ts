@@ -5,7 +5,7 @@ import { expect, test, type Page } from '@playwright/test';
 const sweepState = (page: Page) =>
   page.evaluate(() => getComputedStyle(document.querySelector('.pb-hero .pb-flow')!, '::after').animationPlayState);
 
-/** rAF detenido: el decodificado no avanza y solo el temporizador de respaldo (3 s) fija el titular. */
+/** rAF detenido (pestaña ocupada): no debe impedir que el titular se fije (respaldo de 3 s). */
 const stallDecode = (page: Page) =>
   page.addInitScript(() => {
     window.requestAnimationFrame = () => 0;
@@ -23,14 +23,16 @@ test.describe('Inicio: animaciones y carga', () => {
     expect(await sweepState(page)).toBe('running');
   });
 
-  test('la sombra del titular se pinta solo cuando ya no cambia el texto', async ({ page }) => {
-    await stallDecode(page);
+  // WOR-101: la sombra vive en una copia aparte que aparece por opacidad; el h1 nunca se repinta por ella.
+  test('la sombra del titular aparece solo cuando termina el decodificado', async ({ page }) => {
     await page.goto('/');
-    await page.waitForTimeout(400);
-    const shadow = () => page.evaluate(() => getComputedStyle(document.querySelector('[data-decode]')!).textShadow);
-    expect(await shadow()).toBe('none');
+    const h1Shadow = () => page.evaluate(() => getComputedStyle(document.querySelector('[data-decode]')!).textShadow);
+    const copy = () => page.evaluate(() => Number(getComputedStyle(document.querySelector('.pb-h1-shadow')!).opacity));
+    const decoded = await page.evaluate(() => document.querySelector('[data-decode]')!.hasAttribute('data-decoded'));
+    if (!decoded) expect(await copy()).toBeLessThan(1);
     await page.waitForSelector('[data-decode][data-decoded]', { timeout: 6000 });
-    expect(await shadow()).not.toBe('none');
+    await expect.poll(copy).toBe(1);
+    expect(await h1Shadow()).toBe('none');
   });
 
   test('el hero y las líneas vivas se pausan fuera de pantalla', async ({ page }) => {

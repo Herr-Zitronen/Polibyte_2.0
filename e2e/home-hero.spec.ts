@@ -6,24 +6,29 @@ const TITLE = 'Construimos software. Y a quienes lo construyen.';
 const GLYPHS = '01<>/{}[]#_=+*;';
 const norm = (s: string) => s.replace(/\s+/g, ' ').trim();
 
-type Win = Window & { __seen: string[] };
+type Win = Window & { __mutations: number };
 
-test('el titular se decodifica y termina en el texto real', async ({ page }) => {
+// WOR-101: el decodificado gira un carrete de glifos encima de cada letra (CSS); el texto real NUNCA se reescribe.
+test('el titular se decodifica con glifos y termina en el texto real, sin reescribir las letras', async ({ page }) => {
   await page.addInitScript(() => {
-    (window as unknown as Win).__seen = [];
-    new MutationObserver((ms) => {
-      for (const m of ms) {
-        const el = m.target instanceof Element ? m.target : m.target.parentElement;
-        if (el?.classList.contains('pb-ch')) (window as unknown as Win).__seen.push(el.textContent ?? '');
-      }
-    }).observe(document, { subtree: true, childList: true, characterData: true });
+    (window as unknown as Win).__mutations = 0;
+    document.addEventListener('DOMContentLoaded', () => {
+      const h1 = document.querySelector('[data-decode]');
+      if (!h1) return;
+      new MutationObserver((ms) => {
+        (window as unknown as Win).__mutations += ms.length;
+      }).observe(h1, { subtree: true, childList: true, characterData: true });
+    });
   });
   await page.goto('/');
   const h1 = page.locator('h1');
+  // Cada letra lleva un carrete solo de glifos (sigue en el DOM aunque se oculte al terminar).
+  const reels = await h1.locator('.pb-reel').evaluateAll((els) => els.map((e) => (e.textContent ?? '').replace(/\n/g, '')));
+  expect(reels).toHaveLength(TITLE.replace(/ /g, '').length);
+  expect(reels.every((r) => r.length > 0 && [...r].every((c) => GLYPHS.includes(c)))).toBe(true);
   await expect(h1).toHaveAttribute('data-decoded', '');
   expect(norm(await h1.innerText())).toBe(TITLE);
-  const seen = await page.evaluate(() => (window as unknown as Win).__seen);
-  expect(seen.some((s) => s.length === 1 && GLYPHS.includes(s) && !TITLE.includes(s))).toBe(true);
+  expect(await page.evaluate(() => (window as unknown as Win).__mutations)).toBe(0);
 });
 
 test('accesible: aria-label completo y letras ocultas al lector', async ({ page }) => {

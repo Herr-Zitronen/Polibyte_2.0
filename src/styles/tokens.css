@@ -24,7 +24,7 @@
   --pb-line-main: rgba(242, 244, 250, 0.7);
 
   /* §2.2 Tipografía */
-  --pb-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --pb-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono Fallback', 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --pb-font-pixel: 'Silkscreen', var(--pb-font-mono);
   --pb-font-wordmark: 'Instrument Sans', system-ui, sans-serif;
   --pb-fs-hero: clamp(40px, 6.2vw, 96px);

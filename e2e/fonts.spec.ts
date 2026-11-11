@@ -12,7 +12,10 @@ test('Inicio carga JetBrains Mono, Silkscreen e Instrument Sans sin pedir nada a
   await page.waitForLoadState('networkidle');
   expect(external).toEqual([]);
 
-  const faces = await page.evaluate(() => [...document.fonts].map((f) => ({ family: f.family.replace(/['"]/g, ''), display: f.display })));
+  // 'JetBrains Mono Fallback' es un respaldo local (local('Courier New')…) con métricas ajustadas (WOR-101): no se descarga.
+  const faces = await page.evaluate(() =>
+    [...document.fonts].map((f) => ({ family: f.family.replace(/['"]/g, ''), display: f.display })).filter((f) => f.family !== 'JetBrains Mono Fallback'),
+  );
   const families = [...new Set(faces.map((f) => f.family))].sort();
   expect(families).toEqual(['Instrument Sans', 'JetBrains Mono Variable', 'Silkscreen']);
   for (const f of faces) expect(f.display, f.family).toBe('swap');
