@@ -21,4 +21,7 @@ export default defineConfig({
   // CSS incrustado en el HTML: el sitio es pequeño (~12 KB comprimidos) y así el primer pintado
   // no espera 3 hojas que bloquean el render (Lighthouse, 4G simulado: H2.3).
   build: { inlineStylesheets: 'always' },
+  // Las fuentes nunca se incrustan en base64 (Vite lo hace con todo archivo de menos de 4 KB): como el CSS va
+  // en línea, una fuente pequeña viajaría dentro del HTML de cada página, sin caché y casi sin comprimir.
+  vite: { build: { assetsInlineLimit: (file) => (/\.woff2?$/.test(file) ? false : undefined) } },
 });
