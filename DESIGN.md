@@ -276,6 +276,7 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 - Las animaciones de entrada con `forwards` del hero (líneas, letras, subtítulo) se sueltan al terminar (`data-drawn` en `.pb-hero`, lo pone `decode.ts` en el `animationend` del subtítulo, con respaldo a los 3 s): misma imagen, sin capas vivas durante el scroll.
 - Ningún `will-change` ligado a `:hover`: crea y destruye capas mientras el contenido pasa bajo el cursor.
 - Reglas de especulación con `eagerness: 'conservative'`: la página siguiente se pre-renderiza al pulsar, no al dejar el cursor sobre un enlace (eso robaba CPU y GPU en mitad del scroll).
+- Además, `prefetch` con `eagerness: 'moderate'`: al dejar el cursor sobre un enlace interno solo se descarga su HTML (sin renderizar, sin coste de CPU ni GPU). Al pulsar, el prerender ya lo tiene.
 - La medición de `perf-diag.yml` corre en Actions, que rasteriza por software (sin GPU): sirve para comparar variantes entre sí, no para predecir un PC con gráfica. Para eso está el panel `?diag` (`docs/SESSIONS.md`).
 - Fuentes: `display=swap`; Instrument Sans subconjunto a "PoliByte"; JetBrains Mono (latín) precargada, con un respaldo local de métricas ajustadas para que el titular no salte.
 - JetBrains Mono se declara solo en latín y latín extendido (`Fonts.astro`). Ninguna fuente se incrusta en el HTML en base64 (`assetsInlineLimit` en `astro.config.mjs`).
