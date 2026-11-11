@@ -31,13 +31,24 @@ const cvlRects = (page: Page) =>
     }),
   );
 
-/** Píxeles que difieren en más de 24 niveles en algún canal. */
-async function diffPixels(a: Buffer, b: Buffer): Promise<number> {
-  const [ra, rb] = await Promise.all([sharp(a).raw().toBuffer(), sharp(b).raw().toBuffer()]);
-  expect(ra.length).toBe(rb.length);
+type Rect = { x: number; y: number; w: number; h: number };
+
+/** Píxeles que difieren en más de 24 niveles en algún canal, FUERA de las líneas (cajas + 2 px).
+ *  Dentro de las líneas solo cambia el antialiasing de un trazo de 1.5 px (grupo vs. capa propia: ~1 columna
+ *  por línea); su geometría se compara aparte, con ±0.1 px. Fuera de ellas, el dibujo debe ser el mismo. */
+async function diffPixelsOutside(a: Buffer, b: Buffer, lines: Rect[], cssWidth: number): Promise<number> {
+  const [ia, ib] = await Promise.all([sharp(a).raw().toBuffer({ resolveWithObject: true }), sharp(b).raw().toBuffer()]);
+  const { data: ra, info } = ia;
+  expect(ra.length).toBe(ib.length);
+  const scale = info.width / cssWidth;
+  const pad = 2 * scale;
+  const boxes = lines.map((r) => ({ x0: r.x * scale - pad, x1: (r.x + r.w) * scale + pad, y0: r.y * scale - pad, y1: (r.y + r.h) * scale + pad }));
   let n = 0;
-  for (let i = 0; i < ra.length; i += 4) {
-    if (Math.abs(ra[i]! - rb[i]!) > 24 || Math.abs(ra[i + 1]! - rb[i + 1]!) > 24 || Math.abs(ra[i + 2]! - rb[i + 2]!) > 24) n++;
+  for (let i = 0, px = 0; i < ra.length; i += info.channels, px++) {
+    const x = px % info.width;
+    const y = Math.floor(px / info.width);
+    if (boxes.some((b) => x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1)) continue;
+    if (Math.abs(ra[i]! - ib[i]!) > 24 || Math.abs(ra[i + 1]! - ib[i + 1]!) > 24 || Math.abs(ra[i + 2]! - ib[i + 2]!) > 24) n++;
   }
   return n;
 }
@@ -78,6 +89,7 @@ test('agrupar las líneas centrales no cambia el dibujo del hero (0, 40 y 90 % d
       const q = after.rects[j]!;
       for (const k of ['x', 'y', 'w', 'h'] as const) expect(Math.abs(q[k] - r[k]), `línea ${j}, ${k} al ${p * 100} %`).toBeLessThanOrEqual(0.1);
     }
-    expect(await diffPixels(after.shot, before.shot), `píxeles distintos al ${p * 100} %`).toBeLessThanOrEqual(40);
+    const lines = [...before.rects, ...after.rects];
+    expect(await diffPixelsOutside(after.shot, before.shot, lines, page.viewportSize()!.width), `píxeles distintos fuera de las líneas al ${p * 100} %`).toBeLessThanOrEqual(40);
   }
 });

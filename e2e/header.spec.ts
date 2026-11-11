@@ -1,6 +1,18 @@
 // H2.1 · Barra superior (DESIGN §3.9).
 import { expect, test } from '@playwright/test';
 
+// Espera a que terminen las entradas de la barra (p. ej. «unirme» entra con pb-in: 0.54 s + 0.7 s). Medir antes
+// da posiciones desplazadas y colores a medio fundido (axe veía contraste 1.1:1 en «04 unirme»).
+const barSettled = (page: import('@playwright/test').Page) =>
+  page.locator('.pb-hdr').evaluate((el) =>
+    Promise.all(
+      el
+        .getAnimations({ subtree: true })
+        .filter((a) => a.effect?.getTiming().iterations !== Infinity)
+        .map((a) => a.finished),
+    ),
+  );
+
 const PAGES = ['/', '/eventos/', '/equipo/', '/unirme/'];
 
 test.describe('escritorio', () => {
@@ -113,6 +125,7 @@ test.describe('F17 · escudo ESPOCH en la barra', () => {
 
   test('sin violaciones de axe en la barra', async ({ page }) => {
     await page.goto('/');
+    await barSettled(page);
     const { default: AxeBuilder } = await import('@axe-core/playwright');
     const results = await new AxeBuilder({ page }).include('.pb-hdr').analyze();
     expect(results.violations).toEqual([]);

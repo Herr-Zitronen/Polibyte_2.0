@@ -10,7 +10,9 @@ test('aparece en la primera visita, dura menos de 2 s y sale del DOM', async ({ 
   await expect(page.locator('.pb-intro')).toHaveCount(0, { timeout: 4000 });
   expect(Date.now() - t0).toBeLessThanOrEqual(2300);
   expect(await on(page)).toBe(false);
-  await expect(page.locator('.pb-hdr')).toBeVisible();
+  // .pb-hdr mide 0 px de alto a propósito (fixed, height: 0): toBeVisible nunca pasaría. Lo que la entrada
+  // oculta es su visibility.
+  await expect(page.locator('.pb-hdr')).toHaveCSS('visibility', 'visible');
 });
 
 test('debajo, el titular está pintado en su sitio desde el principio (LCP)', async ({ page }) => {

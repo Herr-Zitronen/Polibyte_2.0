@@ -2,12 +2,25 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
+// Espera a que terminen las entradas de la barra (p. ej. «unirme» entra con pb-in: 0.54 s + 0.7 s). Medir antes
+// da posiciones desplazadas y colores a medio fundido (axe veía contraste 1.1:1 en «04 unirme»).
+const barSettled = (page: import('@playwright/test').Page) =>
+  page.locator('.pb-hdr').evaluate((el) =>
+    Promise.all(
+      el
+        .getAnimations({ subtree: true })
+        .filter((a) => a.effect?.getTiming().iterations !== Infinity)
+        .map((a) => a.finished),
+    ),
+  );
+
 test.beforeEach(async ({ page }) => {
   test.skip(page.viewportSize()!.width > 820, 'solo celular');
   await page.goto('/');
 });
 
 test('una sola fila: logo, "unirme" y botón de menú; nav de escritorio oculto', async ({ page }) => {
+  await barSettled(page);
   const tops = await Promise.all(
     ['.pb-hdr .pb-logo', '.pb-hdr .pb-join', '.pb-hdr .pb-menu-btn'].map(async (s) => {
       const b = (await page.locator(s).boundingBox())!;
