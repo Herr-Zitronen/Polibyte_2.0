@@ -17,7 +17,7 @@ push a una rama ──► GitHub Actions: tipos, lint, Vitest, build, Lighthouse
 |---|---|---|
 | GitHub Actions (`.github/workflows/ci.yml`) | Corre las pruebas. No publica nada. | Pestaña *Actions* y los checks de cada PR |
 | Cloudflare Workers Builds | Construye `dist/` y lo sube al Worker `polibyte-site`. | Panel de Cloudflare → Workers → `polibyte-site` → *Deployments* y *Builds*; también deja un comentario con la URL de preview en cada PR |
-| Protección de ramas en GitHub | No deja fusionar en `staging` ni en `main` si las pruebas fallan. | *Settings → Branches* |
+| Protección de ramas en GitHub | No deja fusionar en `staging` ni en `main` si las pruebas fallan. `main` exige además el job *Contenido real (hacia main)*, que bloquea mientras quede contenido de ejemplo (`docs/CONTENIDO.md`). | *Settings → Branches* |
 
 **¿Por qué así?** Workers Builds publica en cuanto recibe un push, sin esperar las pruebas. El control está en la fusión: a `staging` y `main` solo llega código cuyo PR pasó todos los checks, así que lo que Cloudflare publica desde ahí ya está probado. Las ramas de trabajo también se publican, pero solo como preview, nunca en producción.
 

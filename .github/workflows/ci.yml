@@ -35,6 +35,21 @@ jobs:
       - run: npm run lint
       - run: npm run test
 
+  # L1 (WOR-85): hacia main, el contenido de ejemplo bloquea. Job propio porque la protección de main lo exige
+  # por nombre: una corrida de push a staging (mismo commit) no lo trae y no puede abrir la puerta a producción.
+  content:
+    name: Contenido real (hacia main)
+    if: github.base_ref == 'main' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .node-version, cache: npm }
+      - run: npm ci
+      - run: npx vitest run tests/content-ready.test.ts
+        env:
+          CONTENT_READY: '1'
+
   # Un solo job (un solo npm ci) para tipos, lint, Vitest, build y Lighthouse.
   verify:
     name: Tipos + lint + Vitest + build + Lighthouse
@@ -47,10 +62,7 @@ jobs:
       - run: npm ci
       - run: npm run check:types
       - run: npm run lint
-      # L1 (WOR-85): hacia main, el contenido de ejemplo bloquea (tests/content-ready.test.ts).
       - run: npm run test
-        env:
-          CONTENT_READY: ${{ (github.ref == 'refs/heads/main' || github.base_ref == 'main') && '1' || '' }}
       - run: npm run build
         env:
           SITE_URL: ${{ vars.SITE_URL }}
