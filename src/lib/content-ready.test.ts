@@ -16,6 +16,10 @@ describe('findPlaceholders · contenido de ejemplo que no puede llegar a producc
     ]);
   });
 
+  it('también equipos e integrantes de ejemplo de los proyectos', () => {
+    expect(findPlaceholders([{ path: 'p.md', text: "team: '[Equipo 1]'\nmembers: ['[Integrante A]']" }]).map((p) => p.marker)).toEqual(['[Equipo', '[Integrante']);
+  });
+
   it('el formulario de Microsoft sin ruta es un marcador; con ruta, no', () => {
     expect(findPlaceholders([{ path: 's.json', text: '"joinFormUrl": "https://forms.office.com/",' }])).toHaveLength(1);
     expect(findPlaceholders([{ path: 's.json', text: '"joinFormUrl": "https://forms.office.com/r/AbC123"' }])).toEqual([]);

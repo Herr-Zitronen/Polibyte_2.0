@@ -14,6 +14,8 @@ const MARKERS: { marker: string; re: RegExp }[] = [
   { marker: '[Contenido de ejemplo]', re: /\[Contenido de ejemplo\]/ },
   { marker: '[Nombre', re: /\[Nombre/ },
   { marker: '[Proyecto', re: /\[Proyecto/ },
+  { marker: '[Equipo', re: /\[Equipo/ },
+  { marker: '[Integrante', re: /\[Integrante/ },
   { marker: 'example.com', re: /\bexample\.com\b/ },
   // El enlace del formulario sin ruta (el valor por defecto de site.json).
   { marker: 'forms.office.com/ sin ruta', re: /forms\.office\.com\/?(?=["'\s]|$)/ },
