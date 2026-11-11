@@ -26,7 +26,7 @@ for (const viewport of [
 ]) {
   test.describe(`celular ${viewport.width}×${viewport.height}`, () => {
     test.use({ viewport });
-    test.beforeEach(({}, info) => test.skip(info.project.name !== 'mobile-390', 'solo celular'));
+    test.skip(({ isMobile }) => !isMobile, 'solo celular');
 
     test('titular y botones quedan dentro del marco, sin tocar sus líneas', async ({ page }) => {
       const f = await frame(page);
