@@ -5,7 +5,7 @@ import Base from '../../layouts/Base.astro';
 import { CALENDAR_NOW, calendarEvents } from '../../lib/calendar-fixtures';
 import { calendarRows } from '../../lib/filter';
 
-const past = calendarEvents.filter((e) => e.date && e.date < CALENDAR_NOW);
+const past = calendarEvents.filter((e) => 'date' in e && e.date < CALENDAR_NOW);
 ---
 
 <Base title="Laboratorio · Calendario vacío" noindex header={false}>
