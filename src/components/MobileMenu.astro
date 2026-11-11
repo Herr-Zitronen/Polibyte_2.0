@@ -1,6 +1,6 @@
 ---
 // Menú móvil (DESIGN §3.9, §6): <dialog> nativo con showModal() → fondo inerte y Escape gratis.
-// Va fuera de la barra: su backdrop-filter no puede tener un ancestro con view-transition-name.
+// Va fuera de la barra (vive en la top layer). F13: fondo sólido + grano propio, sin backdrop-filter.
 // El botón que lo abre vive en Header.astro.
 import Button from './Button.astro';
 import Logo from './Logo.astro';

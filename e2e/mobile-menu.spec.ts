@@ -54,3 +54,14 @@ test('elegir "02 eventos" navega y la hoja queda cerrada', async ({ page }) => {
   await expect(page.getByRole('dialog')).toBeHidden();
   await expect(page.locator('.pb-menu-btn')).toHaveAttribute('aria-expanded', 'false');
 });
+
+// F13 (WOR-99) · La hoja no desenfoca el fondo: fondo sólido rgba(15, 26, 77, 0.94) + su grano.
+test('la hoja abierta no usa backdrop-filter y su fondo es casi opaco', async ({ page }) => {
+  await page.locator('.pb-menu-btn').click();
+  const sheet = page.locator('.pb-sheet');
+  await expect(sheet).toBeVisible();
+  await expect(sheet).toHaveCSS('backdrop-filter', 'none');
+  await expect(sheet).toHaveCSS('background-color', 'rgba(15, 26, 77, 0.94)');
+  await expect(sheet.locator('.pb-grain')).toHaveCount(1);
+  await expect(sheet).toHaveScreenshot('menu-abierto-390.png');
+});
