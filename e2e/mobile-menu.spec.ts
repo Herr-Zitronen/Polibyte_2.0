@@ -25,7 +25,10 @@ test('abrir el menú muestra la hoja con 4 enlaces, accesible', async ({ page })
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();
   await expect(dialog).toHaveAttribute('aria-modal', 'true');
-  await expect(dialog.locator('.pb-sheet-nav a')).toHaveCount(4);
+  // Tres enlaces; "unirme" no se repite en la lista: va solo en el botón "Quiero unirme" (PR B).
+  await expect(dialog.locator('.pb-sheet-nav a')).toHaveCount(3);
+  await expect(dialog.locator('.pb-sheet-nav a[href="/unirme/"]')).toHaveCount(0);
+  await expect(dialog.getByRole('link', { name: 'Quiero unirme' })).toHaveAttribute('href', '/unirme/');
   await expect(btn).toHaveAttribute('aria-expanded', 'true');
   const results = await new AxeBuilder({ page }).include('.pb-sheet').analyze();
   expect(results.violations).toEqual([]);

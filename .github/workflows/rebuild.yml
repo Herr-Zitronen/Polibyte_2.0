@@ -1,12 +1,12 @@
 # Reconstrucción programada de producción (PR B). El sitio decide "próximo" o "realizado" al construirse:
 # sin esto, un evento que ya pasó sigue como próximo hasta el siguiente deploy. Solo build + deploy de main,
 # sin pruebas (el código ya pasó CI): ~2 min por corrida.
-# Frecuencia: diaria a las 01:00 de Ecuador (06:00 UTC). Para semanal: '0 6 * * 1'. Para solo manual: borra `schedule`.
+# Frecuencia: semanal, lunes 01:00 de Ecuador (06:00 UTC), decisión de Joel. Diaria: '0 6 * * *'. Solo manual: borra `schedule`.
 name: Reconstrucción programada
 
 on:
   schedule:
-    - cron: '0 6 * * *'
+    - cron: '0 6 * * 1'
   workflow_dispatch:
 
 permissions:

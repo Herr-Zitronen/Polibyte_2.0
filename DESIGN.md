@@ -134,7 +134,7 @@ Cursor light (C) en cada fila. La fila seleccionada es un poco más clara, con b
 - Solo en Inicio, al pasar el panel del próximo evento aparece un **chip** a la izquierda de "unirme" (barrido de máscara + dígitos que suben). Oculto en ≤1180.
 - **Blur progresivo**: una capa de 8px con máscara progresiva, 92px de alto, y un tinte. Se apaga sobre las portadas (su fondo ya está difuminado). F8 probó quitar el blur y se revirtió: se queda así. Sobre secciones claras el tinte y el texto cambian a tema claro (botón invertido).
 - **Importante:** ningún ancestro del blur puede tener `view-transition-name` (lo convierte en "backdrop root" y el blur deja de verse). El nombre de transición va en la fila de contenido, no en el contenedor.
-- Celular (≤820): logo + "unirme" + botón de menú; el menú abre una hoja a pantalla completa con vidrio y links grandes numerados.
+- Celular (≤820): logo + "unirme" + botón de menú; el menú abre una hoja a pantalla completa con vidrio y links grandes numerados (01 club · 02 eventos · 03 equipo). "Unirme" no se repite en la lista: va en el botón "Quiero unirme" de la hoja.
 
 ### 3.10 Pie de página
 
