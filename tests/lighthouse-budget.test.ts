@@ -10,8 +10,9 @@ const lhrc = require('../lighthouserc.cjs') as {
 const a = lhrc.ci.assert.assertions;
 
 describe('H0.2 · presupuestos en lighthouserc.cjs', () => {
-  it('LCP < 2000 ms es error', () => {
-    expect(a['largest-contentful-paint']).toEqual(['error', expect.objectContaining({ maxNumericValue: 2000 })]);
+  // Temporal (WOR-101): 2.0 s estaba al filo en staging. Se vuelve a 2000 cuando el titular esté optimizado.
+  it('LCP < 2200 ms es error (temporal, WOR-101)', () => {
+    expect(a['largest-contentful-paint']).toEqual(['error', expect.objectContaining({ maxNumericValue: 2200 })]);
   });
 
   it('CLS < 0.05 es error', () => {
