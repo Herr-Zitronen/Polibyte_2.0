@@ -124,10 +124,17 @@
   transition: transform 0.45s var(--pb-ease-stroke);
 }
 
-.pb-nav a:hover::after,
 .pb-nav a[aria-current='page']::after {
   transform: scaleX(1);
   transform-origin: left;
+}
+
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-nav a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
 }
 
 .pb-nav a[aria-current='page']::after {
@@ -145,8 +152,11 @@
   transition: transform 0.35s var(--pb-ease-stroke);
 }
 
-.pb-nav a:hover .pb-arr {
-  transform: translate(3px, -3px);
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-nav a:hover .pb-arr {
+    transform: translate(3px, -3px);
+  }
 }
 
 /* Sobre secciones claras el botón se invierte. */

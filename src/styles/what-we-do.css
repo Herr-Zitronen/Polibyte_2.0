@@ -60,8 +60,11 @@
     opacity 0.3s;
 }
 
-.pb-big:hover {
-  transform: translateX(18px);
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-big:hover {
+    transform: translateX(18px);
+  }
 }
 
 .pb-bigw {
@@ -80,10 +83,17 @@
     transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.pb-big:hover .pb-hint,
 .pb-big:focus-visible .pb-hint {
   opacity: 1;
   transform: none;
+}
+
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-big:hover .pb-hint {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .pb-qgrid {

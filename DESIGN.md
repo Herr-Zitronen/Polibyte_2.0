@@ -68,7 +68,7 @@ Prohibido: cursiva en titulares; MAYÚSCULAS manuales (Silkscreen ya es de caja 
 
 - Contenedor: `max-width: 1320px`, padding lateral 32px (16px en ≤820).
 - Ritmo vertical de sección: 112–120px arriba/abajo (96px en celular).
-- Puntos de quiebre: **1200** (filas de eventos compactas), **1180** (se oculta el chip de la barra), **960** (columnas se apilan, la columna fija deja de serlo, se ocultan cruces que dependen de columnas), **820** (barra móvil, menú en hoja), **520** (botones pueden partir texto, se oculta la línea entre etiquetas), **480** (se oculta el subtítulo del logo).
+- Puntos de quiebre: **1200** (filas de eventos compactas), **1180** (se oculta el chip de la barra), **960** (columnas se apilan, la columna fija deja de serlo, se ocultan cruces que dependen de columnas), **820** (barra móvil, menú en hoja), **520** (botones pueden partir texto, se oculta la línea entre etiquetas), **480** (se oculta el subtítulo del logo), **380** (la directiva pasa a una columna).
 - Regla: un layout de dos columnas **nunca** se parte en filas por falta de espacio; se apila solo en un punto de quiebre explícito (lección aprendida con el calendario).
 
 ---
@@ -201,9 +201,29 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 
 - Por evento, campo `showcase: "hidden" | "published"`. Solo con `published` aparecen la sección *Proyectos destacados* en Eventos, el botón "Ver proyectos" en el archivo y el botón principal "Ver proyectos destacados" en la portada de Eventos (si no, "Ver calendario").
 - Por proyecto, `featured: boolean`. El primero destacado va en el panel grande (con conmutador Escritorio/Móvil); los dos siguientes en tarjetas; el resto en filas.
-- Nunca se muestra una vitrina vacía o a medias.
+- Nunca se muestra una vitrina vacía o a medias:
+  - 1 destacado: solo el panel grande. 2 destacados: panel + una tarjeta horizontal a ancho completo (se apila en ≤960). 3 o más: panel + 2 tarjetas + filas.
+  - Sin `demoUrl` ni `repoUrl` no hay fila de botones; sin `demoUrl` la barra del navegador dice "sin demo pública". Sin integrantes ni stack no se pinta la píldora ni la lista.
+- En Eventos se muestra la vitrina del **evento concluido más reciente que la tenga** (un taller posterior al hackathon no la apaga). Si ningún evento tiene vitrina, la sección no existe y el botón del resumen dice "Ver calendario".
+- Cada evento con vitrina publicada muestra sus proyectos en su página de detalle (`#proyectos`), y "Ver proyectos" del archivo lleva ahí.
+- Un evento `published` sin ningún destacado avisa en el build.
+
+### 5.3 Estados vacíos
+
+- Calendario sin próximos: sin pestañas de filtro, "Estamos preparando los próximos eventos" y botón secundario a Unirme. El mensaje de filtro vacío solo remite al archivo si hay archivo.
+- Inicio sin próximos: "Qué hacemos" empalma directamente con el cierre. Si todos los próximos son "por confirmar", el CTA invita a unirse en vez de inscribirse.
+- Equipo sin directiva: la sección no se pinta. Detalle sin cuerpo Markdown: sin bloque de texto vacío.
+- "Pasado" o "próximo" se decide al construir: `rebuild.yml` reconstruye producción a diario.
 
 ---
+
+### 5.4 Celular
+
+- `:hover` solo dentro de `@media (hover: hover)`: en táctil se quedaría pegado tras tocar.
+- Áreas táctiles de al menos 44 px con puntero grueso (botones pequeños, pestañas, enlaces sociales y del pie).
+- Portada de Inicio: altura `clamp(700px, 100svh − 64px, 860px)`.
+- Directiva: 2 por fila (la quinta centrada) hasta 380 px; una columna solo por debajo.
+- Ninguna página desborda a lo ancho a 390 px (prueba E2E por página).
 
 ## 6. Accesibilidad
 

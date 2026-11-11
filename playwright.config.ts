@@ -1,10 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 
 // Se ejecuta solo en GitHub Actions (ver docs/SESSIONS.md).
+// PR B: mobile-390 es un celular de verdad (táctil, sin hover, puntero grueso), no un escritorio estrecho.
 const widths = [
-  { name: 'desktop-1440', viewport: { width: 1440, height: 900 } },
-  { name: 'laptop-1000', viewport: { width: 1000, height: 800 } },
-  { name: 'mobile-390', viewport: { width: 390, height: 844 } },
+  { name: 'desktop-1440', viewport: { width: 1440, height: 900 }, touch: false },
+  { name: 'laptop-1000', viewport: { width: 1000, height: 800 }, touch: false },
+  { name: 'mobile-390', viewport: { width: 390, height: 844 }, touch: true },
 ];
 
 export default defineConfig({
@@ -21,9 +22,9 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
-  projects: widths.map(({ name, viewport }) => ({
+  projects: widths.map(({ name, viewport, touch }) => ({
     name,
-    use: { ...devices['Desktop Chrome'], viewport },
+    use: { ...devices['Desktop Chrome'], viewport, ...(touch && { hasTouch: true, isMobile: true }) },
   })),
   webServer: [
     {

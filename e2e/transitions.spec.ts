@@ -36,9 +36,17 @@ test("como mucho un pb-evtitle por página", async ({ page }) => {
   }
 });
 
-test("sin movimiento reducido, Lenis da el scroll con inercia", async ({ page }) => {
+test("sin movimiento reducido, Lenis da el scroll con inercia (solo con cursor)", async ({ page }, info) => {
+  test.skip(info.project.name === "mobile-390", "en táctil se usa el scroll nativo (F12)");
   await page.goto("/");
-  await expect.poll(() => page.evaluate(() => "lenis" in window)).toBe(true);
+  await expect.poll(() => page.evaluate(() => typeof (window as unknown as { lenis?: object }).lenis === "object")).toBe(true);
+});
+
+test("en táctil no se carga Lenis", async ({ page }, info) => {
+  test.skip(info.project.name !== "mobile-390", "solo celular");
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+  expect(await page.evaluate(() => (window as unknown as { lenis?: object }).lenis)).toBeUndefined();
 });
 
 test.describe("con movimiento reducido", () => {

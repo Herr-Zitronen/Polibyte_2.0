@@ -419,8 +419,9 @@
 }
 
 @media (max-width: 820px) {
+  /* PR B: altura según la pantalla (svh), acotada: el panel del próximo evento queda cerca de la primera pantalla. */
   .pb-hero-s {
-    --pb-hero-h: 860px;
+    --pb-hero-h: clamp(700px, calc(100svh - 64px), 860px);
   }
 
   .pb-flg {
@@ -434,8 +435,8 @@
   .pb-box {
     right: 16px;
     left: 16px;
-    gap: 28px;
-    padding: 28px 10px;
+    gap: 24px;
+    padding: 12px 10px;
   }
 
   .pb-h1 {

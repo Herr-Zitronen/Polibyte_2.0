@@ -94,6 +94,15 @@
 }
 
 /* Al final: movimiento reducido deja todo quieto (sin linterna). */
+/* PR B · Enlaces del pie: área táctil de 44 px. */
+@media (pointer: coarse) {
+  .pb-foot-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pb-lamp .lit {
     transition: none;

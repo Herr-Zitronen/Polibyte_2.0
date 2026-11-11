@@ -3,7 +3,8 @@ import { expect, test } from '@playwright/test';
 
 test('las animaciones de paralaje solo tocan transform u opacity', async ({ page }) => {
   await page.goto('/lab/glass/');
-  await page.mouse.wheel(0, 600);
+  // Scroll por script: page.mouse.wheel no existe en los perfiles táctiles (mobile-390, PR B).
+  await page.evaluate(() => window.scrollTo(0, 600));
   const props = await page.evaluate(() =>
     document
       .getAnimations()

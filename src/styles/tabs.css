@@ -19,8 +19,11 @@
     color 0.3s;
 }
 
-.pb-tab:hover {
-  background: rgba(242, 244, 250, 0.1);
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-tab:hover {
+    background: rgba(242, 244, 250, 0.1);
+  }
 }
 
 .pb-tab[aria-pressed='true'] {
@@ -37,13 +40,23 @@
   border-color: rgba(19, 32, 90, 0.5);
 }
 
-.pb-on-light .pb-tab:hover {
-  background: rgba(19, 32, 90, 0.06);
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-on-light .pb-tab:hover {
+    background: rgba(19, 32, 90, 0.06);
+  }
 }
 
 .pb-on-light .pb-tab[aria-pressed='true'] {
   background: #13205a;
   color: #f2f4fa;
+}
+
+/* PR B · Área táctil de las pestañas: al menos 44 px. */
+@media (pointer: coarse) {
+  .pb-tab {
+    min-height: 44px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

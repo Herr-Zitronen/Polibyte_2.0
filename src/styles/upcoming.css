@@ -242,9 +242,15 @@
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.pb-row:hover::before,
 .pb-row.sel::before {
   transform: scaleX(1);
+}
+
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-row:hover::before {
+    transform: scaleX(1);
+  }
 }
 
 /* Seleccionada: barra amarilla de 3px, brillo superior de 1px y barrido tenue cada 7s. */
@@ -301,8 +307,11 @@
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.pb-row:hover .pb-name {
-  transform: translateX(12px);
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-row:hover .pb-name {
+    transform: translateX(12px);
+  }
 }
 
 .pb-rname {
