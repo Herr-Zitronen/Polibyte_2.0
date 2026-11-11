@@ -461,9 +461,11 @@
 }
 
 @media (max-width: 820px) {
-  /* PR B: altura según la pantalla (svh), acotada: el panel del próximo evento queda cerca de la primera pantalla. */
+  /* PR B: altura según la pantalla, acotada: el panel del próximo evento queda cerca de la primera pantalla.
+     lvh y no svh: con la barra flotante de Safari, svh termina la portada encima de la barra y debajo asomaba
+     la sección siguiente como un bloque oscuro. Con lvh el nevado llega al borde y se ve a través de la barra. */
   .pb-hero-s {
-    --pb-hero-h: clamp(700px, calc(100svh - 64px), 860px);
+    --pb-hero-h: clamp(700px, calc(100lvh - 64px), 860px);
   }
 
   .pb-flg {
@@ -474,9 +476,14 @@
     right: 16px;
   }
 
+  /* La caja define su alto y empuja al marco: en un celular el titular, el subtítulo y los dos botones apilados
+     no caben en el hueco fijo entre líneas (alto − 2 × 168 px) y, centrados, se salían encima de ellas. Los grupos
+     de líneas están anclados arriba y abajo de .pb-hero, así que rodean al contenido sea cual sea su alto. */
   .pb-box {
-    right: 16px;
-    left: 16px;
+    position: relative;
+    inset: auto;
+    min-height: calc(var(--pb-hero-h) - 336px);
+    margin: 168px 16px;
     gap: 24px;
     padding: 12px 10px;
   }
