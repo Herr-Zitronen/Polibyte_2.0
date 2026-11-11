@@ -44,15 +44,16 @@ test("1440: 3 arriba y 2 abajo centradas, todas del mismo tamaño", async ({
   ).toBeLessThanOrEqual(1);
 });
 
-test("390: una sola columna", async ({ page }) => {
+test("390: dos por fila y la quinta centrada (PR B)", async ({ page }) => {
   test.skip(page.viewportSize()!.width !== 390, "solo 390");
   await page.goto("/equipo/");
   const b = await boxes(page);
-  b.reduce((prev, cur) => {
-    expect(Math.abs(cur.x - b[0].x)).toBeLessThanOrEqual(1);
-    expect(cur.y).toBeGreaterThan(prev.y);
-    return cur;
-  });
+  expect(Math.abs(b[0].y - b[1].y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(b[2].y - b[3].y)).toBeLessThanOrEqual(1);
+  expect(b[2].y).toBeGreaterThan(b[0].y);
+  expect(b[4].y).toBeGreaterThan(b[2].y);
+  const grid = (await page.locator("#directiva .pb-dir").boundingBox())!;
+  expect(Math.abs(b[4].x + b[4].width / 2 - (grid.x + grid.width / 2))).toBeLessThanOrEqual(1);
 });
 
 test("miembro sin foto: SVG de iniciales en pixel art con nombre accesible", async ({

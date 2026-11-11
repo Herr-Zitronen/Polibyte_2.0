@@ -1,6 +1,18 @@
 // H2.1 · Barra superior (DESIGN §3.9).
 import { expect, test } from '@playwright/test';
 
+// Espera a que terminen las entradas de la barra (p. ej. «unirme» entra con pb-in: 0.54 s + 0.7 s). Medir antes
+// da posiciones desplazadas y colores a medio fundido (axe veía contraste 1.1:1 en «04 unirme»).
+const barSettled = (page: import('@playwright/test').Page) =>
+  page.locator('.pb-hdr').evaluate((el) =>
+    Promise.all(
+      el
+        .getAnimations({ subtree: true })
+        .filter((a) => a.effect?.getTiming().iterations !== Infinity)
+        .map((a) => a.finished),
+    ),
+  );
+
 const PAGES = ['/', '/eventos/', '/equipo/', '/unirme/'];
 
 test.describe('escritorio', () => {
@@ -30,56 +42,16 @@ test('la barra cambia a tema claro sobre una sección clara', async ({ page }) =
   await page.goto('/');
   const hdr = page.locator('.pb-hdr');
   await expect(hdr).toHaveAttribute('data-theme', 'dark');
-  await page.locator('section[data-theme="light"]').first().evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 10));
+  await page.locator('section[data-theme="light"]').first().evaluate((el) => window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 10, behavior: 'instant' }));
   await expect(hdr).toHaveAttribute('data-theme', 'light');
   await expect(page.locator('.pb-hdr .pb-join .pb-b1__box')).toHaveCSS('background-color', 'rgb(19, 32, 90)');
-  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
   await expect(hdr).toHaveAttribute('data-theme', 'dark');
 });
 
-test('ningún elemento de la barra tiene backdrop-filter (F8)', async ({ page }) => {
-  for (const path of PAGES) {
-    await page.goto(path);
-    const filtered = await page.locator('.pb-hdr, .pb-hdr *').evaluateAll((els) =>
-      els.filter((el) => getComputedStyle(el).backdropFilter !== 'none').map((el) => el.className),
-    );
-    expect(filtered, path).toEqual([]);
-  }
-});
-
-test('la barra sigue legible sobre una sección clara sin blur (F8)', async ({ page }) => {
+test('ningún ancestro del blur tiene view-transition-name', async ({ page }) => {
   await page.goto('/');
-  const hdr = page.locator('.pb-hdr');
-  const darkColor = await page.locator('.pb-bar').evaluate((el) => getComputedStyle(el).color);
-  await page.locator('section[data-theme="light"]').first().evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 10));
-  await expect(hdr).toHaveAttribute('data-theme', 'light');
-  await expect(page.locator('.pb-tint-light')).toHaveCSS('opacity', '1');
-  const lightColor = await page.locator('.pb-bar').evaluate((el) => getComputedStyle(el).color);
-  expect(lightColor).not.toBe(darkColor);
-});
-
-test('la barra se compacta con opacidad al bajar 24 px sin cambiar su altura (F8)', async ({ page }) => {
-  await page.goto('/');
-  const hdr = page.locator('.pb-hdr');
-  await expect(hdr).not.toHaveAttribute('data-compact');
-  const before = (await page.locator('.pb-bar-in').boundingBox())!.height;
-  await page.evaluate(() => window.scrollTo(0, 30));
-  await expect(hdr).toHaveAttribute('data-compact', '');
-  expect((await page.locator('.pb-bar-in').boundingBox())!.height).toBe(before);
-  await expect(page.locator('.pb-tint')).toHaveCSS('transition-property', 'opacity');
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await expect(hdr).not.toHaveAttribute('data-compact');
-});
-
-test('el grano de la barra es estático (F8)', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.locator('.pb-tint-grain')).toHaveCSS('animation-name', 'none');
-  await expect(page.locator('.pb-tint-grain')).toHaveCSS('opacity', '0.3');
-});
-
-test('ningún ancestro de la barra tiene view-transition-name', async ({ page }) => {
-  await page.goto('/');
-  const names = await page.locator('.pb-tint').evaluate((el) => {
+  const names = await page.locator('.pb-blur').evaluate((el) => {
     const out: string[] = [];
     // <html> lleva `view-transition-name: root` por defecto (hoja del navegador): no cuenta.
     for (let n = el.parentElement; n && n !== document.documentElement; n = n.parentElement)
@@ -107,4 +79,67 @@ test('captura de la barra', async ({ page }) => {
   // .pb-hdr mide 0 de alto (no empuja): se captura la franja superior de 92px de la página.
   const width = page.viewportSize()!.width;
   await expect(page).toHaveScreenshot('header.png', { clip: { x: 0, y: 0, width, height: 92 } });
+});
+
+// F17 · Escudo ESPOCH: [escudo] │ [isotipo + nombre], alineados y sin desbordar.
+test.describe('F17 · escudo ESPOCH en la barra', () => {
+  test('escudo, línea e isotipo comparten centro vertical y los huecos de la línea son iguales', async ({ page }) => {
+    await page.goto('/');
+    const box = async (s: string) => (await page.locator(s).first().boundingBox())!;
+    const shield = await box('.pb-hdr .pb-brand__shield');
+    const rule = await box('.pb-hdr .pb-brand__rule');
+    const iso = await box('.pb-hdr .pb-logo svg');
+    const cy = (b: { y: number; height: number }) => b.y + b.height / 2;
+    // El escudo baja 1 px a propósito (centrado óptico, ver header.css): su caja queda a 1 px del centro.
+    expect(Math.abs(cy(shield) - cy(iso) - 1)).toBeLessThanOrEqual(1);
+    expect(Math.abs(cy(rule) - cy(iso))).toBeLessThanOrEqual(1);
+    expect(Math.abs(shield.height - iso.height)).toBeLessThanOrEqual(1);
+    const left = rule.x - (shield.x + shield.width);
+    const right = iso.x - (rule.x + rule.width);
+    expect(Math.abs(left - right)).toBeLessThanOrEqual(1);
+    expect(shield.x).toBeLessThan(rule.x);
+  });
+
+  test('el escudo no es un enlace y se anuncia como ESPOCH', async ({ page }) => {
+    await page.goto('/');
+    const shield = page.locator('.pb-hdr .pb-brand__shield');
+    await expect(shield).toHaveAttribute('role', 'img');
+    await expect(shield).toHaveAttribute('aria-label', 'ESPOCH');
+    expect(await shield.evaluate((el) => !!el.closest('a'))).toBe(false);
+    await expect(page.locator('.pb-hdr .pb-logo')).toHaveAttribute('href', '/');
+  });
+
+  test('la barra no desborda la pantalla', async ({ page }) => {
+    await page.goto('/');
+    const vw = page.viewportSize()!.width;
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(vw);
+    for (const s of ['.pb-hdr .pb-brand', '.pb-hdr .pb-right']) {
+      const b = (await page.locator(s).boundingBox())!;
+      expect(b.x, s).toBeGreaterThanOrEqual(0);
+      expect(b.x + b.width, s).toBeLessThanOrEqual(vw);
+    }
+    const brand = (await page.locator('.pb-hdr .pb-brand').boundingBox())!;
+    const right = (await page.locator('.pb-hdr .pb-right').boundingBox())!;
+    expect(brand.x + brand.width, 'marca y botones no se pisan').toBeLessThanOrEqual(right.x);
+  });
+
+  test('sin violaciones de axe en la barra', async ({ page }) => {
+    await page.goto('/');
+    await barSettled(page);
+    const { default: AxeBuilder } = await import('@axe-core/playwright');
+    const results = await new AxeBuilder({ page }).include('.pb-hdr').analyze();
+    expect(results.violations).toEqual([]);
+  });
+});
+
+// El blur solo se apaga arriba del todo: con scroll, el titular que pasa bajo la barra no debe quedar sin desenfoque.
+test('el blur de la barra se enciende en cuanto se hace scroll, también sobre la portada', async ({ page }) => {
+  for (const path of ['/', '/equipo/', '/eventos/']) {
+    await page.goto(path);
+    await expect(page.locator('.pb-hdr'), path).toHaveAttribute('data-blur', 'off');
+    await page.evaluate(() => window.scrollTo({ top: 300, behavior: 'instant' }));
+    await expect(page.locator('.pb-hdr'), path).toHaveAttribute('data-blur', 'on');
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    await expect(page.locator('.pb-hdr'), path).toHaveAttribute('data-blur', 'off');
+  }
 });

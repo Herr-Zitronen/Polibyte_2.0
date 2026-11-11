@@ -19,7 +19,8 @@ export type ArchiveYear = { year: number; items: ArchiveItem[] };
 const shortDate = (d: Date) =>
   new Intl.DateTimeFormat('es-EC', { timeZone: TIME_ZONE, day: 'numeric', month: 'short' }).format(d).replace('.', '');
 
-/** Solo eventos realizados, por año descendente. "Ver proyectos" con la misma regla que la vitrina. */
+/** Solo eventos realizados, por año descendente. "Ver proyectos" con la misma regla que la vitrina y
+ *  hacia los proyectos de ESE evento, en su página de detalle (PR B; antes iba a la vitrina global). */
 export function archiveView(events: readonly ArchiveEvent[], projects: readonly FeaturedRef[], now: Date): ArchiveYear[] {
   const past = events.filter((e) => eventStatus(e, now) === 'past');
   return groupByYear(past).map(({ year, events: list }) => ({
@@ -29,7 +30,7 @@ export function archiveView(events: readonly ArchiveEvent[], projects: readonly 
       title: e.title,
       date: shortDate(e.date),
       typeLine: typeLine(e),
-      projectsHref: showcaseLayout(e, projects) ? '#destacados' : null,
+      projectsHref: showcaseLayout(e, projects) ? `/eventos/${e.id}/#proyectos` : null,
     })),
   }));
 }

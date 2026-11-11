@@ -3,8 +3,25 @@
 // Sin conexiones a terceros: Google Fonts añadía DNS + TLS a dos orígenes antes del primer pintado
 // y Lighthouse (4G simulado) subía el FCP/LCP de Inicio a ~2,3 s (H4.1).
 // unicode-range: el navegador solo descarga los subconjuntos que usa la página.
+// WOR-101: se precarga el subconjunto latín de JetBrains Mono (el del titular, que es el LCP) y, mientras
+// llega, se usa un respaldo monoespaciado con las métricas de JetBrains Mono (ancho 0,6 em, ascenso 1,02,
+// descenso 0,30): al cambiar de fuente el h1 no se mueve (sin CLS).
 import '@fontsource-variable/jetbrains-mono/wght.css';
 import '@fontsource/silkscreen/latin-400.css';
 import '@fontsource/silkscreen/latin-700.css';
 import '@fontsource/instrument-sans/latin-600.css';
+import jetbrainsLatin from '@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url';
 ---
+
+<link rel="preload" href={jetbrainsLatin} as="font" type="font/woff2" crossorigin />
+<style is:global>
+  /* Courier New / Liberation Mono / Cousine avanzan 1229/2048 ≈ 0,6 em, igual que JetBrains Mono. */
+  @font-face {
+    font-family: 'JetBrains Mono Fallback';
+    src: local('Courier New'), local('Liberation Mono'), local('Cousine'), local('Menlo');
+    size-adjust: 100%;
+    ascent-override: 102%;
+    descent-override: 30%;
+    line-gap-override: 0%;
+  }
+</style>

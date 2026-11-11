@@ -125,10 +125,6 @@
   background: radial-gradient(36% 30% at 86% 30%, rgba(45, 79, 196, 0.4), rgba(45, 79, 196, 0) 100%);
 }
 
-.pb-dabout__bg .pb-grain {
-  opacity: 0.6;
-}
-
 .pb-dabout__wrap {
   position: relative;
   padding-top: 112px;
@@ -204,10 +200,6 @@
   display: flow-root;
   background: #eceff6;
   color: #13205a;
-}
-
-.pb-dsched__bg .pb-grain {
-  opacity: 0.5;
 }
 
 .pb-dsched__wrap {

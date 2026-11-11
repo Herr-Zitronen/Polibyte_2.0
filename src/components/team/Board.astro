@@ -1,6 +1,7 @@
 ---
 // Sección Directiva (H7.1): grid de 6 columnas, cada tarjeta ocupa 2 → 3 arriba y 2 centradas abajo.
 import MemberCard from './MemberCard.astro';
+import SectionChip from '../SectionChip.astro';
 import { boardMembers, type BoardMember } from '../../lib/board';
 import '../../styles/team.css';
 
@@ -9,17 +10,24 @@ interface Props {
   period: string;
 }
 const { members, period } = Astro.props;
+// PR B: sin miembros de la directiva no se pinta la sección (la página ajusta sus franjas).
+const list = boardMembers(members);
 ---
 
+{list.length > 0 && (
 <section id="directiva" class="pb-board" aria-labelledby="directiva-h">
-  <div class="pb-board-bg" aria-hidden="true"><div class="pb-grain"></div></div>
+  <div class="pb-board-bg" aria-hidden="true"></div>
   <div class="pb-container pb-board-in">
     <header class="pb-board-head">
-      <h2 id="directiva-h">Directiva</h2>
+      <div class="pb-stitle">
+        <SectionChip />
+        <h2 id="directiva-h">Directiva</h2>
+      </div>
       <span class="pb-board-period">periodo {period}</span>
     </header>
     <div class="pb-dir">
-      {boardMembers(members).map((m) => <MemberCard member={m} />)}
+      {list.map((m) => <MemberCard member={m} />)}
     </div>
   </div>
 </section>
+)}

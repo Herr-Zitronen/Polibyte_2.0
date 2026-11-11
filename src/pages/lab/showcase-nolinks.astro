@@ -1,0 +1,15 @@
+---
+// Laboratorio PR B: proyectos sin demo, sin repositorio, sin integrantes y sin stack → sin contenedores vacíos.
+import Showcase from '../../components/events/Showcase.astro';
+import Base from '../../layouts/Base.astro';
+import { RECAP_NOW, recapEvents } from '../../lib/recap-fixtures';
+import { latestShowcase } from '../../lib/showcase';
+import { showcaseProjects } from '../../lib/showcase-fixtures';
+
+const projects = showcaseProjects.map((p) => ({ ...p, demoUrl: undefined, repoUrl: undefined, members: [], stack: [] }));
+const s = latestShowcase(recapEvents, projects, RECAP_NOW);
+---
+
+<Base title="Laboratorio · Vitrina sin enlaces" noindex header={false}>
+  <main>{s && <Showcase eventTitle={s.event.title} layout={s.layout} />}</main>
+</Base>

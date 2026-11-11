@@ -1,4 +1,6 @@
 // Vitrina de proyectos de un evento (DESIGN §5.2). Regla: nunca vitrina vacía o a medias.
+import { eventStatus } from './events';
+
 type ShowcaseEvent = { id: string; showcase: 'hidden' | 'published' };
 type ShowcaseProject = { event: string; featured: boolean; order?: number | undefined };
 
@@ -18,4 +20,23 @@ export function showcaseLayout<P extends ShowcaseProject>(
   const cards = nextFeatured.slice(0, 2);
   const rows = own.filter((p) => p !== hero && !cards.includes(p));
   return { hero, cards, rows };
+}
+
+type DatedShowcaseEvent = ShowcaseEvent & { date?: Date | undefined };
+
+/** PR B · Qué vitrina se muestra en /eventos: la del evento CONCLUIDO más reciente que tenga una vitrina
+ *  válida. Antes se miraba solo el último concluido, y un taller posterior al hackathon la hacía desaparecer. */
+export function latestShowcase<E extends DatedShowcaseEvent, P extends ShowcaseProject>(
+  events: readonly E[],
+  projects: readonly P[],
+  now: Date,
+): { event: E & { date: Date }; layout: ShowcaseLayout<P> } | null {
+  const past = events
+    .filter((e): e is E & { date: Date } => eventStatus(e, now) === 'past' && e.date instanceof Date)
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
+  for (const event of past) {
+    const layout = showcaseLayout(event, projects);
+    if (layout) return { event, layout };
+  }
+  return null;
 }

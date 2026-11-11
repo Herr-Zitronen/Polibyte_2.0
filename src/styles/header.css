@@ -1,4 +1,4 @@
-/* DESIGN.md §3.9 · Barra superior: fija, altura 0 en el flujo, tinte degradado + grano estático (F8: sin backdrop-filter). */
+/* DESIGN.md §3.9 · Barra superior: fija, altura 0 en el flujo, blur de 8 px con máscara progresiva. */
 .pb-hdr {
   position: fixed;
   top: 0;
@@ -8,52 +8,54 @@
   height: 0;
 }
 
-/* Tinte degradado + grano estático. Sin backdrop-filter (F8): era lo más caro del scroll en Chrome/Windows.
-   Ningún ancestro de la barra tiene view-transition-name (lo exige la prueba E2E). */
-.pb-tint {
+/* Blur: ningún ancestro puede tener view-transition-name (sería "backdrop root"). */
+.pb-blur {
   position: absolute;
   top: 0;
   right: 0;
   left: 0;
   height: 92px;
   pointer-events: none;
-  transition: opacity 0.45s;
 }
 
-.pb-tint > div {
+.pb-blur > div {
   position: absolute;
   inset: 0;
 }
 
-.pb-tint-dark {
+/* Una sola capa de blur con máscara progresiva (antes eran dos: 6 y 12 px). El backdrop-filter es lo más caro
+   del scroll; se apaga mientras la barra está sobre una portada (data-blur="off"), donde el fondo ya es un nevado difuminado.
+   perf/fluidez-real: se apaga con opacidad, no con visibility: la capa existe siempre y no se crea ni destruye
+   de golpe al cruzar el final de la portada (era un pico de cuadro justo en la zona de las líneas). */
+.pb-blur > .l2 {
+  bottom: 20%;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 70%);
+  mask-image: linear-gradient(to top, transparent 0%, #000 70%);
+}
+
+.pb-hdr[data-blur='off'] .pb-blur > .l2 {
+  opacity: 0;
+}
+
+.pb-blur > .tint-dark {
   background: linear-gradient(180deg, rgba(20, 34, 110, 0.55) 0%, rgba(20, 34, 110, 0.2) 55%, rgba(20, 34, 110, 0) 100%);
   transition: opacity 0.45s;
 }
 
-.pb-tint-light {
+.pb-blur > .tint-light {
   background: linear-gradient(180deg, rgba(236, 239, 246, 0.85) 0%, rgba(236, 239, 246, 0.4) 55%, rgba(236, 239, 246, 0) 100%);
   opacity: 0;
   transition: opacity 0.45s;
 }
 
-/* Grano estático: sin animación, por debajo del texto de la barra (el orden en el DOM lo deja detrás). */
-.pb-tint-grain {
-  background-image: url('../assets/backgrounds/grain.webp');
-  background-size: 160px 160px;
-  opacity: 0.3;
-}
-
-.pb-hdr[data-theme='light'] .pb-tint-dark {
+.pb-hdr[data-theme='light'] .tint-dark {
   opacity: 0;
 }
 
-.pb-hdr[data-theme='light'] .pb-tint-light {
+.pb-hdr[data-theme='light'] .tint-light {
   opacity: 1;
-}
-
-/* Compactación (al bajar 24 px): un solo cambio de opacidad del contenedor; la altura no cambia. */
-.pb-hdr[data-compact] .pb-tint {
-  opacity: 0.6;
 }
 
 .pb-bar {
@@ -81,7 +83,7 @@
   view-transition-name: pb-header;
 }
 
-.pb-bar-in > .pb-logo {
+.pb-bar-in > .pb-brand {
   justify-self: start;
 }
 
@@ -109,6 +111,38 @@
   gap: 6px;
   padding: 11px 13px;
   text-decoration: none;
+  /* Entrada escalonada (design/Main.dc.html). Visible por defecto: `backwards` solo pinta el "desde" durante
+     el retraso. Empieza a los 0.3 s para no competir con la subida del titular. */
+  animation: pb-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+.pb-nav a:nth-child(1) {
+  animation-delay: 0.3s;
+}
+
+.pb-nav a:nth-child(2) {
+  animation-delay: 0.38s;
+}
+
+.pb-nav a:nth-child(3) {
+  animation-delay: 0.46s;
+}
+
+.pb-bar .pb-join {
+  animation: pb-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.54s backwards;
+}
+
+/* Al llegar por una transición de vista la barra ya estaba ahí (pb-header queda quieta): no vuelve a entrar. */
+.pb-vt-nav .pb-nav a,
+.pb-vt-nav .pb-bar .pb-join {
+  animation: none;
+}
+
+@keyframes pb-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
 }
 
 .pb-nav a::after {
@@ -124,10 +158,17 @@
   transition: transform 0.45s var(--pb-ease-stroke);
 }
 
-.pb-nav a:hover::after,
 .pb-nav a[aria-current='page']::after {
   transform: scaleX(1);
   transform-origin: left;
+}
+
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-nav a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
 }
 
 .pb-nav a[aria-current='page']::after {
@@ -145,8 +186,11 @@
   transition: transform 0.35s var(--pb-ease-stroke);
 }
 
-.pb-nav a:hover .pb-arr {
-  transform: translate(3px, -3px);
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-nav a:hover .pb-arr {
+    transform: translate(3px, -3px);
+  }
 }
 
 /* Sobre secciones claras el botón se invierte. */
@@ -160,6 +204,31 @@
 }
 
 /* Logo */
+/* F17: [escudo ESPOCH] │ [isotipo + nombre]. Huecos iguales a ambos lados de la línea. */
+.pb-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.pb-brand__shield {
+  flex: none;
+  display: block;
+  /* Centrado óptico: el escudo pesa arriba y su libro es muy fino, así que a igual caja se ve más alto que el
+     isotipo. 1 px abajo lo asienta sobre la misma línea de base visual. */
+  transform: translateY(1px);
+}
+
+/* Línea de 1 px en el color del texto de la barra: blanca sobre azul, tinta sobre papel. */
+.pb-brand__rule {
+  flex: none;
+  width: 1px;
+  height: 28px;
+  background: currentColor;
+  opacity: 0.35;
+}
+
 .pb-logo {
   display: flex;
   align-items: center;
@@ -286,7 +355,9 @@
   }
 }
 
-/* Chip del próximo evento (solo ≥1180 px): aparece cuando el panel ya pasó por arriba. */
+/* Chip del próximo evento (solo ≥1180 px): aparece cuando el panel ya pasó por arriba.
+   Barrido desde la derecha con scaleX + opacity (el prototipo recortaba con una máscara animada, que no va al compositor)
+   y los dígitos suben por su ranura. */
 .pb-chip {
   display: none;
   flex: none;
@@ -302,15 +373,26 @@
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
-  transform: translateX(12px);
+  transform: scaleX(0);
+  transform-origin: right;
   transition:
     visibility 0.4s,
     opacity 0.4s,
-    transform 0.8s var(--pb-ease-stroke);
+    transform 0.8s var(--pb-ease-out);
 }
 
 .pb-chip .pb-chip-n {
+  display: inline-block;
+  overflow: clip;
+  height: 16px;
   font-family: var(--pb-font-pixel);
+  line-height: 16px;
+}
+
+.pb-chip-n > span {
+  display: inline-block;
+  transform: translateY(100%);
+  transition: transform 0.6s var(--pb-ease-out) 0.25s;
 }
 
 @media (min-width: 1180px) {
@@ -322,6 +404,10 @@
     visibility: visible;
     opacity: 1;
     pointer-events: auto;
+    transform: none;
+  }
+
+  .pb-hdr.show-chip .pb-chip-n > span {
     transform: none;
   }
 }
@@ -344,12 +430,30 @@
   }
 }
 
+@media (max-width: 380px) {
+  .pb-brand,
+  .pb-logo {
+    gap: 10px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pb-logo .lg-d,
   .pb-logo .lg-bl,
   .pb-logo .lg-br,
   .pb-logo .lg-c {
     animation: none;
+    transition: none;
+  }
+
+  .pb-nav a,
+  .pb-bar .pb-join {
+    animation: none;
+  }
+
+  .pb-chip,
+  .pb-chip-n > span {
+    transform: none;
     transition: none;
   }
 }

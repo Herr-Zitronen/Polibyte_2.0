@@ -1,73 +1,89 @@
-# CI de PoliByte (ver docs/SESSIONS.md)
-# - push a feat/** y PR hacia staging/main: solo pruebas, sin despliegue.
-# - push a staging: pruebas y, si pasan, preview en Cloudflare (alias "staging").
-# - push a main: pruebas y, si pasan, despliegue a producción.
+# CI de PoliByte (ver docs/DEPLOY.md). Solo prueba; no despliega.
+# - push a feat/**, perf/**, fix/**, docs/**, chore/**: solo el job rápido (tipos + lint + Vitest, ~1-2 min).
+# - pull_request hacia staging/main: suite completa (build, Lighthouse, Playwright + axe). Sin paths-ignore:
+#   la protección de ramas exige estos checks, y un PR sin corrida quedaría bloqueado.
+# - push a staging/main: suite completa otra vez, sobre el resultado de la fusión.
+# El despliegue lo hace Workers Builds de Cloudflare al recibir el push (main → producción, demás ramas → preview).
+# El diagnóstico de fluidez vive aparte, en perf-diag.yml (manual).
 name: CI
 
 on:
   push:
-    branches: ['feat/**', 'staging', 'main']
+    branches: ['feat/**', 'perf/**', 'fix/**', 'docs/**', 'chore/**', 'staging', 'main']
+    paths-ignore: ['**/*.md', 'docs/**', 'design/**', 'e2e/**/*-snapshots/**']
   pull_request:
     branches: ['staging', 'main']
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
   contents: read
 
-env:
-  NODE_VERSION: '22'
-
 jobs:
-  check:
-    name: Tipos + lint
+  quick:
+    name: Rápido (tipos + lint + Vitest)
+    if: github.event_name == 'push' && github.ref != 'refs/heads/staging' && github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+        with: { node-version-file: .node-version, cache: npm }
       - run: npm ci
       - run: npm run check:types
       - run: npm run lint
-
-  unit:
-    name: Vitest
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
-      - run: npm ci
       - run: npm run test
 
-  build:
-    name: Build
+  # Un solo job (un solo npm ci) para tipos, lint, Vitest, build y Lighthouse.
+  verify:
+    name: Tipos + lint + Vitest + build + Lighthouse
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+        with: { node-version-file: .node-version, cache: npm }
       - run: npm ci
+      - run: npm run check:types
+      - run: npm run lint
+      # L1 (WOR-85): hacia main, el contenido de ejemplo bloquea (tests/content-ready.test.ts).
+      - run: npm run test
+        env:
+          CONTENT_READY: ${{ (github.ref == 'refs/heads/main' || github.base_ref == 'main') && '1' || '' }}
       - run: npm run build
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
       - name: Presupuesto de JS por página (< 20 KB)
         run: npx vitest run tests/js-budget.test.ts
       - uses: actions/upload-artifact@v4
         with: { name: dist, path: dist, retention-days: 7 }
+      - name: Lighthouse CI
+        run: npx --yes @lhci/cli@0.15.1 autorun
 
   e2e:
     name: Playwright (1440/1000/390) + axe
-    needs: build
+    needs: verify
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
+        with: { node-version-file: .node-version, cache: npm }
       - run: npm ci
       - uses: actions/download-artifact@v4
         with: { name: dist, path: dist }
-      - run: npx playwright install --with-deps chromium
+      - id: pw
+        name: Versión de Playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
       - run: npm run e2e
         env: { CI: 'true' }
       - uses: actions/upload-artifact@v4
@@ -79,51 +95,3 @@ jobs:
             test-results
             e2e/**/*-snapshots
           retention-days: 14
-
-  lighthouse:
-    name: Lighthouse CI
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '${{ env.NODE_VERSION }}' }
-      - uses: actions/download-artifact@v4
-        with: { name: dist, path: dist }
-      - run: npx --yes @lhci/cli@0.15.1 autorun
-
-  deploy-staging:
-    name: Preview en Cloudflare (staging)
-    needs: [check, unit, e2e, lighthouse]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
-    runs-on: ubuntu-latest
-    environment: staging
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
-      - run: npm ci
-      - uses: actions/download-artifact@v4
-        with: { name: dist, path: dist }
-      - run: npx wrangler versions upload --preview-alias staging
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-  deploy-production:
-    name: Producción en Cloudflare (main)
-    needs: [check, unit, e2e, lighthouse]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '${{ env.NODE_VERSION }}', cache: npm }
-      - run: npm ci
-      - uses: actions/download-artifact@v4
-        with: { name: dist, path: dist }
-      - run: npx wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

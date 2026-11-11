@@ -4,10 +4,16 @@
 import '../../styles/glass.css';
 import PixelStrip from '../PixelStrip.astro';
 import '../../styles/what-we-do.css';
+import { EDGE } from '../../lib/pixel-strip';
+
+interface Props {
+  /** Color de la sección siguiente (PR B: sin "Próximos eventos" la franja va directo al cierre con imagen). */
+  bottom?: string;
+}
+const { bottom = EDGE.navy } = Astro.props;
 ---
 
 <section id="que-hacemos" class="pb-wwd" data-theme="light">
-  <div class="pb-grain" aria-hidden="true"></div>
   <div class="pb-container pb-wwd-in">
     <div class="pb-wwd-cols">
       <div class="pb-qleft">
@@ -27,6 +33,6 @@ import '../../styles/what-we-do.css';
   </div>
   <div class="pb-gw" aria-hidden="true"><span class="pb-gword"><span class="pb-ghl">soft</span><span class="pb-ghr">ware</span></span></div>
   <div class="pb-gdiv">
-    <PixelStrip seed={23} top="transparent" bottom="#0F1A4D" />
+    <PixelStrip seed={23} top="transparent" bottom={bottom} />
   </div>
 </section>

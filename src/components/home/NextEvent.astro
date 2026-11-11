@@ -83,7 +83,12 @@ const [typeLabel, org] = event ? typeLine(event).split(' · ') : [];
             </div>
             <div class="pb-bin-wrap">
               <span class="pb-binary" aria-hidden="true">
-                <span data-cd="binary">{view.binary}</span>
+                {/* PR C: 8 bits que se teclean uno a uno al entrar el panel (countdown.ts actualiza cada uno). */}
+                <span data-cd="binary">
+                  {[...view.binary].map((b, i) => (
+                    <span class="pb-bit" style={`--i: ${i}`}>{b}</span>
+                  ))}
+                </span>
                 <span class="pb-cursor" />
               </span>
               <span class="pb-dic" data-cd="label">{view.label}</span>
@@ -93,7 +98,7 @@ const [typeLabel, org] = event ? typeLine(event).split(' · ') : [];
         <div class="pb-prog">
           <span class="pb-prog__t">cuenta atrás</span>
           <div class="pb-cells" aria-hidden="true" data-cd="cells">
-            {view.cells.map((c) => <span class:list={['pb-cell', c !== 'off' && 'on', c === 'now' && 'now']} />)}
+            {view.cells.map((c, i) => <span class:list={['pb-cell', c !== 'off' && 'on', c === 'now' && 'now']} style={`--i: ${i}`} />)}
           </div>
           <span>
             <span data-cd="percent">{view.percent}</span>% del camino

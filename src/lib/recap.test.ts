@@ -48,6 +48,13 @@ describe('recapView', () => {
     expect(recapView(events, featured, now).primary).toEqual({ label: 'Ver proyectos destacados', href: '#destacados' });
   });
 
+  it('un evento posterior sin vitrina no apaga "Ver proyectos destacados" (PR B)', () => {
+    const later = [...events, { ...base, id: 'taller', title: 'Taller', date: d('2026-08-01') }];
+    const v = recapView(later, featured, now);
+    expect(v.title).toBe('Taller');
+    expect(v.primary).toEqual({ label: 'Ver proyectos destacados', href: '#destacados' });
+  });
+
   it('publicada pero sin destacados → "Ver calendario"', () => {
     expect(recapView(events, [{ event: 'recent', featured: false }], now).primary).toEqual({ label: 'Ver calendario', href: '#calendario' });
   });

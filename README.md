@@ -14,7 +14,7 @@ design/              prototipo de referencia (abrir *.dc.html en el navegador)
   screens/           capturas de cada página a 1440, 1000 y 390 px (WebP)
   assets/            imágenes que usa el prototipo
 assets/
-  backgrounds/       fondos del Chimborazo (hero, join, recap), niebla, grano y foto original
+  backgrounds/       fondos del Chimborazo (hero, join, recap; créditos en CREDITS.md), niebla y grano
   brand/             logo, logo mono, wordmark, favicon (ico, svg, png 16–512)
 ```
 
@@ -40,7 +40,10 @@ La versión interactiva completa sigue en el lienzo de Claude (siete páginas: I
 - Fechas, lugares, modalidad y descripciones de los eventos.
 - Resumen y cifras del Hackathon de Kiro; capturas, enlaces y equipos de los proyectos cuando la vitrina se publique.
 - Dominio del sitio (aparece en la imagen para compartir).
-- Confirmar los derechos de uso de la foto del Chimborazo.
+
+## Licencia
+
+El código usa la licencia MIT (`LICENSE`); las imágenes con licencia propia, como los fondos del Chimborazo (CC BY-SA 4.0), están en `CREDITS.md`.
 
 ## Notas
 

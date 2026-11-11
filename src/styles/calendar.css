@@ -4,6 +4,7 @@
   display: flow-root;
   background: #eceff6;
   color: #13205a;
+  /* F12: bajo el pliegue, el navegador no la pinta hasta que se acerca. */
 }
 
 .pb-calendar__bg {
@@ -11,10 +12,6 @@
   inset: 0;
   overflow: clip;
   pointer-events: none;
-}
-
-.pb-calendar__bg .pb-grain {
-  opacity: 0.5;
 }
 
 .pb-calendar__wrap {
@@ -158,3 +155,23 @@
     padding-bottom: 96px;
   }
 }
+
+/* PR B · Calendario sin ningún evento próximo. */
+.pb-cal-none {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 48px 0;
+  border-bottom: 1px solid rgba(19, 32, 90, 0.22);
+}
+
+.pb-cal-none p {
+  margin: 0;
+  font-weight: 500;
+  font-size: var(--pb-fs-quote);
+  letter-spacing: -0.05em;
+  line-height: 1.08;
+}
+

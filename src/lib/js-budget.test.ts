@@ -19,6 +19,7 @@ function fixture() {
 }
 
 describe('pageJsBytes', () => {
+  // perf/fluidez-real: Lenis vuelve y recupera su excepción (se carga en tiempo ocioso, fuera del camino crítico).
   it('suma JS externo e inline por página, sin JSON ni Lenis', () => {
     expect(pageJsBytes(fixture())).toEqual({ 'index.html': 1004, 'eventos/index.html': 0 });
   });

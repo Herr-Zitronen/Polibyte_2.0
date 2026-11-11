@@ -1,5 +1,6 @@
 ---
 // Panel con efectos (DESIGN §3.5): A dibujo del borde, B pulso, C luz que sigue al cursor.
+// Los efectos (scripts/fx.ts) los arranca Base.astro una sola vez por página.
 import Cross from './Cross.astro';
 import '../styles/fx.css';
 
@@ -34,8 +35,3 @@ const crosses = draw || pulse;
   <span class="pb-edge" aria-hidden="true"></span>
   <div class="pb-fxc"><slot /></div>
 </Tag>
-
-<script>
-  import { initFx } from '../scripts/fx';
-  initFx();
-</script>

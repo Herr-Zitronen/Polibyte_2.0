@@ -10,13 +10,23 @@ Cada historia se trabaja en **un chat nuevo** de Claude Code. Así el contexto s
 - **Repo**: https://github.com/Herr-Zitronen/Polibyte_2.0
 
 ## Ramas y despliegue
-| Rama | Dónde vive | Despliegue |
-|---|---|---|
-| `main` | GitHub | **Producción** (Cloudflare) |
-| `staging` | GitHub | **Revisión** (URL de staging en Cloudflare) |
-| `feat/hX.Y-…` | GitHub, **solo para correr pruebas** | **Nunca se despliega** |
+Detalle y configuración en `docs/DEPLOY.md`.
 
-Regla: **solo `main` y `staging` se despliegan en Cloudflare.** Las ramas `feat/*` se suben únicamente para que GitHub Actions corra las pruebas.
+| Rama | Dónde vive | Despliegue (Cloudflare Workers Builds) |
+|---|---|---|
+| `main` | GitHub | **Producción** |
+| `staging` | GitHub | **Revisión** (preview con alias `staging`) |
+| `feat/…`, `fix/…`, `perf/…`, `docs/…`, `chore/…` | GitHub | Preview propia, nunca producción |
+
+Regla: **solo `main` llega a producción**, y a `staging`/`main` solo se fusiona por PR con todos los checks en verde (protección de ramas).
+
+### CI (GitHub Actions: solo pruebas)
+- **Push a ramas de trabajo**: solo el job rápido (tipos + lint + Vitest, ~1-2 min).
+- **PR hacia `staging`/`main`** y **push a `staging`/`main`**: suite completa (build, Lighthouse, Playwright + axe). CI no despliega.
+- En los push, cambios solo de `*.md`, `docs/`, `design/` o capturas base no disparan corridas; en los PR sí corren siempre (la protección de ramas exige los checks).
+- **Un solo push por PR**: acumula los commits en local y empuja una vez. Cada push a una rama con PR abierto repite la suite completa.
+- Diagnóstico de fluidez (`e2e/home-smoothness.spec.ts` con `PERF_DIAG=1`): manual, desde Actions → *Diagnóstico de fluidez* → *Run workflow*.
+- Capturas base: si se borran las PNG, la corrida del PR las genera (`updateSnapshots: 'missing'`); se descargan del artefacto `playwright-report`, se revisan y se versionan (ese commit no dispara CI).
 
 Dónde corre cada prueba (para no congelar la laptop):
 | Prueba | Local | GitHub Actions |
@@ -28,8 +38,8 @@ Dónde corre cada prueba (para no congelar la laptop):
 
 Flujo por historia:
 1. `git switch staging && git pull` → `git switch -c feat/hX.Y-nombre`.
-2. **Rojo**: escribir las pruebas. Las unitarias se ven fallar localmente; las E2E se ven fallar haciendo push de la rama → Actions en rojo.
-3. **Verde + refactor**: push → Actions en verde.
+2. **Rojo**: escribir las pruebas. Las unitarias se ven fallar localmente. Las E2E se escriben primero pero no se empujan solo para verlas fallar (cuesta una corrida completa).
+3. **Verde + refactor**: `npm run test` local; luego un único push + PR → Actions en verde.
 4. PR `feat/hX.Y-nombre → staging`; solo se puede unir con CI en verde. Al unir → despliegue a staging.
 5. Revisar en la URL de staging (capturas 1440/1000/390 en los artefactos de Actions).
 6. PR `staging → main` (puede agrupar varias historias). Al unir → producción.
@@ -59,6 +69,18 @@ Una prueba **no debe caducar** porque pase el tiempo ni depender del contenido r
 - **Verde** = pasan tras implementar.
 - Actions tarda ~5 min y **un push nuevo cancela la corrida anterior de la rama**: espera a que termine la corrida en rojo antes del siguiente push.
 - Las capturas base nuevas salen como artefacto (`playwright-report`): descárgalas, revísalas y versiónalas en `e2e/*-snapshots`.
+
+## Panel de fluidez en tu PC (`?diag`)
+La medición de Actions rasteriza por software (sin gráfica): sirve para comparar variantes entre sí, no para saber cómo se siente en tu PC. Para eso está el panel.
+
+1. **Compila y sirve**: `npm run build && npm run preview`. Nunca `npm run dev`: Vite y la barra de herramientas de Astro añaden trabajo propio y falsean la medida.
+2. **Comprueba la gráfica** en `chrome://gpu`: «Rasterization» y «Compositing» deben decir *Hardware accelerated*. Si no, activa «Usar aceleración por hardware cuando esté disponible» en la configuración de Chrome y reinícialo. Cierra DevTools mientras mides.
+3. **Abre** `http://localhost:4321/?diag`. Aparece un panel fijo abajo a la derecha. Espera 4 s (las variantes se aplican cuando termina la entrada del titular).
+4. **Pasada base** (sin casillas): con la rueda, baja rápido de arriba abajo y vuelve. Al parar, «última pasada» muestra FPS, peor cuadro y % de cuadros de más de 20 ms. Pulsa «Copiar resultado».
+5. **Una casilla cada vez** (la página se recarga sola) y repite la misma pasada. Orden sugerido: `sin-lenis`, `sin-barridos`, `sin-nodos`, `lineas-estaticas`, `sin-backdrop-filter`, `blur-siempre`, `sin-paralaje`, `sin-scroll-timelines`, `sin-reveals`, `sin-cubo`.
+6. **Qué anotar**: por cada pasada, el texto copiado y si *se sintió* más fluida que la base (sí / no / igual). La sensación manda: el medidor cuenta cuadros del hilo principal, y un scroll puede sentirse bien aunque el número no cambie.
+
+Si quieres más detalle: graba en DevTools → Performance una pasada por la zona de la portada y mira la pista «Frames» (cuadros rojos o amarillos) y qué hay debajo en «Main» y «GPU».
 
 ## Orden recomendado (respeta dependencias)
 | Sprint | Issues |

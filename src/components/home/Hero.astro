@@ -1,23 +1,38 @@
 ---
 // Portada de Inicio (DESIGN §4, design/Main.dc.html): marco de líneas que se abre al hacer scroll + titular decodificado.
 import Button from '../Button.astro';
+import TerminalIcon from '../TerminalIcon.astro';
 import GlassBackground from '../GlassBackground.astro';
+import { decodeReels } from '../../lib/decode';
 import '../../styles/hero.css';
 
 const TITLE = 'Construimos software. Y a quienes lo construyen.';
+// WOR-101: carretes de glifos generados en el build (semilla fija → HTML estable). El texto real no cambia nunca.
+const reels = decodeReels(TITLE, 2026);
+const decodeMs = Math.max(...reels.map((r) => r.durationMs));
 // Escalonado corto (por palabra + leve por letra): el h1 es el LCP y debe terminar de entrar pronto (presupuesto 2 s).
-const words = TITLE.split(' ').map((w, wi) => [...w].map((c, ci) => ({ c, delay: (0.1 + wi * 0.05 + ci * 0.012).toFixed(3) })));
+let at = 0;
+const words = TITLE.split(' ').map((w, wi) => {
+  const letters = [...w].map((c, ci) => ({ c, reel: reels[at + ci]!.reel, spin: reels[at + ci]!.durationMs, delay: (0.1 + wi * 0.05 + ci * 0.012).toFixed(3) }));
+  at += [...w].length + 1;
+  return letters;
+});
 const line = 'position: absolute; left: 0; right: 0; height: 1.5px';
 ---
 
 <section id="top" class="pb-glass pb-hero-s" data-bg>
   <GlassBackground image="hero" parallax="root" />
   <div class="pb-hero pb-content">
-    <div class="pb-hero__lines" aria-hidden="true">
+    {/* F7: pb-mouse → el marco sigue al cursor (fx.ts, lineOffset). */}
+    <div class="pb-hero__lines pb-mouse" aria-hidden="true">
       <div class="pb-tlg">
         <div class="pb-line pb-flow" style={`${line}; top: 72px`}></div>
         <div class="pb-line pb-flow" style={`${line}; top: 168px`}></div>
         <div class="pb-node" style="right: 0; top: 168px"></div>
+        {/* Línea vertical corta del centro (prototipo), dentro del grupo con el que viaja: sin animación propia. */}
+        <div class="pb-cvl" style="top: 80px; height: 80px">
+          <div class="pb-vline" style="position: absolute; inset: 0"></div>
+        </div>
       </div>
       <div class="pb-trg">
         <div class="pb-line r pb-flow" style={`${line}; top: 72px`}></div>
@@ -37,6 +52,10 @@ const line = 'position: absolute; left: 0; right: 0; height: 1.5px';
       <div class="pb-blg">
         <div class="pb-line pb-flow" style={`${line}; top: 0`}></div>
         <div class="pb-line pb-flow" style={`${line}; top: 96px`}></div>
+        {/* Su pareja abajo, dentro del grupo inferior izquierdo. */}
+        <div class="pb-cvl" style="bottom: 82px; height: 80px">
+          <div class="pb-vline" style="position: absolute; inset: 0"></div>
+        </div>
       </div>
       <div class="pb-brg">
         <div class="pb-line r pb-flow" style={`${line}; top: 0`}></div>
@@ -45,25 +64,38 @@ const line = 'position: absolute; left: 0; right: 0; height: 1.5px';
       </div>
     </div>
     <div class="pb-box pb-hx">
-      <h1 class="pb-h1" aria-label={TITLE} data-decode>
-        {
-          words.map((w) => (
-            <>
-              <span class="pb-word" aria-hidden="true">
-                {w.map((ch) => (
-                  <span class="pb-ch" style={`animation-delay: ${ch.delay}s`}>
-                    {ch.c}
-                  </span>
-                ))}
-              </span>{' '}
-            </>
-          ))
-        }
-      </h1>
+      <div class="pb-h1w">
+        <h1 class="pb-h1" aria-label={TITLE} data-decode data-decode-ms={decodeMs}>
+          {
+            words.map((w) => (
+              <>
+                <span class="pb-word" aria-hidden="true">
+                  {w.map((ch) => (
+                    <span class="pb-ch" style={`animation-delay: ${ch.delay}s`}>
+                      {/* Carrete arriba de la letra (aria-hidden por .pb-word); una sola línea: sin espacios dentro de la letra. */}
+                      <span class="pb-ci" data-c={ch.c} style={`--n: ${ch.reel.length}; animation-duration: ${ch.spin}ms`}><span class="pb-reel">{ch.reel.join('\n')}</span>{ch.c}</span>
+                    </span>
+                  ))}
+                </span>{' '}
+              </>
+            ))
+          }
+        </h1>
+        {/* Sombra en una copia aparte: aparece por opacidad al terminar, sin repintar el titular. */}
+        <p class="pb-h1 pb-h1-shadow" aria-hidden="true">
+          {
+            words.map((w) => (
+              <>
+                <span class="pb-word">{w.map((ch) => ch.c).join('')}</span>{' '}
+              </>
+            ))
+          }
+        </p>
+      </div>
       <div class="pb-sub">
         <p>Eventos, competencias y comunidad para quien quiere construir. Abierto a toda la carrera y a todo público.</p>
         <div class="pb-actions">
-          <Button variant="primary" href="/eventos/">Ver eventos</Button>
+          <Button variant="primary" href="/eventos/"><TerminalIcon slot="icon" />Ver eventos</Button>
           <Button variant="secondary" href="/unirme/">Unirme al club</Button>
         </div>
       </div>

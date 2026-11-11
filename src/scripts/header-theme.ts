@@ -1,8 +1,8 @@
-import { isCompact } from '../lib/header-compact';
-
 // Tema de la barra: claro solo cuando una sección clara está bajo el texto de la barra (y = 40px).
 // IntersectionObserver: el navegador avisa al cambiar de sección; no corre JS en cada píxel de scroll.
 const LINE_Y = 40;
+/** Alto (px) desde el inicio de la página en el que el blur de la barra está apagado. */
+const TOP_ZONE = 60;
 
 export function initHeaderTheme(header: HTMLElement): () => void {
   const lights = [...document.querySelectorAll<HTMLElement>('[data-theme="light"]')].filter((el) => !header.contains(el));
@@ -29,22 +29,40 @@ export function initHeaderTheme(header: HTMLElement): () => void {
     for (const el of lights) observer.observe(el);
   };
 
-  // Compactación (F8): solo escribe el atributo cuando cambia el estado, no en cada evento de scroll.
-  const syncCompact = () => {
-    const next = isCompact(window.scrollY);
-    if (next === header.hasAttribute('data-compact')) return;
-    if (next) header.setAttribute('data-compact', '');
-    else header.removeAttribute('data-compact');
+  // Blur: apagado solo con la página arriba del todo (primeros TOP_ZONE px), donde bajo la barra no pasa
+  // contenido, solo el nevado ya difuminado. En cuanto se hace scroll vuelve a encenderse. Antes se apagaba
+  // mientras la barra estaba sobre la portada (#top) y el titular de Equipo o Eventos pasaba bajo la barra
+  // sin desenfoque. Un centinela fijo al inicio del documento + IntersectionObserver: nada corre por scroll.
+  let sentinel: HTMLElement | undefined;
+  let coverObserver: IntersectionObserver | undefined;
+  const observeCover = () => {
+    if (coverObserver) return;
+    sentinel = document.createElement('div');
+    sentinel.className = 'pb-top-sentinel';
+    sentinel.setAttribute('aria-hidden', 'true');
+    sentinel.style.cssText = `position:absolute;top:0;left:0;width:1px;height:${TOP_ZONE}px;pointer-events:none;visibility:hidden`;
+    document.body.prepend(sentinel);
+    coverObserver = new IntersectionObserver(([e]) => header.setAttribute('data-blur', e?.isIntersecting ? 'off' : 'on'));
+    coverObserver.observe(sentinel);
   };
 
   apply();
-  syncCompact();
+  observeCover();
   if (lights.length) observe();
-  window.addEventListener('resize', observe, { passive: true });
-  window.addEventListener('scroll', syncCompact, { passive: true });
+  // F12: un solo listener de resize, con debounce (la barra de URL del celular lo dispara a cada rato).
+  let timer = 0;
+  const onResize = () => {
+    clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      if (lights.length) observe();
+    }, 150);
+  };
+  window.addEventListener('resize', onResize, { passive: true });
   return () => {
+    clearTimeout(timer);
     observer?.disconnect();
-    window.removeEventListener('resize', observe);
-    window.removeEventListener('scroll', syncCompact);
+    coverObserver?.disconnect();
+    sentinel?.remove();
+    window.removeEventListener('resize', onResize);
   };
 }

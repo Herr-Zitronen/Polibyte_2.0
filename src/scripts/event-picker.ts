@@ -17,11 +17,26 @@ export function initEventPicker(): void {
     if (row) selectRow(root, row.dataset['pick']!);
   });
   if (!matchMedia('(hover: hover)').matches) return;
-  root.addEventListener('pointermove', (e) => {
-    const row = (e.target as Element).closest<HTMLElement>('[data-pick]');
+  // F12: como mucho una escritura por cuadro (pointermove puede llegar varias veces por cuadro).
+  let row: HTMLElement | null = null;
+  let x = 0;
+  let y = 0;
+  let raf = 0;
+  const apply = () => {
+    raf = 0;
     if (!row) return;
     const r = row.getBoundingClientRect();
-    row.style.setProperty('--gx', `${e.clientX - r.left}px`);
-    row.style.setProperty('--gy', `${e.clientY - r.top}px`);
-  });
+    row.style.setProperty('--gx', `${x - r.left}px`);
+    row.style.setProperty('--gy', `${y - r.top}px`);
+  };
+  root.addEventListener(
+    'pointermove',
+    (e) => {
+      row = (e.target as Element).closest<HTMLElement>('[data-pick]');
+      x = e.clientX;
+      y = e.clientY;
+      if (row && !raf) raf = requestAnimationFrame(apply);
+    },
+    { passive: true },
+  );
 }

@@ -196,14 +196,52 @@
   background: var(--pb-accent);
 }
 
+/* PR C: al entrar el panel (.is-in, fx.ts) las celdas se llenan de izquierda a derecha con scaleY y la actual
+   parpadea. Por defecto (sin .is-in, sin animaciones) ya se ven llenas. */
+.pb-panel.is-in .pb-cell.on {
+  animation: pb-fill 0.2s steps(2) both;
+  animation-delay: calc(var(--i, 0) * 15ms);
+}
+
+.pb-panel.is-in .pb-cell.now {
+  animation:
+    pb-fill 0.2s steps(2) both,
+    pb-blink 1.2s steps(1) infinite;
+  animation-delay: calc(var(--i, 0) * 15ms), 1.6s;
+}
+
+/* Los 8 bits del binario se "teclean" uno a uno. Visibles por defecto: `backwards` solo pinta el "desde". */
+.pb-bit {
+  display: inline-block;
+}
+
+.pb-panel.is-in .pb-bit {
+  animation: pb-bit 0.3s steps(2) backwards;
+  animation-delay: calc(0.3s + var(--i, 0) * 0.08s);
+}
+
 .pb-fx.is-off .pb-sep,
-.pb-fx.is-off .pb-cursor {
+.pb-fx.is-off .pb-cursor,
+.pb-fx.is-off .pb-cell.now {
   animation-play-state: paused;
 }
 
 @keyframes pb-blink {
   50% {
     opacity: 0;
+  }
+}
+
+@keyframes pb-fill {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes pb-bit {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
   }
 }
 
@@ -237,7 +275,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pb-sep,
-  .pb-cursor {
+  .pb-cursor,
+  .pb-panel.is-in .pb-cell.on,
+  .pb-panel.is-in .pb-cell.now,
+  .pb-panel.is-in .pb-bit {
     animation: none;
   }
 }

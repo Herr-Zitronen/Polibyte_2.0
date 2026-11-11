@@ -32,8 +32,11 @@
   transition: transform 0.35s var(--pb-ease-stroke), background-color 0.3s, color 0.3s;
 }
 
-.pb-b1:hover .pb-b1__box {
-  transform: translateY(-2px);
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-b1:hover .pb-b1__box {
+    transform: translateY(-2px);
+  }
 }
 
 .pb-b2 {
@@ -45,9 +48,12 @@
   transition: background-color 0.3s, color 0.3s, border-color 0.45s;
 }
 
-.pb-b2:hover {
-  background: #ffffff;
-  color: var(--pb-blue-800);
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-b2:hover {
+    background: #ffffff;
+    color: var(--pb-blue-800);
+  }
 }
 
 /* Tamaño pequeño (barra y listas) */
@@ -81,9 +87,12 @@
   color: var(--pb-ink);
 }
 
-.pb-on-light .pb-b2:hover {
-  background: var(--pb-ink);
-  color: var(--pb-white);
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-on-light .pb-b2:hover {
+    background: var(--pb-ink);
+    color: var(--pb-white);
+  }
 }
 
 .pb-actions {
@@ -98,6 +107,15 @@
   .pb-b1__box,
   .pb-b2 {
     white-space: normal;
+  }
+}
+
+/* PR B · Con dedo, los botones pequeños miden al menos 44 px de alto (WCAG 2.5.8 / guía de Apple). */
+@media (pointer: coarse) {
+  .pb-b1.sm,
+  .pb-b2.sm {
+    min-height: 44px;
+    align-items: center;
   }
 }
 

@@ -1,0 +1,24 @@
+---
+// F9 (WOR-95) · Chip de 34×34 que acompaña a los títulos de sección pequeños (Próximos eventos, Directiva,
+// Proyectos destacados). Trazo del color del texto (#F2F4FA sobre oscuro), 1.4 px. Decorativo.
+---
+
+<svg class="pb-schip" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" focusable="false">
+  <rect x="7" y="7" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" />
+  <rect x="12" y="12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.4" />
+  <path d="M12 2v5M17 2v5M22 2v5M12 27v5M17 27v5M22 27v5M2 12h5M2 17h5M2 22h5M27 12h5M27 17h5M27 22h5" stroke="currentColor" stroke-width="1.4" />
+</svg>
+
+<style is:global>
+  /* Fila chip + título (Directiva, Proyectos destacados); el h2 conserva el estilo de su sección. */
+  .pb-stitle {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .pb-schip {
+    flex: none;
+  }
+</style>

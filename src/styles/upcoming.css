@@ -5,6 +5,7 @@
   overflow: clip;
   color: var(--pb-white);
   background: var(--pb-navy-900);
+  /* F12: bajo el pliegue, el navegador no la pinta hasta que se acerca. */
 }
 
 .pb-cal-bg {
@@ -55,6 +56,8 @@
   display: flex;
   flex-wrap: nowrap;
   align-items: flex-start;
+  /* Línea de tiempo del cubo iso: la rejilla cruza la pantalla entera, la columna sticky no. */
+  view-timeline-name: --pb-cal;
 }
 
 .pb-calgrid > .pb-vl {
@@ -89,7 +92,34 @@
   width: 158px;
   height: 218px;
   transform-style: preserve-3d;
-  transform: rotateX(-18deg) rotateY(-38deg);
+  /* Pose media entre las dos poses del giro: la que se ve sin soporte o con movimiento reducido. */
+  transform: rotateX(-18deg) rotateY(-37deg);
+}
+
+/* PR C: el cubo gira al atravesar la pantalla (design/Main.dc.html). Sin soporte, queda en su pose media.
+   perf/scroll-fino: .pb-aside es sticky, así que una view() del propio cubo casi no avanza mientras está
+   pegado (el cubo "no giraba"). Usa la línea de tiempo con nombre de .pb-calgrid, su ancestro.
+   Selectores distintos a propósito: con el mismo selector, el minificador funde todo en
+   `animation: … pb-iso-spin --pb-cal` y Chromium no acepta una línea de tiempo con nombre en el shorthand
+   (el cubo quedaba con animation-timeline: auto y no giraba). */
+@supports (animation-timeline: view()) {
+  .pb-iso {
+    animation: pb-iso-spin linear both;
+  }
+
+  .pb-isowrap > .pb-iso {
+    animation-timeline: --pb-cal;
+    animation-range: cover 0% cover 100%;
+  }
+}
+
+@keyframes pb-iso-spin {
+  from {
+    transform: rotateX(-14deg) rotateY(-62deg);
+  }
+  to {
+    transform: rotateX(-22deg) rotateY(-12deg);
+  }
 }
 
 .pb-iso svg {
@@ -239,9 +269,15 @@
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.pb-row:hover::before,
 .pb-row.sel::before {
   transform: scaleX(1);
+}
+
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-row:hover::before {
+    transform: scaleX(1);
+  }
 }
 
 /* Seleccionada: barra amarilla de 3px, brillo superior de 1px y barrido tenue cada 7s. */
@@ -298,8 +334,11 @@
   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.pb-row:hover .pb-name {
-  transform: translateX(12px);
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-row:hover .pb-name {
+    transform: translateX(12px);
+  }
 }
 
 .pb-rname {
@@ -424,5 +463,9 @@
 
   .pb-row:hover .pb-name {
     transform: none;
+  }
+
+  .pb-iso {
+    animation: none;
   }
 }

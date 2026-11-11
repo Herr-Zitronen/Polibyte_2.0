@@ -4,6 +4,7 @@
 // se ve el primero. La isla event-picker.ts solo cambia la selección y mueve la luz del cursor.
 import type { UpcomingRow } from '../../lib/upcoming';
 import Button from '../Button.astro';
+import SectionChip from '../SectionChip.astro';
 import Status from '../Status.astro';
 import '../../styles/fx.css';
 import '../../styles/glass.css';
@@ -16,6 +17,11 @@ interface Props {
 
 const { rows } = Astro.props;
 const total = String(rows.length).padStart(2, '0');
+// PR B: si ningún evento tiene fecha todavía, el CTA no invita a inscribirse a algo sin fecha.
+const onlyTbd = rows.length > 0 && rows.every((r) => r.status === 'tbd');
+const cta = onlyTbd
+  ? { t: 'Aún sin fechas confirmadas', s: 'Únete al club y te avisamos en cuanto se confirmen.', b: 'Unirme al club' }
+  : { t: 'Inscribe a tu equipo', s: 'Te ayudamos a armar equipo para la próxima competencia.', b: 'Quiero inscribirme' };
 const ISO = 'M0 0H180V184H0Z M736 0H913V184H736Z M0 269H433V410L258 411V1120H433V1264H0Z M483 269H913V1264H483V1120H659V411L483 410Z M330 847V621Q330 611 340 611H573Q583 611 583 621V847Z';
 const layers = [-84, -70, -56, -42, -28, -14, 0];
 ---
@@ -23,18 +29,12 @@ const layers = [-84, -70, -56, -42, -28, -14, 0];
 {
   rows.length > 0 && (
     <section id="calendario" class="pb-cal" data-event-picker>
-      <div class="pb-cal-bg" aria-hidden="true">
-        <div class="pb-grain" />
-      </div>
+      <div class="pb-cal-bg" aria-hidden="true" />
       <div class="pb-container pb-cal-in">
         <div class="pb-cal-head">
           <span class="pb-hl" aria-hidden="true" />
           <div class="pb-cal-title">
-            <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
-              <rect x="7" y="7" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.4" />
-              <rect x="12" y="12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.4" />
-              <path d="M12 2v5M17 2v5M22 2v5M12 27v5M17 27v5M22 27v5M2 12h5M2 17h5M2 22h5M27 12h5M27 17h5M27 22h5" stroke="currentColor" stroke-width="1.4" />
-            </svg>
+            <SectionChip />
             <h2>Próximos eventos</h2>
           </div>
           <Button variant="secondary" size="sm" href="/eventos/#calendario">Calendario completo</Button>
@@ -94,10 +94,10 @@ const layers = [-84, -70, -56, -42, -28, -14, 0];
               ))}
             </div>
             <div class="pb-cal-cta">
-              <span class="pb-cta-t">Inscribe a tu equipo</span>
-              <span class="pb-cta-s">Te ayudamos a armar equipo para la próxima competencia.</span>
+              <span class="pb-cta-t">{cta.t}</span>
+              <span class="pb-cta-s">{cta.s}</span>
               <div class="pb-cta-b">
-                <Button variant="primary" href="/unirme/">Quiero inscribirme</Button>
+                <Button variant="primary" href="/unirme/">{cta.b}</Button>
                 <Button variant="secondary" href="/eventos/#calendario">Calendario completo</Button>
               </div>
             </div>

@@ -3,6 +3,7 @@
   position: relative;
   display: flow-root;
   background: var(--pb-navy-900);
+  /* F12: bajo el pliegue, el navegador no la pinta hasta que se acerca. */
 }
 
 .pb-board-bg {
@@ -21,10 +22,6 @@
       rgba(53, 124, 140, 0.24),
       rgba(53, 124, 140, 0) 100%
     );
-}
-
-.pb-board-bg .pb-grain {
-  opacity: 0.6;
 }
 
 .pb-board-in {
@@ -113,8 +110,11 @@
   transition: opacity 0.6s;
 }
 
-.pb-mem:hover .pb-photo .pb-shade {
-  opacity: 0.08;
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-mem:hover .pb-photo .pb-shade {
+    opacity: 0.08;
+  }
 }
 
 .pb-pic {
@@ -169,8 +169,11 @@
   text-underline-offset: 3px;
 }
 
-.pb-slink:hover {
-  opacity: 1;
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-slink:hover {
+    opacity: 1;
+  }
 }
 
 @media (max-width: 960px) {
@@ -189,7 +192,8 @@
   }
 }
 
-@media (max-width: 520px) {
+/* PR B: en celular siguen 2 por fila (antes 1 → cinco pantallas de fotos); solo < 380 px va a una columna. */
+@media (max-width: 379px) {
   .pb-dir {
     grid-template-columns: 1fr;
   }
@@ -198,6 +202,15 @@
   .pb-mem:nth-of-type(4),
   .pb-mem:nth-of-type(5) {
     grid-column: auto;
+  }
+}
+
+/* PR B · Enlaces sociales de la directiva: área táctil de 44 px. */
+@media (pointer: coarse) {
+  .pb-slink {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 }
 

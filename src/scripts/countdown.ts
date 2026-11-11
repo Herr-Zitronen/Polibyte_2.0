@@ -8,7 +8,18 @@ function render(root: ParentNode, start: Date): void {
   };
   set('days', v.days);
   set('hours', v.hours);
-  set('binary', v.binary);
+  // Los 8 bits son spans propios (.pb-bit, se teclean al entrar): se cambia el dígito, no se borran.
+  for (const el of root.querySelectorAll<HTMLElement>('[data-cd="binary"]')) {
+    const bits = el.querySelectorAll<HTMLElement>('.pb-bit');
+    if (bits.length !== v.binary.length) {
+      if (el.textContent !== v.binary) el.textContent = v.binary;
+      continue;
+    }
+    bits.forEach((b, i) => {
+      const d = v.binary[i]!;
+      if (b.textContent !== d) b.textContent = d;
+    });
+  }
   set('label', v.label);
   set('percent', String(v.percent));
   for (const el of root.querySelectorAll<HTMLElement>('[data-cd="aria"]')) el.setAttribute('aria-label', v.aria);

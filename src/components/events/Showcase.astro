@@ -1,11 +1,15 @@
 ---
 // Proyectos destacados de un evento (DESIGN §5.2, design/Eventos.dc.html #destacados).
 // Solo se renderiza con un layout no nulo: `showcaseLayout` ya decidió que la vitrina está completa.
+// PR B · Nunca a medias: 1 destacado → solo el panel; 2 → panel + una tarjeta horizontal a ancho completo;
+// 3+ → panel + 2 tarjetas + filas. Sin enlaces, integrantes o stack no se pinta el contenedor vacío.
+// Se usa en /eventos (id "destacados") y en el detalle de cada evento publicado (id "proyectos").
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 import type { ShowcaseLayout } from '../../lib/showcase';
 import Button from '../Button.astro';
 import Cross from '../Cross.astro';
+import SectionChip from '../SectionChip.astro';
 import '../../styles/showcase.css';
 import '../../styles/tabs.css';
 
@@ -24,18 +28,25 @@ export type ShowcaseItem = {
 interface Props {
   eventTitle: string;
   layout: ShowcaseLayout<ShowcaseItem>;
+  /** Ancla de la sección: "destacados" en /eventos, "proyectos" en el detalle del evento. */
+  id?: string;
 }
 
-const { eventTitle, layout } = Astro.props;
+const { eventTitle, layout, id = 'destacados' } = Astro.props;
 const { hero, cards, rows } = layout;
 const host = (url?: string) => (url ? new URL(url).host : 'sin demo pública');
+const hasLinks = (p: ShowcaseItem) => Boolean(p.demoUrl || p.repoUrl);
+const people = (p: ShowcaseItem) => p.members.filter((m) => m.trim()).join(', ');
 ---
 
-<section id="destacados" class="pb-showcase">
-  <div class="pb-showcase__bg" aria-hidden="true"><div class="pb-grain"></div></div>
+<section id={id} class="pb-showcase">
+  <div class="pb-showcase__bg" aria-hidden="true"></div>
   <div class="pb-container pb-showcase__wrap">
     <div class="pb-showcase__bar">
-      <h2>Proyectos destacados</h2>
+      <div class="pb-stitle">
+        <SectionChip />
+        <h2>Proyectos destacados</h2>
+      </div>
       <span class="pb-showcase__event">{eventTitle}</span>
     </div>
     <p class="pb-showcase__lead">Lo que construyeron nuestros equipos, publicado para que cualquiera lo pruebe.</p>
@@ -72,23 +83,29 @@ const host = (url?: string) => (url ? new URL(url).host : 'sin demo pública');
         <span class="pb-featR__eyebrow"><span class="pb-dot" aria-hidden="true"></span>destacado</span>
         <h3 class="pb-feat__title">{hero.title}</h3>
         <div class="pb-pair">
-          <span class="pb-tag">{hero.team}</span><span class="pb-pair__line" aria-hidden="true"></span><span class="pb-tag pill">{hero.members.join(', ')}</span>
+          <span class="pb-tag">{hero.team}</span>
+          {people(hero) && <span class="pb-pair__line" aria-hidden="true" />}
+          {people(hero) && <span class="pb-tag pill">{people(hero)}</span>}
         </div>
         <div class="pb-feat__problem">
           <span>qué resuelve</span>
           <p>{hero.problem}</p>
         </div>
-        <ul class="pb-stack">{hero.stack.map((t) => <li class="pb-tech">{t}</li>)}</ul>
-        <div class="pb-actions">
-          {hero.demoUrl && <Button variant="primary" href={hero.demoUrl} external>Ver demo</Button>}
-          {hero.repoUrl && <Button variant="secondary" href={hero.repoUrl} external>Código</Button>}
-        </div>
+        {hero.stack.length > 0 && <ul class="pb-stack">{hero.stack.map((t) => <li class="pb-tech">{t}</li>)}</ul>}
+        {
+          hasLinks(hero) && (
+            <div class="pb-actions">
+              {hero.demoUrl && <Button variant="primary" href={hero.demoUrl} external>Ver demo</Button>}
+              {hero.repoUrl && <Button variant="secondary" href={hero.repoUrl} external>Código</Button>}
+            </div>
+          )
+        }
       </div>
     </article>
 
     {
       cards.length > 0 && (
-        <div class="pb-pgrid2">
+        <div class:list={['pb-pgrid2', cards.length === 1 && 'is-one']}>
           {cards.map((p) => (
             <article class="pb-pcard">
               <div class="pb-browser">
@@ -100,13 +117,15 @@ const host = (url?: string) => (url ? new URL(url).host : 'sin demo pública');
               </div>
               <div class="pb-pcardb">
                 <h3 class="pb-pcard__title">{p.title}</h3>
-                <span class="pb-meta">{p.team} · {p.members.join(', ')}</span>
+                <span class="pb-meta">{people(p) ? `${p.team} · ${people(p)}` : p.team}</span>
                 <p>{p.problem}</p>
-                <ul class="pb-stack">{p.stack.map((t) => <li class="pb-tech">{t}</li>)}</ul>
-                <div class="pb-actions">
-                  {p.demoUrl && <Button variant="primary" size="sm" href={p.demoUrl} external>Ver demo</Button>}
-                  {p.repoUrl && <Button variant="secondary" size="sm" href={p.repoUrl} external>Código</Button>}
-                </div>
+                {p.stack.length > 0 && <ul class="pb-stack">{p.stack.map((t) => <li class="pb-tech">{t}</li>)}</ul>}
+                {hasLinks(p) && (
+                  <div class="pb-actions">
+                    {p.demoUrl && <Button variant="primary" size="sm" href={p.demoUrl} external>Ver demo</Button>}
+                    {p.repoUrl && <Button variant="secondary" size="sm" href={p.repoUrl} external>Código</Button>}
+                  </div>
+                )}
               </div>
             </article>
           ))}
@@ -127,11 +146,13 @@ const host = (url?: string) => (url ? new URL(url).host : 'sin demo pública');
                   <span class="pb-pn__title">{p.title}</span>
                   <span class="pb-meta">{p.team}</span>
                 </div>
-                <ul class="pb-stack">{p.stack.map((t) => <li class="pb-tech">{t}</li>)}</ul>
-                <div class="pb-actions">
-                  {p.demoUrl && <Button variant="primary" size="sm" href={p.demoUrl} external>Ver demo</Button>}
-                  {p.repoUrl && <Button variant="secondary" size="sm" href={p.repoUrl} external>Código</Button>}
-                </div>
+                {p.stack.length > 0 ? <ul class="pb-stack">{p.stack.map((t) => <li class="pb-tech">{t}</li>)}</ul> : <span />}
+                {hasLinks(p) && (
+                  <div class="pb-actions">
+                    {p.demoUrl && <Button variant="primary" size="sm" href={p.demoUrl} external>Ver demo</Button>}
+                    {p.repoUrl && <Button variant="secondary" size="sm" href={p.repoUrl} external>Código</Button>}
+                  </div>
+                )}
               </div>
             ))}
           </div>

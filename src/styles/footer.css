@@ -5,6 +5,7 @@
   overflow: clip;
   background: #0d1438;
   color: #f2f4fa;
+  /* F12: bajo el pliegue, el navegador no la pinta hasta que se acerca. */
 }
 
 .pb-foot-in {
@@ -37,6 +38,16 @@
 .pb-foot-org,
 .pb-foot-links > span {
   color: #aeb6d3;
+}
+
+/* Crédito de la foto (CC BY-SA 4.0): discreto, un paso por debajo de la línea de ESPOCH. */
+.pb-foot-credit {
+  font-size: 12px;
+  color: #aeb6d3;
+}
+
+.pb-foot-credit a {
+  color: inherit;
 }
 
 .pb-foot-links {
@@ -91,6 +102,15 @@
 }
 
 /* Al final: movimiento reducido deja todo quieto (sin linterna). */
+/* PR B · Enlaces del pie: área táctil de 44 px. */
+@media (pointer: coarse) {
+  .pb-foot-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pb-lamp .lit {
     transition: none;

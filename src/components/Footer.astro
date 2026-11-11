@@ -3,6 +3,11 @@
 import '../styles/glass.css';
 import '../styles/fx.css';
 import '../styles/footer.css';
+import site from '../content/site.json';
+import { footerLinks } from '../lib/footer-links';
+
+// Enlaces y periodo salen de src/content/site.json (docs/CONTENIDO.md): los vacíos no se muestran.
+const links = footerLinks(site.links);
 
 const wordmark = {
   x: 0,
@@ -15,16 +20,33 @@ const wordmark = {
 ---
 
 <footer id="contacto" class="pb-foot">
-  <div class="pb-grain" aria-hidden="true"></div>
   <div class="pb-container pb-foot-in">
     <div class="pb-foot-row">
       <div class="pb-foot-id">
-        <span class="pb-foot-copy">© 2026–2027 PoliByte · Club de la Carrera de Software</span>
-        <span class="pb-foot-org">ESPOCH · Escuela Superior Politécnica de Chimborazo</span>
+        <span class="pb-foot-copy">© {site.period} {site.name} · {site.descriptor}</span>
+        <span class="pb-foot-org">ESPOCH · {site.institution}</span>
+        {/* WOR-105: la foto de los fondos es CC BY-SA 4.0 y la licencia pide el crédito donde se usa (CREDITS.md). */}
+        <span class="pb-foot-credit">
+          Foto del Chimborazo:
+          <a href="https://www.descubrecuador.com/item/volcan-chimborazo/" target="_blank" rel="noopener noreferrer">Go593</a>
+          ·
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer license">CC BY-SA 4.0</a>
+        </span>
       </div>
-      <div class="pb-foot-links">
-        <a href="#contacto">[Correo]</a><span aria-hidden="true">·</span><a href="#contacto">[Instagram]</a><span aria-hidden="true">·</span><a href="#contacto">[GitHub]</a>
-      </div>
+      {
+        links.length > 0 && (
+          <div class="pb-foot-links">
+            {links.map((l, i) => (
+              <>
+                {i > 0 && <span aria-hidden="true">·</span>}
+                <a href={l.href} {...(l.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                  {l.label}
+                </a>
+              </>
+            ))}
+          </div>
+        )
+      }
     </div>
     <div class="pb-foot-rule" aria-hidden="true"><span class="pb-x" style="left:0"></span><span class="pb-x" style="left:100%"></span></div>
     <div class="pb-lamp" role="img" aria-label="PoliByte">

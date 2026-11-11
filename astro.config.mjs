@@ -2,8 +2,9 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// PLACEHOLDER: dominio definitivo pendiente (WOR-85). Mientras tanto, la URL de producción del Worker.
-const SITE = process.env.SITE_URL ?? 'https://polibyte-site.der-zitronen-saft.workers.dev';
+// Dominio definitivo: variable SITE_URL (en CI, la variable del repositorio vars.SITE_URL; ver docs/CONTENIDO.md).
+// Si falta o está vacía, la URL de producción del Worker (L1 · WOR-85).
+const SITE = process.env.SITE_URL?.trim() || 'https://polibyte-site.der-zitronen-saft.workers.dev';
 
 /** Igual que isPublicPath (src/lib/seo.ts): fuera /lab/ y la 404. */
 const isPublic = (/** @type {string} */ page) => {

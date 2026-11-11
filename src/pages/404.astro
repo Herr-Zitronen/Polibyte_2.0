@@ -2,6 +2,7 @@
 // 404 (H9.2, design/NoEncontrado.dc.html). Cloudflare la sirve con estado 404 gracias a
 // `not_found_handling: "404-page"` en wrangler.jsonc.
 import Base from '../layouts/Base.astro';
+import { pageTitle } from '../lib/page-title';
 import Button from '../components/Button.astro';
 import GlassBackground from '../components/GlassBackground.astro';
 import PixelStrip from '../components/PixelStrip.astro';
@@ -9,7 +10,7 @@ import { EDGE } from '../lib/pixel-strip';
 import '../styles/not-found.css';
 ---
 
-<Base title="Página no encontrada · PoliByte" description="Esta página no existe." noindex cover="hero">
+<Base title={pageTitle('Página no encontrada')} description="Esta página no existe." noindex cover="hero">
   <main>
     <section id="top" class="pb-glass pb-nf" data-bg>
       <GlassBackground image="hero" parallax="root" />

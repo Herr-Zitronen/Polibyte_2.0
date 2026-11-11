@@ -4,8 +4,6 @@
   display: flow-root;
   background: linear-gradient(180deg, #22389c 0, #1a2b78 100%);
   color: var(--pb-white);
-  content-visibility: auto;
-  contain-intrinsic-size: auto 900px;
 }
 
 .pb-archive__bg {
