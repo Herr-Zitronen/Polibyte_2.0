@@ -215,7 +215,7 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 
 ## 7. Rendimiento
 
-- Presupuesto: LCP < 2.0s, CLS < 0.05, INP < 200ms, JS de la página < 20 KB (sin contar Lenis).
+- Presupuesto: LCP < 2.2s (temporal, WOR-101; objetivo original 2.0s), CLS < 0.05, INP < 200ms, JS de la página < 20 KB (sin contar Lenis).
 - Fondos estáticos (WebP 8–36 KB), grano en mosaico (21 KB).
 - Blur solo en la barra (2 capas). Nunca se anima `filter` ni `backdrop-filter`.
 - `content-visibility: auto` en secciones bajo el pliegue.

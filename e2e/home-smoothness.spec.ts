@@ -1,7 +1,7 @@
 // F5 · Fluidez y carga de Inicio: presupuesto medido con CDP (CPU ×4). Solo corre en Actions.
 // Mide: LCP, tareas largas tras la carga y fotogramas durante un scroll programado.
 // El informe completo se imprime y se adjunta a la prueba (ver `test-results`).
-import { expect, test, type BrowserContextOptions, type Page } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 const BUDGET = {
   lcpMs: 1800, // meta de WOR-91 (margen 10 % sobre los 2,0 s de Lighthouse)
@@ -103,10 +103,6 @@ const VARIANTS: Record<string, Variant> = {
   'sin-scroll-timelines': {
     js: `document.getAnimations().filter(a=>a.timeline&&a.timeline!==document.timeline).forEach(a=>a.cancel())`,
   },
-  // A/B en la misma corrida: restaura las capas de blur a pantalla completa (versión previa a F5).
-  'blur-original': {
-    css: `.pb-blur>.l2{bottom:0!important;-webkit-mask-image:linear-gradient(to top,transparent 30%,#000 65%)!important;mask-image:linear-gradient(to top,transparent 30%,#000 65%)!important}.pb-blur>.l3{bottom:0!important;-webkit-mask-image:linear-gradient(to top,transparent 60%,#000 100%)!important;mask-image:linear-gradient(to top,transparent 60%,#000 100%)!important}`,
-  },
   'sin-lenis': { js: `try{window.lenis&&window.lenis.destroy()}catch(e){}` },
   'sin-backdrop-filter': { css: `*{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}` },
   'sin-grano': { css: `.pb-grain{display:none!important}` },
@@ -126,20 +122,3 @@ test.describe('diagnóstico de costes', () => {
   }
 });
 
-// A/B intercalado (3 rondas) de la base contra el blur original: el runner compartido es ruidoso,
-// así que solo se comparan medianas dentro de la misma corrida.
-test('A/B: blur de 2 capas vs sin blur (cota superior) (medianas)', async ({ browser }, info) => {
-  test.skip(info.project.name === 'mobile-390', 'solo escritorio y portátil');
-  test.setTimeout(180_000);
-  const fps: Record<string, number[]> = { recortado: [], sinblur: [] };
-  for (let i = 0; i < 3; i++) {
-    for (const [label, key] of [['recortado', 'base'], ['sinblur', 'sin-backdrop-filter']] as const) {
-      const ctx = await browser.newContext(info.project.use as BrowserContextOptions);
-      const page = await ctx.newPage();
-      fps[label]!.push((await measure(page, VARIANTS[key])).fps);
-      await ctx.close();
-    }
-  }
-  const med = (a: number[]) => [...a].sort((x, y) => x - y)[1]!;
-  console.log(`[F5-AB] ${info.project.name} recortado=${JSON.stringify(fps.recortado)} mediana=${med(fps.recortado!)} | sinblur=${JSON.stringify(fps.sinblur)} mediana=${med(fps.sinblur!)}`);
-});

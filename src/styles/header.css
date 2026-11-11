@@ -1,4 +1,4 @@
-/* DESIGN.md §3.9 · Barra superior: fija, altura 0 en el flujo, blur progresivo de 3 capas. */
+/* DESIGN.md §3.9 · Barra superior: fija, altura 0 en el flujo, tinte degradado + grano estático (F8: sin backdrop-filter). */
 .pb-hdr {
   position: fixed;
   top: 0;
@@ -8,52 +8,52 @@
   height: 0;
 }
 
-/* Blur: ningún ancestro puede tener view-transition-name (sería "backdrop root"). */
-.pb-blur {
+/* Tinte degradado + grano estático. Sin backdrop-filter (F8): era lo más caro del scroll en Chrome/Windows.
+   Ningún ancestro de la barra tiene view-transition-name (lo exige la prueba E2E). */
+.pb-tint {
   position: absolute;
   top: 0;
   right: 0;
   left: 0;
   height: 92px;
   pointer-events: none;
+  transition: opacity 0.45s;
 }
 
-.pb-blur > div {
+.pb-tint > div {
   position: absolute;
   inset: 0;
 }
 
-/* Una sola capa de blur con máscara progresiva (antes eran dos: 6 y 12 px). El backdrop-filter es lo más caro
-   del scroll; se apaga mientras la barra está sobre una portada (data-blur="off"), donde el fondo ya es un nevado difuminado. */
-.pb-blur > .l2 {
-  bottom: 20%;
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 70%);
-  mask-image: linear-gradient(to top, transparent 0%, #000 70%);
-}
-
-.pb-hdr[data-blur='off'] .pb-blur > .l2 {
-  visibility: hidden;
-}
-
-.pb-blur > .tint-dark {
+.pb-tint-dark {
   background: linear-gradient(180deg, rgba(20, 34, 110, 0.55) 0%, rgba(20, 34, 110, 0.2) 55%, rgba(20, 34, 110, 0) 100%);
   transition: opacity 0.45s;
 }
 
-.pb-blur > .tint-light {
+.pb-tint-light {
   background: linear-gradient(180deg, rgba(236, 239, 246, 0.85) 0%, rgba(236, 239, 246, 0.4) 55%, rgba(236, 239, 246, 0) 100%);
   opacity: 0;
   transition: opacity 0.45s;
 }
 
-.pb-hdr[data-theme='light'] .tint-dark {
+/* Grano estático: sin animación, por debajo del texto de la barra (el orden en el DOM lo deja detrás). */
+.pb-tint-grain {
+  background-image: url('../assets/backgrounds/grain.webp');
+  background-size: 160px 160px;
+  opacity: 0.3;
+}
+
+.pb-hdr[data-theme='light'] .pb-tint-dark {
   opacity: 0;
 }
 
-.pb-hdr[data-theme='light'] .tint-light {
+.pb-hdr[data-theme='light'] .pb-tint-light {
   opacity: 1;
+}
+
+/* Compactación (al bajar 24 px): un solo cambio de opacidad del contenedor; la altura no cambia. */
+.pb-hdr[data-compact] .pb-tint {
+  opacity: 0.6;
 }
 
 .pb-bar {
