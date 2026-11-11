@@ -78,7 +78,8 @@ test.describe('F17 · escudo ESPOCH en la barra', () => {
     const rule = await box('.pb-hdr .pb-brand__rule');
     const iso = await box('.pb-hdr .pb-logo svg');
     const cy = (b: { y: number; height: number }) => b.y + b.height / 2;
-    expect(Math.abs(cy(shield) - cy(iso))).toBeLessThanOrEqual(1);
+    // El escudo baja 1 px a propósito (centrado óptico, ver header.css): su caja queda a 1 px del centro.
+    expect(Math.abs(cy(shield) - cy(iso) - 1)).toBeLessThanOrEqual(1);
     expect(Math.abs(cy(rule) - cy(iso))).toBeLessThanOrEqual(1);
     expect(Math.abs(shield.height - iso.height)).toBeLessThanOrEqual(1);
     const left = rule.x - (shield.x + shield.width);
@@ -116,4 +117,16 @@ test.describe('F17 · escudo ESPOCH en la barra', () => {
     const results = await new AxeBuilder({ page }).include('.pb-hdr').analyze();
     expect(results.violations).toEqual([]);
   });
+});
+
+// El blur solo se apaga arriba del todo: con scroll, el titular que pasa bajo la barra no debe quedar sin desenfoque.
+test('el blur de la barra se enciende en cuanto se hace scroll, también sobre la portada', async ({ page }) => {
+  for (const path of ['/', '/equipo/', '/eventos/']) {
+    await page.goto(path);
+    await expect(page.locator('.pb-hdr'), path).toHaveAttribute('data-blur', 'off');
+    await page.evaluate(() => window.scrollTo({ top: 300, behavior: 'instant' }));
+    await expect(page.locator('.pb-hdr'), path).toHaveAttribute('data-blur', 'on');
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    await expect(page.locator('.pb-hdr'), path).toHaveAttribute('data-blur', 'off');
+  }
 });

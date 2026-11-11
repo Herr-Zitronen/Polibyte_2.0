@@ -215,6 +215,9 @@
 .pb-brand__shield {
   flex: none;
   display: block;
+  /* Centrado óptico: el escudo pesa arriba y su libro es muy fino, así que a igual caja se ve más alto que el
+     isotipo. 1 px abajo lo asienta sobre la misma línea de base visual. */
+  transform: translateY(1px);
 }
 
 /* Línea de 1 px en el color del texto de la barra: blanca sobre azul, tinta sobre papel. */

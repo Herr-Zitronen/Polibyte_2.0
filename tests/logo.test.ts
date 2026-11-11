@@ -51,6 +51,10 @@ describe('F17 · escudo ESPOCH', () => {
     expect(css).toMatch(/@media \(max-width: 380px\)\s*\{[^@]*\.pb-brand[^{]*\{[^}]*gap:\s*10px/);
   });
 
+  it('el escudo baja 1 px (centrado óptico respecto al isotipo)', () => {
+    expect(css).toMatch(/\.pb-brand__shield\s*\{[^}]*transform:\s*translateY\(1px\)/);
+  });
+
   it('el bloque de marca ocupa la columna izquierda de la barra', () => {
     expect(css).toMatch(/\.pb-bar-in > \.pb-brand\s*\{[^}]*justify-self:\s*start/);
   });
