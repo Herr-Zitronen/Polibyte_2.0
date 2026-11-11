@@ -1,5 +1,6 @@
 ---
 // DESIGN.md §3.1: solo existen dos variantes. Con `href` es enlace; sin él, <button>.
+// F9: `slot="icon"` pone un icono decorativo antes del texto (p. ej. la terminal de "Ver eventos").
 import '../styles/buttons.css';
 
 interface Props {
@@ -19,5 +20,17 @@ const linkAttrs = href
 ---
 
 <Tag class={classes} {...linkAttrs}>
-  {variant === 'primary' ? <span class="pb-b1__box"><slot /></span> : <slot />}
+  {
+    variant === 'primary' ? (
+      <span class="pb-b1__box">
+        <slot name="icon" />
+        <slot />
+      </span>
+    ) : (
+      <>
+        <slot name="icon" />
+        <slot />
+      </>
+    )
+  }
 </Tag>

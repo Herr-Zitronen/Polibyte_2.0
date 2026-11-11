@@ -9,6 +9,7 @@ import { Image } from 'astro:assets';
 import type { ShowcaseLayout } from '../../lib/showcase';
 import Button from '../Button.astro';
 import Cross from '../Cross.astro';
+import SectionChip from '../SectionChip.astro';
 import '../../styles/showcase.css';
 import '../../styles/tabs.css';
 
@@ -42,7 +43,10 @@ const people = (p: ShowcaseItem) => p.members.filter((m) => m.trim()).join(', ')
   <div class="pb-showcase__bg" aria-hidden="true"></div>
   <div class="pb-container pb-showcase__wrap">
     <div class="pb-showcase__bar">
-      <h2>Proyectos destacados</h2>
+      <div class="pb-stitle">
+        <SectionChip />
+        <h2>Proyectos destacados</h2>
+      </div>
       <span class="pb-showcase__event">{eventTitle}</span>
     </div>
     <p class="pb-showcase__lead">Lo que construyeron nuestros equipos, publicado para que cualquiera lo pruebe.</p>
