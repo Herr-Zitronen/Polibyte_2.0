@@ -64,31 +64,48 @@ test('agrupar las líneas centrales no cambia el dibujo del hero (0, 40 y 90 % d
   await page.addStyleTag({ content: FREEZE });
   await page.waitForTimeout(1200); // entradas de la barra y del titular
 
-  const now: { shot: Buffer; rects: Awaited<ReturnType<typeof cvlRects>> }[] = [];
+  // Las dos estructuras se capturan una tras otra en cada posición (no en dos tandas separadas por segundos):
+  // así nada que dependa del tiempo entra en la comparación, solo la estructura de las líneas.
+  const toOld = () =>
+    page.evaluate(() => {
+      const w = window as unknown as { __cvl?: { el: HTMLElement; parent: Node; next: Node | null; cls: string; style: string }[] };
+      const lines = document.querySelector('.pb-hero__lines')!;
+      w.__cvl = [...document.querySelectorAll<HTMLElement>('.pb-hero .pb-cvl')].map((el) => ({
+        el,
+        parent: el.parentNode!,
+        next: el.nextSibling,
+        cls: el.className,
+        style: el.getAttribute('style') ?? '',
+      }));
+      for (const { el } of w.__cvl) {
+        const top = !!el.closest('.pb-tlg');
+        el.className = `${top ? 'pb-tlg' : 'pb-blg'} pb-cvl-old`;
+        el.setAttribute('style', top ? 'left: 50%; top: 80px; width: 1.5px; height: 80px' : 'left: 50%; bottom: 82px; width: 1.5px; height: 80px');
+        lines.appendChild(el);
+      }
+    });
+  const toNew = () =>
+    page.evaluate(() => {
+      const w = window as unknown as { __cvl?: { el: HTMLElement; parent: Node; next: Node | null; cls: string; style: string }[] };
+      for (const { el, parent, next, cls, style } of w.__cvl ?? []) {
+        el.className = cls;
+        el.setAttribute('style', style);
+        parent.insertBefore(el, next);
+      }
+    });
+  const frame = () => page.evaluate(() => new Promise((d) => requestAnimationFrame(() => requestAnimationFrame(d))));
+
   for (const p of POSITIONS) {
     await scrollToLines(page, p);
     await page.waitForTimeout(300);
-    now.push({ shot: await page.screenshot(), rects: await cvlRects(page) });
+    const after = { shot: await page.screenshot(), rects: await cvlRects(page) };
+    expect(after.rects).toHaveLength(2);
     await expect(page, `captura base del hero al ${p * 100} %`).toHaveScreenshot(`hero-lines-${p * 100}.png`, { maxDiffPixelRatio: 0.002 });
-  }
-  expect(now[0]!.rects).toHaveLength(2);
-
-  // Estructura anterior: cada línea, elemento aparte con la clase (y la animación) de su grupo.
-  await page.evaluate(() => {
-    const lines = document.querySelector('.pb-hero__lines')!;
-    document.querySelectorAll<HTMLElement>('.pb-hero .pb-cvl').forEach((c) => {
-      const top = !!c.closest('.pb-tlg');
-      c.className = `${top ? 'pb-tlg' : 'pb-blg'} pb-cvl-old`;
-      c.setAttribute('style', top ? 'left: 50%; top: 80px; width: 1.5px; height: 80px' : 'left: 50%; bottom: 82px; width: 1.5px; height: 80px');
-      lines.appendChild(c);
-    });
-  });
-
-  for (const [i, p] of POSITIONS.entries()) {
-    await scrollToLines(page, p);
-    await page.waitForTimeout(300);
+    await toOld();
+    await frame();
     const before = { shot: await page.screenshot(), rects: await cvlRects(page) };
-    const after = now[i]!;
+    await toNew();
+    await frame();
     for (const [j, r] of before.rects.entries()) {
       const q = after.rects[j]!;
       for (const k of ['x', 'y', 'w', 'h'] as const) expect(Math.abs(q[k] - r[k]), `línea ${j}, ${k} al ${p * 100} %`).toBeLessThanOrEqual(0.1);
