@@ -45,7 +45,7 @@ test('el h1 es único y lleva view-transition-name: pb-evtitle', async ({ page }
 });
 
 test('una ruta por evento; slug inexistente → 404', async ({ page }) => {
-  for (const slug of ['imagine-cup-2027', 'icpc-2025', 'codefest-2027', 'hackathon-espoch-2026', 'taller-git-2026']) {
+  for (const slug of ['imagine-cup-2027', 'icpc-2025', 'codefest-2027', 'kiroween-2026', 'taller-git-2026']) {
     const res = await page.goto(`/eventos/${slug}/`);
     expect(res?.status(), slug).toBe(200);
   }

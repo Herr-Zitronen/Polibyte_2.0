@@ -1,7 +1,7 @@
 // Fixtures de laboratorio para H5.2: proyectos del evento 'hack' de recap-fixtures.
 import type { ImageMetadata } from 'astro';
 import mobile from '../assets/backgrounds/fog.webp';
-import desktop from '../content/projects/hackathon-espoch-2026/shot.webp';
+import desktop from '../content/projects/kiroween-2026/polibyte-web.webp';
 
 const base = {
   event: 'hack',

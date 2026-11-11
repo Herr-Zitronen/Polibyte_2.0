@@ -6,7 +6,7 @@ import { expect, test } from '@playwright/test';
 test('fixture con 3 pasados: h1 = último concluido, cifras en Silkscreen y botón a destacados', async ({ page }) => {
   await page.goto('/lab/recap/');
   const recap = page.locator('#recap');
-  await expect(recap.locator('h1')).toHaveAccessibleName('Hackathon ESPOCH');
+  await expect(recap.locator('h1')).toHaveAccessibleName('KIROWEEN 2026');
   const nums = recap.locator('.pb-statn');
   await expect(nums).toHaveText(['12', '11', '44']);
   for (const n of await nums.all()) await expect(n).toHaveCSS('font-family', /Silkscreen/);
@@ -34,6 +34,6 @@ test('sin eventos pasados → estado alternativo', async ({ page }) => {
 test('/eventos encabeza con el último evento concluido del contenido', async ({ page }) => {
   await page.goto('/eventos/');
   await expect(page.locator('h1')).toHaveCount(1);
-  await expect(page.locator('#recap h1')).toHaveAccessibleName('Hackathon ESPOCH');
+  await expect(page.locator('#recap h1')).toHaveAccessibleName('KIROWEEN 2026');
   await expect(page.locator('#recap .pb-statn')).toHaveText(['12', '11', '44']);
 });
