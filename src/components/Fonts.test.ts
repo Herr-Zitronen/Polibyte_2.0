@@ -1,5 +1,5 @@
 // H1.1 / H4.1 · Fuentes propias: nada de hojas externas (sin conexiones a terceros antes del primer pintado).
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -51,12 +51,17 @@ describe('Fonts.astro', () => {
     expect(config).toMatch(/woff2\?/);
   });
 
-  it('importa solo las hojas de Silkscreen e Instrument Sans, con los pesos de DESIGN §2.2', () => {
+  it('importa solo las hojas de Silkscreen, con los pesos de DESIGN §2.2', () => {
     const imports = [...src.matchAll(/^import '([^']+)';/gm)].map((m) => m[1]);
-    expect(imports).toEqual([
-      '@fontsource/silkscreen/latin-400.css',
-      '@fontsource/silkscreen/latin-700.css',
-      '@fontsource/instrument-sans/latin-600.css',
-    ]);
+    expect(imports).toEqual(['@fontsource/silkscreen/latin-400.css', '@fontsource/silkscreen/latin-700.css']);
+  });
+
+  it('Instrument Sans va reducida a las letras de «PoliByte» (DESIGN §2.2): solo dibuja el wordmark del pie', () => {
+    const face = [...src.matchAll(/@font-face\s*\{([^}]*)\}/g)].map((m) => m[1] ?? '').find((f) => /'Instrument Sans'/.test(f)) ?? '';
+    expect(face).toMatch(/assets\/fonts\/instrument-sans-polibyte\.woff2/);
+    expect(face).toMatch(/font-weight:\s*600/);
+    expect(face).toMatch(/font-display:\s*swap/);
+    // La latina completa pesa 17 KB; con ocho letras quedan menos de 2 KB.
+    expect(statSync(resolve(import.meta.dirname, '../assets/fonts/instrument-sans-polibyte.woff2')).size).toBeLessThan(2048);
   });
 });

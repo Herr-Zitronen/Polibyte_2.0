@@ -48,7 +48,7 @@ Líneas sobre oscuro: `rgba(242,244,250,.25)` (separadores), `.45` (marcos), `.6
 |---|---|---|
 | JetBrains Mono | 300–800 (variable, sin cursiva) | Todo el texto |
 | Silkscreen | 400, 700 | Etiquetas pequeñas, fechas en listas, números grandes (cuenta regresiva, cifras, 404), binario |
-| Instrument Sans | 600, **solo las letras de "PoliByte"** (`&text=PoliByte`) | Wordmark del pie |
+| Instrument Sans | 600, **solo las letras de "PoliByte"** (`src/assets/fonts/instrument-sans-polibyte.woff2`, 1,3 KB) | Wordmark del pie |
 
 Escala principal:
 
@@ -278,5 +278,7 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 - Reglas de especulación con `eagerness: 'conservative'`: la página siguiente se pre-renderiza al pulsar, no al dejar el cursor sobre un enlace (eso robaba CPU y GPU en mitad del scroll).
 - La medición de `perf-diag.yml` corre en Actions, que rasteriza por software (sin GPU): sirve para comparar variantes entre sí, no para predecir un PC con gráfica. Para eso está el panel `?diag` (`docs/SESSIONS.md`).
 - Fuentes: `display=swap`; Instrument Sans subconjunto a "PoliByte"; JetBrains Mono (latín) precargada, con un respaldo local de métricas ajustadas para que el titular no salte.
+- JetBrains Mono se declara solo en latín y latín extendido (`Fonts.astro`). Ninguna fuente se incrusta en el HTML en base64 (`assetsInlineLimit` en `astro.config.mjs`).
+- Caché: los archivos con hash de `/_astro/` se sirven con `immutable` durante un año (`public/_headers`); el HTML revalida siempre.
 - Lighthouse CI mide Inicio, Eventos, un detalle de evento, Equipo y Unirme (mediana de 3).
 - Diagnóstico de fluidez: manual (`perf-diag.yml`), nunca en la suite normal. Dos modos: `script` (scrollTo por cuadro, comparable con mediciones antiguas) y `rueda` (gesto de rueda real por CDP, el que refleja el scroll del compositor).
