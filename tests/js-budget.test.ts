@@ -1,4 +1,4 @@
-// H0.2 · DESIGN §7: JS por página < 20 KB (sin Lenis). Necesita `dist/`: corre en CI tras el build.
+// H0.2 · DESIGN §7: JS por página < 20 KB. Necesita `dist/`: corre en CI tras el build.
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';

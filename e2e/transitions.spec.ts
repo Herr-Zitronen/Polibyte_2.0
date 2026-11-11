@@ -36,17 +36,13 @@ test("como mucho un pb-evtitle por página", async ({ page }) => {
   }
 });
 
-test("sin movimiento reducido, Lenis da el scroll con inercia (solo con cursor)", async ({ page }, info) => {
-  test.skip(info.project.name === "mobile-390", "en táctil se usa el scroll nativo (F12)");
-  await page.goto("/");
-  await expect.poll(() => page.evaluate(() => typeof (window as unknown as { lenis?: object }).lenis === "object")).toBe(true);
-});
-
-test("en táctil no se carga Lenis", async ({ page }, info) => {
-  test.skip(info.project.name !== "mobile-390", "solo celular");
+// perf/scroll-fino: scroll nativo en todos los dispositivos; nada mueve el scroll con JS.
+test("scroll nativo: sin Lenis y con saltos suaves a anclas", async ({ page }) => {
   await page.goto("/");
   await page.waitForLoadState("networkidle");
-  expect(await page.evaluate(() => (window as unknown as { lenis?: object }).lenis)).toBeUndefined();
+  expect(await page.evaluate(() => "lenis" in window)).toBe(false);
+  expect(await page.evaluate(() => document.documentElement.className)).not.toMatch(/lenis/);
+  await expect(page.locator("html")).toHaveCSS("scroll-behavior", "smooth");
 });
 
 test.describe("con movimiento reducido", () => {
@@ -57,6 +53,7 @@ test.describe("con movimiento reducido", () => {
       await page.goto(p);
       await page.waitForLoadState("networkidle");
       expect(await page.evaluate(() => "lenis" in window), p).toBe(false);
+      await expect(page.locator("html"), p).toHaveCSS("scroll-behavior", "auto");
       const vtNone = await page.evaluate(() =>
         [...document.styleSheets].some((s) => {
           try {

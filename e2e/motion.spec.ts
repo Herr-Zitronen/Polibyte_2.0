@@ -28,7 +28,7 @@ test.describe('barra', () => {
     const chip = page.locator('.pb-chip');
     await expect(chip).toHaveCSS('clip-path', 'none');
     expect(await chip.evaluate((el) => getComputedStyle(el).transitionProperty)).not.toMatch(/clip-path/);
-    await page.locator('#proximo').evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().bottom + window.scrollY + 50));
+    await page.locator('#proximo').evaluate((el) => window.scrollTo({ top: el.getBoundingClientRect().bottom + window.scrollY + 50, behavior: 'instant' }));
     await expect(chip).toHaveCSS('opacity', '1', { timeout: 3000 });
     await expect(chip).toHaveCSS('transform', 'none');
     await expect(chip.locator('.pb-chip-n > span')).toHaveCSS('transform', 'none', { timeout: 3000 });

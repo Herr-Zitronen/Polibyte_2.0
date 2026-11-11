@@ -76,13 +76,37 @@ describe('A3 · efectos y pausa fuera de pantalla', () => {
   });
 });
 
-describe('A4 · Lenis', () => {
-  const lenis = read('src/scripts/lenis.ts');
-  it('se anuncia en window.lenis (el diagnóstico sin-lenis lo necesita)', () => {
-    expect(lenis).toMatch(/window\.lenis\s*=/);
+// perf/scroll-fino: Lenis movía el scroll con JS en el hilo principal; con él, las animaciones scroll()/view()
+// dejaban de ir solo por el compositor y cualquier trabajo de JS se notaba como tirón. Scroll nativo.
+describe('Scroll nativo (sin Lenis)', () => {
+  const exists = (p: string) => {
+    try {
+      statSync(resolve(ROOT, p));
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  it('no queda ni el script, ni su import, ni la dependencia', () => {
+    expect(exists('src/scripts/lenis.ts')).toBe(false);
+    expect(read('src/layouts/Base.astro')).not.toMatch(/lenis/i);
+    const pkg = JSON.parse(read('package.json')) as { dependencies?: Record<string, string>; devDependencies?: Record<string, string> };
+    expect({ ...pkg.dependencies, ...pkg.devDependencies }).not.toHaveProperty('lenis');
+    expect(read('src/styles/transitions.css')).not.toMatch(/\.lenis/);
   });
-  it('no se carga en pantallas táctiles', () => {
-    expect(lenis).toMatch(/hover: none|pointer: coarse/);
+
+  it('las anclas se desplazan con suavidad solo sin movimiento reducido', () => {
+    const css = read('src/styles/global.css');
+    expect(css).toMatch(/@media \(prefers-reduced-motion: no-preference\)\s*\{\s*html\s*\{\s*scroll-behavior:\s*smooth;?\s*\}\s*\}/);
+    expect(css).not.toMatch(/(^|\n)html\s*\{[^}]*scroll-behavior:\s*smooth/);
+  });
+
+  it('ningún script mueve el scroll en cada cuadro', () => {
+    for (const f of files(resolve(ROOT, 'src/scripts'), /\.ts$/)) {
+      const src = readFileSync(f, 'utf8');
+      expect(src, relative(ROOT, f)).not.toMatch(/\bscrollTo\(|\.scrollTop\s*=/);
+    }
   });
 });
 
@@ -95,11 +119,6 @@ describe('A6 · transiciones entre páginas', () => {
   it('el grano de página no se funde entre páginas', () => {
     expect(read('src/styles/glass.css')).toMatch(/\.pb-grain--page\s*\{[^}]*view-transition-name:\s*pb-grain/);
     expect(css).toMatch(/::view-transition-group\(pb-grain\)[^{]*\{[^}]*animation:\s*none/);
-  });
-  it('Lenis se detiene al salir de la página y se reanuda al volver', () => {
-    const lenis = read('src/scripts/lenis.ts');
-    expect(lenis).toMatch(/pageswap|pagehide/);
-    expect(lenis).toMatch(/pagereveal|pageshow/);
   });
 });
 

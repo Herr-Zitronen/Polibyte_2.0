@@ -42,10 +42,10 @@ test("scroll rápido durante la entrada y regreso: titular completo", async ({ p
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: 6 });
   await page.goto("/", { waitUntil: "domcontentloaded" });
   for (let i = 0; i < 6; i++) {
-    await page.evaluate((y) => window.scrollTo(0, y), i % 2 ? 0 : 1400);
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), i % 2 ? 0 : 1400);
     await page.waitForTimeout(60);
   }
-  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
   await expect.poll(async () => (await letters(page)).hidden, { timeout: 8000 }).toBe(0);
   expect((await letters(page)).text).toBe(LETTERS);
 });

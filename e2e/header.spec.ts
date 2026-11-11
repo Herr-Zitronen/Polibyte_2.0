@@ -30,10 +30,10 @@ test('la barra cambia a tema claro sobre una sección clara', async ({ page }) =
   await page.goto('/');
   const hdr = page.locator('.pb-hdr');
   await expect(hdr).toHaveAttribute('data-theme', 'dark');
-  await page.locator('section[data-theme="light"]').first().evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 10));
+  await page.locator('section[data-theme="light"]').first().evaluate((el) => window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 10, behavior: 'instant' }));
   await expect(hdr).toHaveAttribute('data-theme', 'light');
   await expect(page.locator('.pb-hdr .pb-join .pb-b1__box')).toHaveCSS('background-color', 'rgb(19, 32, 90)');
-  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
   await expect(hdr).toHaveAttribute('data-theme', 'dark');
 });
 

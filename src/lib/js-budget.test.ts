@@ -19,7 +19,8 @@ function fixture() {
 }
 
 describe('pageJsBytes', () => {
-  it('suma JS externo e inline por página, sin JSON ni Lenis', () => {
-    expect(pageJsBytes(fixture())).toEqual({ 'index.html': 1004, 'eventos/index.html': 0 });
+  // perf/scroll-fino: Lenis se quitó; ningún script tiene ya excepción en el presupuesto.
+  it('suma JS externo e inline por página, sin JSON y sin excepciones por nombre', () => {
+    expect(pageJsBytes(fixture())).toEqual({ 'index.html': 1004, 'eventos/index.html': 9000 });
   });
 });

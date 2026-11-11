@@ -52,16 +52,6 @@
   to { opacity: 1; transform: none; }
 }
 
-/* Lenis: el documento conserva su altura natural mientras Lenis gobierna el scroll. */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-
-.lenis.lenis-stopped {
-  overflow: clip;
-}
-
 /* F12: mientras una página se pre-renderiza (reglas de especulación de Base.astro) sus animaciones
    de entrada esperan; arrancan al mostrarse (prerenderingchange quita la clase). */
 .pb-prerender *,

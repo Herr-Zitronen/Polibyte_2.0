@@ -39,12 +39,12 @@ test('el chip aparece en la barra al pasar el panel (solo ≥1180 px)', async ({
   await page.goto('/');
   const chip = page.locator('.pb-hdr .pb-chip');
   await expect(chip).toBeHidden();
-  await page.locator('#proximo').evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().bottom + window.scrollY + 50));
+  await page.locator('#proximo').evaluate((el) => window.scrollTo({ top: el.getBoundingClientRect().bottom + window.scrollY + 50, behavior: 'instant' }));
   const wide = page.viewportSize()!.width >= 1180;
   if (wide) {
     await expect(chip).toBeVisible();
     // Al volver arriba se oculta.
-    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
     await expect(chip).toBeHidden();
   } else {
     await page.waitForTimeout(500);

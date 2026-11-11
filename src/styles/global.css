@@ -61,6 +61,14 @@ a {
   white-space: nowrap;
 }
 
+/* perf/scroll-fino: scroll nativo (sin Lenis). La rueda la suaviza el navegador en el compositor; aquí
+   solo se suavizan los saltos a anclas, y nunca con movimiento reducido. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 /* Siempre al final: todo visible y quieto. */
 @media (prefers-reduced-motion: reduce) {
   *,

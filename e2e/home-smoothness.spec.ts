@@ -44,7 +44,7 @@ async function measure(page: Page, variant: Variant = {}, mode: Mode = 'script')
     }).observe({ type: 'longtask', buffered: true });
   });
   await page.goto('/', { waitUntil: 'load' });
-  // Deja pasar la entrada del titular y la carga ociosa de Lenis.
+  // Deja pasar la entrada del titular.
   await page.waitForTimeout(3500);
   if (variant.css) await page.addStyleTag({ content: variant.css });
   if (variant.js) await page.evaluate(variant.js);
@@ -140,7 +140,6 @@ const VARIANTS: Record<string, Variant> = {
   'sin-scroll-timelines': {
     js: `document.getAnimations().filter(a=>a.timeline&&a.timeline!==document.timeline).forEach(a=>a.cancel())`,
   },
-  'sin-lenis': { js: `try{window.lenis&&window.lenis.destroy();window.lenis=undefined}catch(e){}` },
   'sin-backdrop-filter': { css: `*{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}` },
   'sin-grano': { css: `.pb-grain{display:none!important}` },
   'sin-fondos-paralaje': { css: `.pb-par{display:none!important}` },
@@ -174,7 +173,8 @@ test.describe('diagnóstico de costes', () => {
 
 // A/B intercalado (3 rondas) con gesto de rueda real: el runner compartido es ruidoso, así que solo se
 // comparan medianas dentro de la misma corrida. Sirve para el tirón de las líneas del hero (perf/scroll-fino).
-const AB = ['base', 'sin-is-off', 'sin-barridos', 'lineas-agrupadas', 'sin-lenis'] as const;
+// (Lenis ya no existe: su coste se ve comparando la base con la tabla de referencia del plan.)
+const AB = ['base', 'sin-is-off', 'sin-barridos', 'lineas-agrupadas'] as const;
 
 test('A/B con rueda: variantes del hero (medianas)', async ({ browser }, info) => {
   test.skip(!DIAG, 'solo con PERF_DIAG=1 (perf-diag.yml)');

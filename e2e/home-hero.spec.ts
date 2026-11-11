@@ -56,7 +56,7 @@ test('al hacer scroll el marco se abre y el titular se aleja', async ({ page }) 
   const read = () => page.evaluate(() => ['.pb-tlg', '.pb-hx'].map((s) => getComputedStyle(document.querySelector(s)!).transform));
   const before = await read();
   const h = await page.locator('#top').evaluate((el) => (el as HTMLElement).offsetHeight);
-  await page.evaluate((y) => window.scrollTo(0, y), h / 2);
+  await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), h / 2);
   await expect.poll(async () => (await read())[0]).not.toBe(before[0]);
   await expect.poll(async () => (await read())[1]).not.toBe(before[1]);
 });

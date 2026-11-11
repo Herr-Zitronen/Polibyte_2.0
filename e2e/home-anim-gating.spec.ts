@@ -39,9 +39,9 @@ test.describe('Inicio: animaciones y carga', () => {
     await page.goto('/');
     await page.waitForSelector('[data-decode][data-decoded]');
     await expect.poll(() => sweepState(page)).toBe('running');
-    await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+    await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
     await expect.poll(() => sweepState(page)).toBe('paused');
-    await page.evaluate(() => scrollTo(0, 0));
+    await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
     await expect.poll(() => sweepState(page)).toBe('running');
   });
 
