@@ -51,7 +51,10 @@ jobs:
       - run: npm ci
       - run: npm run check:types
       - run: npm run lint
+      # L1 (WOR-85): hacia main, el contenido de ejemplo bloquea (tests/content-ready.test.ts).
       - run: npm run test
+        env:
+          CONTENT_READY: ${{ (github.ref == 'refs/heads/main' || github.base_ref == 'main') && '1' || '' }}
       - run: npm run build
       - name: Presupuesto de JS por página (< 20 KB)
         run: npx vitest run tests/js-budget.test.ts

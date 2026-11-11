@@ -20,3 +20,10 @@ describe('Pie de página desde site.json (contenido editable sin tocar código)'
     expect(footer).toMatch(/links\.length > 0 &&/);
   });
 });
+
+describe('L1 · contenido real obligatorio solo hacia main', () => {
+  it('el workflow enciende CONTENT_READY en main y en PRs hacia main', () => {
+    const ci = read('.github/workflows/ci.yml');
+    expect(ci).toMatch(/CONTENT_READY: \$\{\{ \(github\.ref == 'refs\/heads\/main' \|\| github\.base_ref == 'main'\) && '1' \|\| '' \}\}/);
+  });
+});
