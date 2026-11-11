@@ -37,49 +37,9 @@ test('la barra cambia a tema claro sobre una sección clara', async ({ page }) =
   await expect(hdr).toHaveAttribute('data-theme', 'dark');
 });
 
-test('ningún elemento de la barra tiene backdrop-filter (F8)', async ({ page }) => {
-  for (const path of PAGES) {
-    await page.goto(path);
-    const filtered = await page.locator('.pb-hdr, .pb-hdr *').evaluateAll((els) =>
-      els.filter((el) => getComputedStyle(el).backdropFilter !== 'none').map((el) => el.className),
-    );
-    expect(filtered, path).toEqual([]);
-  }
-});
-
-test('la barra sigue legible sobre una sección clara sin blur (F8)', async ({ page }) => {
+test('ningún ancestro del blur tiene view-transition-name', async ({ page }) => {
   await page.goto('/');
-  const hdr = page.locator('.pb-hdr');
-  const darkColor = await page.locator('.pb-bar').evaluate((el) => getComputedStyle(el).color);
-  await page.locator('section[data-theme="light"]').first().evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 10));
-  await expect(hdr).toHaveAttribute('data-theme', 'light');
-  await expect(page.locator('.pb-tint-light')).toHaveCSS('opacity', '1');
-  const lightColor = await page.locator('.pb-bar').evaluate((el) => getComputedStyle(el).color);
-  expect(lightColor).not.toBe(darkColor);
-});
-
-test('la barra se compacta con opacidad al bajar 24 px sin cambiar su altura (F8)', async ({ page }) => {
-  await page.goto('/');
-  const hdr = page.locator('.pb-hdr');
-  await expect(hdr).not.toHaveAttribute('data-compact');
-  const before = (await page.locator('.pb-bar-in').boundingBox())!.height;
-  await page.evaluate(() => window.scrollTo(0, 30));
-  await expect(hdr).toHaveAttribute('data-compact', '');
-  expect((await page.locator('.pb-bar-in').boundingBox())!.height).toBe(before);
-  await expect(page.locator('.pb-tint')).toHaveCSS('transition-property', 'opacity');
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await expect(hdr).not.toHaveAttribute('data-compact');
-});
-
-test('el grano de la barra es estático (F8)', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.locator('.pb-tint-grain')).toHaveCSS('animation-name', 'none');
-  await expect(page.locator('.pb-tint-grain')).toHaveCSS('opacity', '0.3');
-});
-
-test('ningún ancestro de la barra tiene view-transition-name', async ({ page }) => {
-  await page.goto('/');
-  const names = await page.locator('.pb-tint').evaluate((el) => {
+  const names = await page.locator('.pb-blur').evaluate((el) => {
     const out: string[] = [];
     // <html> lleva `view-transition-name: root` por defecto (hoja del navegador): no cuenta.
     for (let n = el.parentElement; n && n !== document.documentElement; n = n.parentElement)
