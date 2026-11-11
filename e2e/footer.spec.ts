@@ -21,6 +21,16 @@ test('textos del pie y fondo #0D1438', async ({ page }) => {
   await expect(foot).toHaveCSS('background-color', 'rgb(13, 20, 56)');
 });
 
+// WOR-105: la foto del Chimborazo es CC BY-SA 4.0 (Go593); la licencia pide el crédito donde se usa.
+test('crédito de la foto del Chimborazo con autor y licencia', async ({ page }) => {
+  await page.goto('/');
+  const credit = page.locator('.pb-foot-credit');
+  await expect(credit).toContainText('Foto del Chimborazo');
+  await expect(credit.getByRole('link', { name: 'Go593' })).toHaveAttribute('href', 'https://www.descubrecuador.com/item/volcan-chimborazo/');
+  await expect(credit.getByRole('link', { name: 'CC BY-SA 4.0' })).toHaveAttribute('href', 'https://creativecommons.org/licenses/by-sa/4.0/');
+  for (const a of await credit.getByRole('link').all()) await expect(a).toHaveAttribute('rel', /noopener/);
+});
+
 // PR D: los enlaces salen de site.json; vacíos no se muestran y nunca hay marcadores como "[Correo]".
 test('enlaces del pie: sin marcadores ni anclas de relleno', async ({ page }) => {
   await page.goto('/');

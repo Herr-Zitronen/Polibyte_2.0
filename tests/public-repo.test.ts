@@ -41,6 +41,13 @@ describe('Créditos de la foto del Chimborazo', () => {
     }
   });
 
+  it('el pie del sitio da el crédito (CC BY-SA lo pide donde se usa la imagen)', () => {
+    const footer = read('src/components/Footer.astro');
+    expect(footer).toMatch(/Go593/);
+    expect(footer).toContain('https://creativecommons.org/licenses/by-sa/4.0/');
+    expect(footer).toContain('https://www.descubrecuador.com/item/volcan-chimborazo/');
+  });
+
   it('la foto original no se publica en el repositorio', () => {
     expect(existsSync(resolve(ROOT, 'assets/backgrounds/chimborazo-original.png'))).toBe(false);
   });

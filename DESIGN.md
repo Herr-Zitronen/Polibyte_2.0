@@ -142,7 +142,7 @@ Cursor light (C) en cada fila. La fila seleccionada es un poco más clara, con b
 
 ### 3.10 Pie de página
 
-- Fondo `#0D1438`. Línea `© {periodo} PoliByte · Club de la Carrera de Software`, ESPOCH debajo, enlaces a la derecha (Correo · Instagram · GitHub).
+- Fondo `#0D1438`. Línea `© {periodo} PoliByte · Club de la Carrera de Software`, ESPOCH debajo y, debajo de ESPOCH, el crédito de la foto en 12 px (`Foto del Chimborazo: Go593 · CC BY-SA 4.0`, ver `CREDITS.md`); enlaces a la derecha (Correo · Instagram · GitHub).
 - Periodo y enlaces salen de `src/content/site.json` (`period`, `links`): un enlace vacío no se muestra y, sin ninguno, no se pinta el bloque. Las redes abren en otra pestaña; el correo es `mailto:`.
 - Wordmark grande en tono sólido `#252D4F` (no transparente: la "y" y la "t" se solapan en el logo y la transparencia marcaría el cruce). Al pasar el mouse, una "linterna" ilumina las letras con un degradado blanco azulado → amarillo, en una capa sólida cuya opacidad (0.75) se aplica al grupo.
 
