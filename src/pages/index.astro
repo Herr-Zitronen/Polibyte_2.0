@@ -25,9 +25,10 @@ const next = nextEvent(events, new Date()) as ((typeof events)[number] & { date:
       <NextEvent event={next} />
     </Hero>
     <PixelStrip seed={11} top={EDGE.cover} bottom={EDGE.paper} />
-    <WhatWeDo />
+    {/* PR B: sin próximos eventos, "Qué hacemos" empalma directo con el cierre (sin franja azul de más). */}
+    <WhatWeDo bottom={rows.length > 0 ? EDGE.navy : EDGE.image} />
     <UpcomingEvents rows={rows} />
-    <PixelStrip seed={37} top={EDGE.navy} bottom={EDGE.image} />
+    {rows.length > 0 && <PixelStrip seed={37} top={EDGE.navy} bottom={EDGE.image} />}
     <JoinCta />
     <PixelStrip seed={51} top={EDGE.cover} bottom={EDGE.footer} />
   </main>

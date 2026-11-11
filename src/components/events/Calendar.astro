@@ -13,9 +13,13 @@ import '../../styles/calendar.css';
 interface Props {
   rows: CalendarRow[];
   span?: string;
+  /** Hay archivo más abajo: el mensaje de filtro vacío puede remitir a él. */
+  hasArchive?: boolean;
 }
 
-const { rows, span } = Astro.props;
+const { rows, span, hasArchive = false } = Astro.props;
+// PR B: sin ningún evento próximo no hay nada que filtrar → sin pestañas y con un mensaje propio.
+const empty = rows.length === 0;
 const filters = [
   ['all', 'Todos'],
   ['club', 'Del club'],
@@ -31,17 +35,29 @@ const filters = [
         {span && <span class="pb-calendar__span">{span}</span>}
         <h2>Calendario</h2>
       </div>
-      <div role="group" aria-label="Filtrar por tipo" class="pb-tabs">
-        {filters.map(([key, label]) => (
-          <button type="button" class="pb-tab" data-filter={key} aria-pressed={key === 'all' ? 'true' : 'false'}>{label}</button>
-        ))}
-      </div>
+      {
+        !empty && (
+          <div role="group" aria-label="Filtrar por tipo" class="pb-tabs">
+            {filters.map(([key, label]) => (
+              <button type="button" class="pb-tab" data-filter={key} aria-pressed={key === 'all' ? 'true' : 'false'}>{label}</button>
+            ))}
+          </div>
+        )
+      }
     </div>
     <div class="pb-calendar__list">
       <LiveLine style="left: 0; right: 0; top: -1px" />
       <Cross x="0" y="0" />
       <Cross x="100%" y="0" />
-      <ul>
+      {
+        empty && (
+          <div class="pb-cal-none" data-none>
+            <p>Estamos preparando los próximos eventos.</p>
+            <Button variant="secondary" href="/unirme/">Unirme al club</Button>
+          </div>
+        )
+      }
+      <ul hidden={empty}>
         {rows.map((r) => (
           <li class="pb-urow" data-type={r.type}>
             <div class="pb-urow__date">
@@ -60,7 +76,7 @@ const filters = [
           </li>
         ))}
       </ul>
-      <p class="pb-cal-empty" data-empty hidden={rows.length > 0}>No hay eventos de este tipo por ahora. Revisa el archivo más abajo.</p>
+      <p class="pb-cal-empty" data-empty hidden>No hay eventos de este tipo por ahora.{hasArchive && ' Revisa el archivo más abajo.'}</p>
     </div>
   </div>
 </section>

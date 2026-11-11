@@ -1,0 +1,15 @@
+---
+// Laboratorio PR B: calendario sin ningún evento próximo (solo pasados) → sin pestañas, mensaje y botón a Unirme.
+import Calendar from '../../components/events/Calendar.astro';
+import Base from '../../layouts/Base.astro';
+import { CALENDAR_NOW, calendarEvents } from '../../lib/calendar-fixtures';
+import { calendarRows } from '../../lib/filter';
+
+const past = calendarEvents.filter((e) => e.date && e.date < CALENDAR_NOW);
+---
+
+<Base title="Laboratorio · Calendario vacío" noindex header={false}>
+  <main>
+    <Calendar rows={calendarRows(past, CALENDAR_NOW)} span="2026–2027" />
+  </main>
+</Base>

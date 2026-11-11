@@ -16,6 +16,11 @@ interface Props {
 
 const { rows } = Astro.props;
 const total = String(rows.length).padStart(2, '0');
+// PR B: si ningún evento tiene fecha todavía, el CTA no invita a inscribirse a algo sin fecha.
+const onlyTbd = rows.length > 0 && rows.every((r) => r.status === 'tbd');
+const cta = onlyTbd
+  ? { t: 'Aún sin fechas confirmadas', s: 'Únete al club y te avisamos en cuanto se confirmen.', b: 'Unirme al club' }
+  : { t: 'Inscribe a tu equipo', s: 'Te ayudamos a armar equipo para la próxima competencia.', b: 'Quiero inscribirme' };
 const ISO = 'M0 0H180V184H0Z M736 0H913V184H736Z M0 269H433V410L258 411V1120H433V1264H0Z M483 269H913V1264H483V1120H659V411L483 410Z M330 847V621Q330 611 340 611H573Q583 611 583 621V847Z';
 const layers = [-84, -70, -56, -42, -28, -14, 0];
 ---
@@ -92,10 +97,10 @@ const layers = [-84, -70, -56, -42, -28, -14, 0];
               ))}
             </div>
             <div class="pb-cal-cta">
-              <span class="pb-cta-t">Inscribe a tu equipo</span>
-              <span class="pb-cta-s">Te ayudamos a armar equipo para la próxima competencia.</span>
+              <span class="pb-cta-t">{cta.t}</span>
+              <span class="pb-cta-s">{cta.s}</span>
               <div class="pb-cta-b">
-                <Button variant="primary" href="/unirme/">Quiero inscribirme</Button>
+                <Button variant="primary" href="/unirme/">{cta.b}</Button>
                 <Button variant="secondary" href="/eventos/#calendario">Calendario completo</Button>
               </div>
             </div>
