@@ -5,6 +5,9 @@
   overflow: clip;
   background: #0d1438;
   color: #f2f4fa;
+  /* F12: bajo el pliegue, el navegador no la pinta hasta que se acerca. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 520px;
 }
 
 .pb-foot-in {

@@ -29,7 +29,7 @@ Nunca marques una historia como terminada sin pruebas en verde.
 
 ## Reglas de diseño que no se negocian
 - Solo dos botones (primario y secundario). Nunca estirados a ancho completo en escritorio.
-- Una sola capa de grano por sección, encima del contenido.
+- Una sola capa de grano por página, fija, encima del contenido y bajo la barra (`Base.astro`). Ninguna sección pinta la suya (solo el menú móvil, que vive en la top layer).
 - Contenedores de animaciones de scroll: `overflow: clip`, nunca `hidden`. Secciones con `display: flow-root`.
 - Ningún ancestro de un `backdrop-filter` puede tener `view-transition-name`.
 - Solo se animan `transform` y `opacity`. Nunca `filter`/`backdrop-filter`.

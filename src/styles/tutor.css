@@ -5,10 +5,9 @@
   overflow: clip;
   background: var(--pb-paper);
   color: var(--pb-ink);
-}
-
-.pb-tutor-s > .pb-grain {
-  opacity: 0.5;
+  /* F12: bajo el pliegue, el navegador no la pinta hasta que se acerca. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 760px;
 }
 
 .pb-tutor-in {

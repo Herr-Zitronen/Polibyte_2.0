@@ -3,6 +3,9 @@
   position: relative;
   display: flow-root;
   background: var(--pb-navy-900);
+  /* F12: bajo el pliegue, el navegador no la pinta hasta que se acerca. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1400px;
 }
 
 .pb-board-bg {
@@ -21,10 +24,6 @@
       rgba(53, 124, 140, 0.24),
       rgba(53, 124, 140, 0) 100%
     );
-}
-
-.pb-board-bg .pb-grain {
-  opacity: 0.6;
 }
 
 .pb-board-in {

@@ -44,12 +44,20 @@ export function initHeaderTheme(header: HTMLElement): () => void {
   apply();
   observeCover();
   if (lights.length) observe();
-  window.addEventListener('resize', observe, { passive: true });
-  window.addEventListener('resize', observeCover, { passive: true });
+  // F12: un solo listener de resize, con debounce (la barra de URL del celular lo dispara a cada rato).
+  let timer = 0;
+  const onResize = () => {
+    clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      if (lights.length) observe();
+      observeCover();
+    }, 150);
+  };
+  window.addEventListener('resize', onResize, { passive: true });
   return () => {
+    clearTimeout(timer);
     observer?.disconnect();
     coverObserver?.disconnect();
-    window.removeEventListener('resize', observe);
-    window.removeEventListener('resize', observeCover);
+    window.removeEventListener('resize', onResize);
   };
 }

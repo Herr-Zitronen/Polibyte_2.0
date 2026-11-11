@@ -49,16 +49,6 @@
   background: transparent;
 }
 
-.pb-sheet .pb-grain {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  background-image: url('../assets/backgrounds/grain.webp');
-  background-size: 160px 160px;
-  opacity: 0.6;
-}
-
 .pb-sheet__top {
   position: relative;
   display: flex;

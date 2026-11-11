@@ -5,12 +5,23 @@
   navigation: auto;
 }
 
+/* F12: fundido más corto (antes 0.22 s / 0.32 s): la página nueva ya viene pre-renderizada. */
 ::view-transition-old(root) {
-  animation: pb-vt-out 0.22s cubic-bezier(0.4, 0, 1, 1) both;
+  animation: pb-vt-out 0.16s cubic-bezier(0.4, 0, 1, 1) both;
 }
 
 ::view-transition-new(root) {
-  animation: pb-vt-in 0.32s cubic-bezier(0, 0, 0.2, 1) 0.06s both;
+  animation: pb-vt-in 0.24s cubic-bezier(0, 0, 0.2, 1) 0.04s both;
+}
+
+/* El grano fijo es igual en las dos páginas: ni se funde ni se mueve. */
+::view-transition-group(pb-grain),
+::view-transition-new(pb-grain) {
+  animation: none;
+}
+
+::view-transition-old(pb-grain) {
+  display: none;
 }
 
 ::view-transition-group(pb-navcur),
@@ -49,6 +60,14 @@ html.lenis body {
 
 .lenis.lenis-stopped {
   overflow: clip;
+}
+
+/* F12: mientras una página se pre-renderiza (reglas de especulación de Base.astro) sus animaciones
+   de entrada esperan; arrancan al mostrarse (prerenderingchange quita la clase). */
+.pb-prerender *,
+.pb-prerender *::before,
+.pb-prerender *::after {
+  animation-play-state: paused !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -21,9 +21,26 @@ export function onPointer(sub: PointerSub): void {
   );
 }
 
+/** F5/F12: el hero y las líneas vivas pausan lo infinito fuera de pantalla; el hero además suelta sus
+ *  animaciones de scroll. El hero se marca con 200 px de margen para reactivarlo antes de que asome. */
+function initOffscreen(): void {
+  const toggle: IntersectionObserverCallback = (entries) => {
+    for (const e of entries) e.target.classList.toggle('is-off', !e.isIntersecting);
+  };
+  const hero = document.querySelector<HTMLElement>('.pb-hero');
+  if (hero) new IntersectionObserver(toggle, { rootMargin: '200px 0px' }).observe(hero);
+  const live = document.querySelectorAll<HTMLElement>('.pb-hl, .pb-vl');
+  if (live.length) {
+    const liveIo = new IntersectionObserver(toggle);
+    live.forEach((el) => liveIo.observe(el));
+  }
+}
+
+/** Arranca una sola vez por página (Base.astro). */
 export function initFx(): void {
   if (started) return;
   started = true;
+  initOffscreen();
   const panels = [...document.querySelectorAll<HTMLElement>('[data-fx]')];
   if (!panels.length) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -48,15 +65,6 @@ export function initFx(): void {
     { threshold: [0, 0.15] },
   );
   for (const el of panels) io.observe(el);
-
-  // F5: el hero y las líneas vivas pausan sus animaciones infinitas fuera de pantalla.
-  const live = document.querySelectorAll<HTMLElement>('.pb-hero, .pb-hl, .pb-vl');
-  if (live.length) {
-    const liveIo = new IntersectionObserver((entries) => {
-      for (const e of entries) e.target.classList.toggle('is-off', !e.isIntersecting);
-    });
-    live.forEach((el) => liveIo.observe(el));
-  }
 
   // C: sin cursor (táctil) no se registra nada.
   if (reduce || !matchMedia('(hover: hover)').matches) return;

@@ -15,5 +15,4 @@ const { seed, top, bottom } = Astro.props;
 
 <div class="pb-div" aria-hidden="true" data-seed={seed}>
   <Fragment set:html={pixelStrip({ seed, top, bottom })} />
-  {top !== 'transparent' && <div class="pb-grain" style="--pb-grain-opacity: 0.6"></div>}
 </div>

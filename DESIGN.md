@@ -122,8 +122,9 @@ Cursor light (C) en cada fila. La fila seleccionada es un poco más clara, con b
 
 ### 3.8 Fondos
 
-- Capas, de atrás hacia adelante: imagen del nevado (lejos) → niebla (cerca) → brillo (`.pb-sheen`) → vidrio acanalado (`.pb-reed`) → degradado a sólido en los bordes → **grano (siempre arriba)**.
-- **Una sola capa de grano por sección**, con `z-index` sobre el contenido. Nunca dos granos superpuestos (forman rectángulos visibles).
+- Capas, de atrás hacia adelante: imagen del nevado (lejos) → niebla (cerca) → brillo (`.pb-sheen`) → vidrio acanalado (`.pb-reed`) → degradado a sólido en los bordes. Encima de todo, el grano de página.
+- **Una sola capa de grano por página** (`.pb-grain--page` en `Base.astro`): `position: fixed`, opacidad 0.55, `z-index` 10 (sobre el contenido, bajo la barra). Queda quieta respecto a la ventana, como grano de película, y no se rasteriza al hacer scroll (F12: antes había ~15 capas, una por sección y franja, y eran de lo más caro del scroll). Nunca dos granos superpuestos (forman rectángulos visibles); la única excepción es el menú móvil, que vive en la top layer.
+- Paralaje: cada capa sobresale solo lo que exige su recorrido (portada: lejos 170 px arriba, cerca 110 px abajo; secciones: ±90/±70 px). En ≤820 px solo se mueve el paralaje de las portadas.
 - Imágenes en `assets/backgrounds/` (8–12 KB cada una; la niebla 36 KB con transparencia).
 
 ### 3.9 Barra superior
@@ -131,7 +132,7 @@ Cursor light (C) en cada fila. La fila seleccionada es un poco más clara, con b
 - Fija arriba, de lado a lado, altura 0 en el flujo (no empuja la página).
 - Tres columnas: logo | 01 club · 02 eventos · 03 equipo (centrado siempre) | 04 unirme (botón primario pequeño).
 - Solo en Inicio, al pasar el panel del próximo evento aparece un **chip** a la izquierda de "unirme" (barrido de máscara + dígitos que suben). Oculto en ≤1180.
-- **Blur progresivo** de 2 capas (6px → 12px; se quitó la de 2px en F5 por coste de scroll) con máscaras escalonadas, 92px de alto, y un tinte. Sobre secciones claras el tinte y el texto cambian a tema claro (botón invertido).
+- **Blur progresivo**: una capa de 8px con máscara progresiva, 92px de alto, y un tinte. Se apaga sobre las portadas (su fondo ya está difuminado). F8 probó quitar el blur y se revirtió: se queda así. Sobre secciones claras el tinte y el texto cambian a tema claro (botón invertido).
 - **Importante:** ningún ancestro del blur puede tener `view-transition-name` (lo convierte en "backdrop root" y el blur deja de verse). El nombre de transición va en la fila de contenido, no en el contenedor.
 - Celular (≤820): logo + "unirme" + botón de menú; el menú abre una hoja a pantalla completa con vidrio y links grandes numerados.
 
@@ -153,14 +154,14 @@ Animado por piezas (bits, llaves, núcleo), con pasos secos (`steps`):
 
 | Efecto | Disparador | Técnica |
 |---|---|---|
-| Titular: letras suben por ranura + decodificación con glifos `01<>/{}[]#_=+*;` | Carga | máscara por palabra + cambio de `textContent` solo de las letras (sin re-render) |
+| Titular: letras suben por ranura + decodificación con glifos `01<>/{}[]#_=+*;` | Carga | máscara por palabra + **carrete de glifos** encima de cada letra que gira con `transform` + `steps()` (CSS, sin JS por cuadro). El texto real nunca se reescribe (WOR-101); la sombra grande es una copia que aparece por opacidad al terminar |
 | Líneas de portada se dibujan, destello recorre, nodos parpadean | Carga / tiempo | `transform: scaleX` y brillo con `transform`; pausa fuera de pantalla |
 | Marco de portada se abre en 4 y el titular se aleja | Scroll | `animation-timeline: scroll(root)` |
 | Paralaje nevado/niebla | Scroll | `scroll(root)` en portadas, `view()` en secciones |
 | Vidrio acanalado y líneas siguen al cursor | Cursor | un solo listener + rAF, `transform` directo |
 | "soft" + "ware" se unen | Scroll | `view()`, rango `cover 0% → 40%` |
 | Apariciones de bloques | Scroll | `view()`, `entry 0% → cover 24%` |
-| Scroll con inercia | Rueda | **Lenis** en producción (en el prototipo, implementación propia equivalente) |
+| Scroll con inercia | Rueda | **Lenis** en escritorio (no se carga en táctiles: el scroll nativo es mejor); se pausa al salir de la página |
 
 Curvas: `cubic-bezier(.16,1,.3,1)` (entrada suave), `cubic-bezier(.7,0,.2,1)` (trazos). Pixel art: `steps()`.
 
@@ -173,9 +174,10 @@ Curvas: `cubic-bezier(.16,1,.3,1)` (entrada suave), `cubic-bezier(.7,0,.2,1)` (t
 ### 4.1 Transiciones entre páginas
 
 View Transitions API nativa (`@view-transition { navigation: auto; }`), sin JS:
-- **A.** La barra queda quieta (`view-transition-name: pb-header` en la fila de contenido), el subrayado del menú se desliza al link nuevo (`pb-navcur` en el link actual), el contenido se funde (salida 220ms, entrada 320ms).
+- **A.** La barra queda quieta (`view-transition-name: pb-header` en la fila de contenido), el subrayado del menú se desliza al link nuevo (`pb-navcur` en el link actual), el contenido se funde (salida 160ms, entrada 240ms). El grano de página tiene su propio `view-transition-name` y no se funde.
 - **B.** El nombre del evento viaja de la lista/panel al título de su página de detalle (`view-transition-name: pb-evtitle`, **único por página**).
 - Con movimiento reducido: sin animación.
+- Las páginas pre-renderizadas (reglas de especulación) no corren sus animaciones de entrada hasta mostrarse.
 
 ---
 
@@ -217,7 +219,9 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 
 - Presupuesto: LCP < 2.2s (temporal, WOR-101; objetivo original 2.0s), CLS < 0.05, INP < 200ms, JS de la página < 20 KB (sin contar Lenis).
 - Fondos estáticos (WebP 8–36 KB), grano en mosaico (21 KB).
-- Blur solo en la barra (2 capas). Nunca se anima `filter` ni `backdrop-filter`.
+- Blur solo en la barra (1 capa) y en el menú móvil. Nunca se anima `filter` ni `backdrop-filter`.
+- Grano: una sola capa fija por página (§3.8).
 - `content-visibility: auto` en secciones bajo el pliegue.
-- Animaciones infinitas pausadas fuera de pantalla (IntersectionObserver).
-- Fuentes: `display=swap`; Instrument Sans subconjunto a "PoliByte".
+- Animaciones infinitas pausadas fuera de pantalla (IntersectionObserver); el hero además suelta sus animaciones de scroll.
+- Fuentes: `display=swap`; Instrument Sans subconjunto a "PoliByte"; JetBrains Mono (latín) precargada, con un respaldo local de métricas ajustadas para que el titular no salte.
+- Diagnóstico de fluidez: manual (`perf-diag.yml`), nunca en la suite normal.

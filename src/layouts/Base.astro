@@ -6,6 +6,7 @@ import Footer from '../components/Footer.astro';
 import Seo from '../components/Seo.astro';
 import { assertContentIntegrity } from '../content/integrity';
 import '../styles/global.css';
+import '../styles/glass.css';
 import '../styles/transitions.css';
 // `?url` pasa por el mismo pipeline de Vite que los `url()` del CSS: misma ruta con hash, sin doble descarga.
 import heroBg from '../assets/backgrounds/chimborazo-hero.webp?url';
@@ -43,6 +44,13 @@ const speculation = JSON.stringify({
     <Fonts />
     {cover && <link rel="preload" as="image" href={COVERS[cover]} />}
     {header && <script type="speculationrules" is:inline set:html={speculation} />}
+    {/* F12: una página pre-renderizada no corre sus animaciones de entrada hasta que se muestra. */}
+    <script is:inline>
+      if (document.prerendering) {
+        document.documentElement.classList.add('pb-prerender');
+        document.addEventListener('prerenderingchange', () => document.documentElement.classList.remove('pb-prerender'), { once: true });
+      }
+    </script>
   </head>
   <body>
     {
@@ -55,8 +63,12 @@ const speculation = JSON.stringify({
     {header && <MobileMenu />}
     <slot />
     {header && <Footer />}
+    {/* F12: UNA capa de grano fija para toda la página (antes una por sección). */}
+    <div class="pb-grain pb-grain--page" aria-hidden="true"></div>
     <script>
+      import { initFx } from '../scripts/fx';
       import { initLenis } from '../scripts/lenis';
+      initFx();
       initLenis();
     </script>
   </body>

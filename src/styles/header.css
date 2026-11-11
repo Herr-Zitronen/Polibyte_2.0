@@ -1,4 +1,4 @@
-/* DESIGN.md §3.9 · Barra superior: fija, altura 0 en el flujo, blur progresivo de 3 capas. */
+/* DESIGN.md §3.9 · Barra superior: fija, altura 0 en el flujo, blur de 8 px con máscara progresiva. */
 .pb-hdr {
   position: fixed;
   top: 0;
