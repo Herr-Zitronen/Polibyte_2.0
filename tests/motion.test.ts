@@ -56,11 +56,32 @@ describe('F7 · líneas del hero y vidrio siguen al cursor', () => {
 });
 
 describe('Líneas verticales centrales del hero (prototipo)', () => {
-  it('hay una arriba (viaja con el grupo superior izquierdo) y otra abajo (con el inferior izquierdo)', () => {
-    const hero = read('src/components/home/Hero.astro');
-    expect(hero).toMatch(/class="pb-tlg pb-cvl"[^>]*left: 50%; top: 80px; width: 1\.5px; height: 80px/);
-    expect(hero).toMatch(/class="pb-blg pb-cvl"[^>]*left: 50%; bottom: 82px; width: 1\.5px; height: 80px/);
-    expect(hero.match(/pb-cvl"[\s\S]*?<div class="pb-vline"/g) ?? []).toHaveLength(2);
+  const hero = read('src/components/home/Hero.astro');
+  const css = read('src/styles/hero.css');
+  /** Marcado del grupo `cls` hasta el siguiente grupo. */
+  const group = (cls: string, next: string) => hero.slice(hero.indexOf(`<div class="${cls}">`), hero.indexOf(`<div class="${next}">`));
+
+  // perf/scroll-fino: cada línea central vive DENTRO del grupo con el que viaja (una animación de scroll y una
+  // capa menos por línea, 9 → 7), en vez de ser un elemento aparte con la misma animación.
+  it('la de arriba vive dentro del grupo superior izquierdo y la de abajo dentro del inferior izquierdo', () => {
+    expect(group('pb-tlg', 'pb-trg')).toMatch(/class="pb-cvl" style="top: 80px; height: 80px"/);
+    expect(group('pb-blg', 'pb-brg')).toMatch(/class="pb-cvl" style="bottom: 82px; height: 80px"/);
+    expect(hero.match(/class="pb-cvl"[\s\S]*?<div class="pb-vline"/g) ?? []).toHaveLength(2);
+    expect(hero).not.toMatch(/pb-[tb]lg pb-cvl/);
+  });
+
+  it('quedan en el centro del marco: el grupo mide 45 % y la línea va a 100 % × 10/9 de él (= 50 %)', () => {
+    expect(rule(css, '.pb-tlg')).toMatch(/width:\s*45%/);
+    const cvl = rule(css, '.pb-cvl');
+    expect(cvl).toMatch(/position:\s*absolute/);
+    expect(cvl).toMatch(/left:\s*calc\(100% \* 10 \/ 9\)/);
+    expect(cvl).toMatch(/width:\s*1\.5px/);
+  });
+
+  it('el marco tiene 7 animaciones de scroll: titular + 6 grupos', () => {
+    const m = /([^{}]+)\{\s*animation-timeline:\s*scroll\(root\);?\s*\}/.exec(css);
+    const sels = (m?.[1] ?? '').split(',').map((x) => x.trim());
+    expect(sels).toEqual(['.pb-hx', '.pb-tlg', '.pb-trg', '.pb-blg', '.pb-brg', '.pb-flg', '.pb-frg']);
   });
 });
 

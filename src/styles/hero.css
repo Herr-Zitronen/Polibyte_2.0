@@ -63,6 +63,15 @@
   bottom: 0;
 }
 
+/* Líneas verticales cortas del centro. Viven dentro de .pb-tlg / .pb-blg (45 % del marco) y viajan con su
+   animación de scroll; 100 % × 10/9 del grupo = 50 % del marco, justo donde estaban como elementos sueltos.
+   perf/scroll-fino: antes eran elementos aparte con la misma animación (2 animaciones y 2 capas de más). */
+.pb-cvl {
+  position: absolute;
+  left: calc(100% * 10 / 9);
+  width: 1.5px;
+}
+
 .pb-flg,
 .pb-frg {
   position: absolute;

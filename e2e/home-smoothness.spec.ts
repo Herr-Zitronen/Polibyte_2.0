@@ -146,17 +146,22 @@ const VARIANTS: Record<string, Variant> = {
   'sin-sombras': { css: `*{text-shadow:none!important;box-shadow:none!important}` },
   'sin-content-visibility': { css: `*{content-visibility:visible!important}` },
   'sin-will-change': { css: `*{will-change:auto!important}` },
-  // Tirón de las líneas del hero (perf/scroll-fino). Sospechosos, en orden:
-  // (a) el hero nunca se marca .is-off: no suelta ni retoma sus animaciones de scroll al cruzar el margen.
+  // Tirón de las líneas del hero (perf/scroll-fino). La base ya lleva los cambios; cada variante prueba
+  // un sospechoso o devuelve una parte a como estaba antes, para medir cuánto aportó.
+  // (a) el hero nunca se marca .is-off: ni se oculta ni pausa sus barridos.
   'sin-is-off': {
     js: `(()=>{const h=document.querySelector('.pb-hero');if(!h)return;h.classList.remove('is-off');new MutationObserver(()=>{if(h.classList.contains('is-off'))h.classList.remove('is-off')}).observe(h,{attributes:true,attributeFilter:['class']})})()`,
   },
+  // (a') comportamiento anterior: al marcarse .is-off se sueltan las animaciones de scroll (y se recrean al volver).
+  'is-off-suelta-animaciones': {
+    css: `.pb-hero.is-off .pb-hx,.pb-hero.is-off .pb-tlg,.pb-hero.is-off .pb-trg,.pb-hero.is-off .pb-blg,.pb-hero.is-off .pb-brg,.pb-hero.is-off .pb-flg,.pb-hero.is-off .pb-frg{animation:none!important}`,
+  },
   // (c) sin los 8 barridos (.pb-flow::after) ni los 4 nodos que parpadean.
   'sin-barridos': { css: `.pb-flow::after,.pb-node{display:none!important}` },
-  // Líneas verticales centrales dentro de su grupo (una capa animada menos por lado), sin cambiar el dibujo.
-  'lineas-agrupadas': {
-    css: `.pb-cvl-in{position:absolute}.pb-cvl-in .pb-vline{animation:none;transform:none}`,
-    js: `document.querySelectorAll('.pb-hero .pb-cvl').forEach(c=>{const top=c.classList.contains('pb-tlg');const g=document.querySelector(top?'.pb-hero .pb-tlg:not(.pb-cvl)':'.pb-hero .pb-blg:not(.pb-cvl)');if(!g)return;c.className='pb-cvl-in';c.style.left='calc(100% * 10 / 9)';g.appendChild(c)})`,
+  // Estructura anterior: líneas centrales como elementos aparte con la animación de su grupo (2 capas más).
+  'lineas-sueltas': {
+    css: `.pb-cvl-old .pb-vline{animation:none!important;transform:none!important}`,
+    js: `(()=>{const l=document.querySelector('.pb-hero__lines');if(!l)return;document.querySelectorAll('.pb-hero .pb-cvl').forEach(c=>{const top=!!c.closest('.pb-tlg');c.className=(top?'pb-tlg':'pb-blg')+' pb-cvl-old';c.setAttribute('style',top?'left:50%;top:80px;width:1.5px;height:80px':'left:50%;bottom:82px;width:1.5px;height:80px');l.appendChild(c)})})()`,
   },
 };
 
@@ -174,7 +179,7 @@ test.describe('diagnóstico de costes', () => {
 // A/B intercalado (3 rondas) con gesto de rueda real: el runner compartido es ruidoso, así que solo se
 // comparan medianas dentro de la misma corrida. Sirve para el tirón de las líneas del hero (perf/scroll-fino).
 // (Lenis ya no existe: su coste se ve comparando la base con la tabla de referencia del plan.)
-const AB = ['base', 'sin-is-off', 'sin-barridos', 'lineas-agrupadas'] as const;
+const AB = ['base', 'sin-is-off', 'is-off-suelta-animaciones', 'sin-barridos', 'lineas-sueltas'] as const;
 
 test('A/B con rueda: variantes del hero (medianas)', async ({ browser }, info) => {
   test.skip(!DIAG, 'solo con PERF_DIAG=1 (perf-diag.yml)');

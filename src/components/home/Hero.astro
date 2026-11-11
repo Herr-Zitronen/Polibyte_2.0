@@ -29,15 +29,15 @@ const line = 'position: absolute; left: 0; right: 0; height: 1.5px';
         <div class="pb-line pb-flow" style={`${line}; top: 72px`}></div>
         <div class="pb-line pb-flow" style={`${line}; top: 168px`}></div>
         <div class="pb-node" style="right: 0; top: 168px"></div>
+        {/* Línea vertical corta del centro (prototipo), dentro del grupo con el que viaja: sin animación propia. */}
+        <div class="pb-cvl" style="top: 80px; height: 80px">
+          <div class="pb-vline" style="position: absolute; inset: 0"></div>
+        </div>
       </div>
       <div class="pb-trg">
         <div class="pb-line r pb-flow" style={`${line}; top: 72px`}></div>
         <div class="pb-line r pb-flow" style={`${line}; top: 168px`}></div>
         <div class="pb-node" style="left: 0; top: 72px"></div>
-      </div>
-      {/* Línea vertical corta del centro (prototipo): usa la clase del grupo superior izquierdo para viajar con él al hacer scroll. */}
-      <div class="pb-tlg pb-cvl" style="left: 50%; top: 80px; width: 1.5px; height: 80px">
-        <div class="pb-vline" style="position: absolute; inset: 0"></div>
       </div>
       <div class="pb-flg">
         <div class="pb-vline" style="position: absolute; left: 0; top: 0; bottom: 0; width: 1.5px"></div>
@@ -52,15 +52,15 @@ const line = 'position: absolute; left: 0; right: 0; height: 1.5px';
       <div class="pb-blg">
         <div class="pb-line pb-flow" style={`${line}; top: 0`}></div>
         <div class="pb-line pb-flow" style={`${line}; top: 96px`}></div>
+        {/* Su pareja abajo, dentro del grupo inferior izquierdo. */}
+        <div class="pb-cvl" style="bottom: 82px; height: 80px">
+          <div class="pb-vline" style="position: absolute; inset: 0"></div>
+        </div>
       </div>
       <div class="pb-brg">
         <div class="pb-line r pb-flow" style={`${line}; top: 0`}></div>
         <div class="pb-line r pb-flow" style={`${line}; top: 96px`}></div>
         <div class="pb-node" style="left: 0; top: 96px"></div>
-      </div>
-      {/* Su pareja abajo, con el grupo inferior izquierdo. */}
-      <div class="pb-blg pb-cvl" style="left: 50%; bottom: 82px; width: 1.5px; height: 80px">
-        <div class="pb-vline" style="position: absolute; inset: 0"></div>
       </div>
     </div>
     <div class="pb-box pb-hx">
