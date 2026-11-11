@@ -254,6 +254,6 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 - Blur solo en la barra (1 capa). El menú móvil usa fondo sólido (F13). Nunca se anima `filter` ni `backdrop-filter`.
 - Grano: una sola capa fija por página (§3.8).
 - `content-visibility: auto` en secciones bajo el pliegue.
-- Animaciones infinitas pausadas fuera de pantalla (IntersectionObserver); el hero además suelta sus animaciones de scroll.
+- Animaciones infinitas pausadas fuera de pantalla (IntersectionObserver). El hero, a más de medio viewport de distancia, oculta su marco con `visibility` pero **no suelta** sus animaciones de scroll: soltarlas y recrearlas al volver era un tirón (perf/scroll-fino).
 - Fuentes: `display=swap`; Instrument Sans subconjunto a "PoliByte"; JetBrains Mono (latín) precargada, con un respaldo local de métricas ajustadas para que el titular no salte.
 - Diagnóstico de fluidez: manual (`perf-diag.yml`), nunca en la suite normal.

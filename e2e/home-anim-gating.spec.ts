@@ -45,6 +45,22 @@ test.describe('Inicio: animaciones y carga', () => {
     await expect.poll(() => sweepState(page)).toBe('running');
   });
 
+  // perf/scroll-fino: fuera de pantalla el marco solo se oculta; sus animaciones de scroll siguen enganchadas
+  // (soltarlas y recrearlas al volver era un tirón).
+  test('lejos de la pantalla el hero se oculta sin soltar sus animaciones de scroll', async ({ page }) => {
+    await page.goto('/');
+    const state = () =>
+      page.evaluate(() => ({
+        off: document.querySelector('.pb-hero')!.classList.contains('is-off'),
+        visibility: getComputedStyle(document.querySelector('.pb-hero__lines')!).visibility,
+        split: getComputedStyle(document.querySelector('.pb-tlg')!).animationName,
+      }));
+    await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+    await expect.poll(state).toEqual({ off: true, visibility: 'hidden', split: 'pb-split-tl' });
+    await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+    await expect.poll(state).toEqual({ off: false, visibility: 'visible', split: 'pb-split-tl' });
+  });
+
   test('las capas de paralaje no fijan will-change (la animación de scroll ya las promueve)', async ({ page }) => {
     await page.goto('/');
     const values = await page.evaluate(() => [...document.querySelectorAll('.pb-par')].map((el) => getComputedStyle(el).willChange));

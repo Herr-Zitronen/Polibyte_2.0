@@ -60,9 +60,21 @@ describe('A3 · efectos y pausa fuera de pantalla', () => {
     if (early > -1) expect(early).toBeGreaterThan(hero);
   });
 
-  it('con el hero fuera de pantalla se sueltan sus animaciones de scroll', () => {
+  // perf/scroll-fino: soltar y retomar las animaciones de scroll al cruzar el margen recreaba de golpe
+  // todas las animaciones y capas del marco (un tirón al volver). Ahora siguen enganchadas: fuera de
+  // pantalla solo se ocultan (visibility, sin repintar nada visible) y se pausan las infinitas.
+  it('fuera de pantalla el hero oculta su marco sin soltar sus animaciones de scroll', () => {
     const css = read('src/styles/hero.css');
-    expect(css).toMatch(/\.pb-hero\.is-off[^{]*\{[^}]*animation:\s*none/);
+    const off = [...css.matchAll(/([^{}]*\.pb-hero\.is-off[^{]*)\{([^}]*)\}/g)];
+    expect(off.length).toBeGreaterThan(0);
+    for (const [, sel, body] of off) expect(body, sel).not.toMatch(/animation(-name)?:\s*none/);
+    expect(css).toMatch(/\.pb-hero\.is-off[^{]*\{[^}]*visibility:\s*hidden/);
+    expect(css).toMatch(/\.pb-hero\.is-off \.pb-flow::after[^{]*\{[^}]*animation-play-state:\s*paused/);
+  });
+
+  it('el hero se marca fuera de pantalla con medio viewport de margen, lejos de donde se mira', () => {
+    expect(read('src/scripts/fx.ts')).toMatch(/observe\(hero\)/);
+    expect(read('src/scripts/fx.ts')).toMatch(/rootMargin:\s*'50% 0px'/);
   });
 
   it('el parallax de las secciones intermedias se apaga en ≤ 820 px', () => {

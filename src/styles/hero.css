@@ -434,17 +434,13 @@
   }
 }
 
-/* F12: con el hero fuera de pantalla se sueltan sus 7 animaciones de scroll y las capas de las líneas.
-   fx.ts marca .is-off con 200 px de margen, así que nunca se ve el estado sin animar. */
+/* Hero lejos de la pantalla (fx.ts, medio viewport de margen): el marco y el titular solo se ocultan, sin
+   pintarse. perf/scroll-fino: antes también se soltaban sus animaciones de scroll (animation: none), y al
+   volver se recreaban todas con sus capas de golpe: era el tirón al pasar por la portada. Siguen enganchadas;
+   el compositor las mantiene sin trabajo del hilo principal. Los barridos infinitos se pausan más abajo. */
 .pb-hero.is-off .pb-hx,
-.pb-hero.is-off .pb-tlg,
-.pb-hero.is-off .pb-trg,
-.pb-hero.is-off .pb-blg,
-.pb-hero.is-off .pb-brg,
-.pb-hero.is-off .pb-flg,
-.pb-hero.is-off .pb-frg {
+.pb-hero.is-off .pb-hero__lines {
   visibility: hidden;
-  animation: none;
 }
 
 @media (max-width: 820px) {
