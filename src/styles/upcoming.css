@@ -58,6 +58,8 @@
   display: flex;
   flex-wrap: nowrap;
   align-items: flex-start;
+  /* Línea de tiempo del cubo iso: la rejilla cruza la pantalla entera, la columna sticky no. */
+  view-timeline-name: --pb-cal;
 }
 
 .pb-calgrid > .pb-vl {
@@ -92,10 +94,13 @@
   width: 158px;
   height: 218px;
   transform-style: preserve-3d;
-  transform: rotateX(-18deg) rotateY(-38deg);
+  /* Pose media entre las dos poses del giro: la que se ve sin soporte o con movimiento reducido. */
+  transform: rotateX(-18deg) rotateY(-37deg);
 }
 
 /* PR C: el cubo gira al atravesar la pantalla (design/Main.dc.html). Sin soporte, queda en su pose media.
+   perf/scroll-fino: .pb-aside es sticky, así que una view() del propio cubo casi no avanza mientras está
+   pegado (el cubo "no giraba"). Usa la línea de tiempo con nombre de .pb-calgrid, su ancestro.
    Reglas separadas: el minificador no puede fundir animation-timeline en el shorthand. */
 @supports (animation-timeline: view()) {
   .pb-iso {
@@ -103,7 +108,7 @@
   }
 
   .pb-iso {
-    animation-timeline: view();
+    animation-timeline: --pb-cal;
     animation-range: cover 0% cover 100%;
   }
 }

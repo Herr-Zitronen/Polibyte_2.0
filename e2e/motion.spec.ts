@@ -1,6 +1,6 @@
 // PR C · Animaciones del prototipo que faltaban. Solo transform/opacity; visibles por defecto; quietas con
 // movimiento reducido.
-import { expect, test, type Locator } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 /** Nombres de las animaciones CSS que corren sobre un elemento. */
 const animationNames = (loc: Locator) =>
@@ -65,13 +65,35 @@ test.describe('panel del próximo evento', () => {
   });
 });
 
-test('calendario de Inicio: el cubo iso gira con el scroll (view())', async ({ page }) => {
+/** Ángulo de rotateY del cubo, en grados (con rotateX·rotateY, m11 = cos(rotateY)). */
+const isoYaw = (iso: Locator) =>
+  iso.evaluate((el) => Math.round((Math.acos(new DOMMatrix(getComputedStyle(el).transform).m11) * 180) / Math.PI));
+
+/** Lleva la rejilla del calendario a la fracción `p` de su recorrido `cover` y espera dos cuadros. */
+async function coverCalendar(page: Page, p: number): Promise<void> {
+  await page.locator('.pb-calgrid').evaluate(async (el, f) => {
+    const r = el.getBoundingClientRect();
+    const top = r.top + scrollY;
+    scrollTo({ top: top - innerHeight + f * (innerHeight + r.height), behavior: 'instant' });
+    await new Promise((d) => requestAnimationFrame(() => requestAnimationFrame(d)));
+  }, p);
+}
+
+// perf/scroll-fino: el cubo vive en una columna sticky; gira con la línea de tiempo de .pb-calgrid.
+test('calendario de Inicio: el cubo iso gira de forma visible mientras la sección cruza la pantalla', async ({ page }) => {
   await page.goto('/');
   const iso = page.locator('.pb-iso');
   test.skip((await iso.count()) === 0, 'sin próximos eventos no hay calendario');
-  const timeline = await iso.evaluate((el) => getComputedStyle(el).animationTimeline);
-  expect(timeline).toBe('view()');
+  expect(await iso.evaluate((el) => getComputedStyle(el).animationTimeline)).toBe('--pb-cal');
   await expect(iso).toHaveCSS('animation-name', 'pb-iso-spin');
+  await coverCalendar(page, 0.15);
+  const early = await isoYaw(iso);
+  await coverCalendar(page, 0.75);
+  const late = await isoYaw(iso);
+  // De -62° a -12°: |rotateY| baja. Entre 15 % y 75 % del recorrido son ~30°; se exige al menos 20°.
+  expect(early).toBeGreaterThanOrEqual(12);
+  expect(early).toBeLessThanOrEqual(62);
+  expect(early - late).toBeGreaterThanOrEqual(20);
 });
 
 test.describe('con movimiento reducido', () => {
@@ -86,6 +108,10 @@ test.describe('con movimiento reducido', () => {
     await expect(panel.locator('.pb-bit').first()).toHaveCSS('animation-name', 'none');
     await expect(panel.locator('.pb-bit').first()).toHaveCSS('opacity', '1');
     const iso = page.locator('.pb-iso');
-    if (await iso.count()) await expect(iso).toHaveCSS('animation-name', 'none');
+    if (await iso.count()) {
+      await expect(iso).toHaveCSS('animation-name', 'none');
+      // Pose media del giro (-62° … -12° → -37°).
+      expect(await isoYaw(iso)).toBe(37);
+    }
   });
 });

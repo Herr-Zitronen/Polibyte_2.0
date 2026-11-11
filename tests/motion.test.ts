@@ -103,11 +103,27 @@ describe('Entradas de la barra y del menú móvil', () => {
 });
 
 describe('Calendario y panel del próximo evento', () => {
-  it('el cubo iso gira con view(), en una regla aparte del shorthand', () => {
+  // perf/scroll-fino: el cubo vive en una columna sticky; con view() propio su progreso casi no avanza
+  // mientras está pegado, así que gira con la línea de tiempo de la rejilla (que sí cruza la pantalla).
+  it('el cubo iso gira con la línea de tiempo con nombre de .pb-calgrid, no con su propia view()', () => {
     const css = read('src/styles/upcoming.css');
+    expect(rule(css, '.pb-calgrid')).toMatch(/view-timeline-name:\s*--pb-cal\b/);
     expect(css).toMatch(/\.pb-iso\s*\{\s*animation:\s*pb-iso-spin linear both;?\s*\}/);
-    expect(css).toMatch(/\.pb-iso\s*\{\s*animation-timeline:\s*view\(\);\s*animation-range:\s*cover 0% cover 100%;?\s*\}/);
-    expect(reduced(css)).toMatch(/\.pb-iso/);
+    expect(css).toMatch(/\.pb-iso\s*\{\s*animation-timeline:\s*--pb-cal;\s*animation-range:\s*cover 0% cover 100%;?\s*\}/);
+    expect(css).not.toMatch(/\.pb-iso\s*\{[^}]*animation-timeline:\s*view\(\)/);
+  });
+
+  it('gira de -62° a -12° en rotateY y, sin soporte o con movimiento reducido, queda en la pose media', () => {
+    const css = read('src/styles/upcoming.css');
+    const kf = /@keyframes pb-iso-spin\s*\{\s*from\s*\{\s*transform:\s*rotateX\((-?\d+)deg\) rotateY\((-?\d+)deg\);?\s*\}\s*to\s*\{\s*transform:\s*rotateX\((-?\d+)deg\) rotateY\((-?\d+)deg\);?\s*\}/.exec(css);
+    expect(kf).not.toBeNull();
+    const [, x0, y0, x1, y1] = kf!.map(Number);
+    expect([y0, y1]).toEqual([-62, -12]);
+    const pose = /\.pb-iso\s*\{[^}]*transform:\s*rotateX\((-?\d+)deg\) rotateY\((-?\d+)deg\)/.exec(css);
+    expect(pose).not.toBeNull();
+    expect(Number(pose![1])).toBe((x0! + x1!) / 2);
+    expect(Number(pose![2])).toBe((y0! + y1!) / 2);
+    expect(reduced(css)).toMatch(/\.pb-iso\s*\{\s*animation:\s*none/);
   });
 
   it('las celdas de progreso se llenan con scaleY al entrar y la actual parpadea (pausada fuera de pantalla)', () => {
