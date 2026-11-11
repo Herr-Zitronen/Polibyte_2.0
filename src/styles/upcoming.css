@@ -99,13 +99,15 @@
 /* PR C: el cubo gira al atravesar la pantalla (design/Main.dc.html). Sin soporte, queda en su pose media.
    perf/scroll-fino: .pb-aside es sticky, así que una view() del propio cubo casi no avanza mientras está
    pegado (el cubo "no giraba"). Usa la línea de tiempo con nombre de .pb-calgrid, su ancestro.
-   Reglas separadas: el minificador no puede fundir animation-timeline en el shorthand. */
+   Selectores distintos a propósito: con el mismo selector, el minificador funde todo en
+   `animation: … pb-iso-spin --pb-cal` y Chromium no acepta una línea de tiempo con nombre en el shorthand
+   (el cubo quedaba con animation-timeline: auto y no giraba). */
 @supports (animation-timeline: view()) {
   .pb-iso {
     animation: pb-iso-spin linear both;
   }
 
-  .pb-iso {
+  .pb-isowrap > .pb-iso {
     animation-timeline: --pb-cal;
     animation-range: cover 0% cover 100%;
   }

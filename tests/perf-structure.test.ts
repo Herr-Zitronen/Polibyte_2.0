@@ -184,6 +184,15 @@ describe('A7 · limpiezas', () => {
   });
 });
 
+describe('WOR-101 · LCP del titular', () => {
+  it('la sombra del titular nunca empieza en opacidad 0 (sería un LCP tardío al aparecer)', () => {
+    const rule = /\.pb-h1-shadow \{[^}]*\}/.exec(read('src/styles/hero.css'))![0];
+    const opacity = Number(/opacity: ([\d.]+)/.exec(rule)![1]);
+    expect(opacity).toBeGreaterThan(0);
+    expect(opacity).toBeLessThanOrEqual(0.02);
+  });
+});
+
 describe('A1 · CI barato', () => {
   const ci = read('.github/workflows/ci.yml');
   it('los pushes a ramas de trabajo solo corren el job rápido', () => {

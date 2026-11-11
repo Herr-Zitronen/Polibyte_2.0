@@ -53,8 +53,13 @@ function initFollow(): void {
     const view = { w: window.innerWidth, h: window.innerHeight };
     const line = lineOffset(pointer, view);
     const reed = reedOffset(pointer, view);
+    // Sin cursor, reposo = sin transform en línea (ni capa extra); la transición CSS lo devuelve a su sitio.
     for (const el of visible)
-      el.style.transform = el.classList.contains('pb-mouse') ? `translate3d(${line.x}px, ${line.y}px, 0)` : `translate3d(${reed}px, 0, 0)`;
+      el.style.transform = !pointer
+        ? ''
+        : el.classList.contains('pb-mouse')
+          ? `translate3d(${line.x}px, ${line.y}px, 0)`
+          : `translate3d(${reed}px, 0, 0)`;
   };
   const schedule = () => {
     if (!raf) raf = requestAnimationFrame(apply);
