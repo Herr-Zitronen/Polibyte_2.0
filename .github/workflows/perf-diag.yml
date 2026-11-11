@@ -1,0 +1,43 @@
+# Diagnóstico de fluidez de Inicio (manual). No forma parte de CI: cuesta ~6-8 min y solo hace falta
+# para comparar antes/después de un cambio de rendimiento. Lánzalo desde Actions → "Diagnóstico de fluidez"
+# → Run workflow, eligiendo la rama. Los resultados salen en el log (líneas [F5-DIAG] y [F5-AB]).
+name: Diagnóstico de fluidez
+
+on:
+  workflow_dispatch:
+    inputs:
+      projects:
+        description: 'Proyectos de Playwright separados por espacios'
+        default: 'desktop-1440 laptop-1000'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  diag:
+    name: home-smoothness (PERF_DIAG=1)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: npm }
+      - run: npm ci
+      - run: npm run build
+      - id: pw
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: Diagnóstico
+        env: { CI: 'true', PERF_DIAG: '1', PROJECTS: '${{ inputs.projects }}' }
+        run: |
+          args=""
+          for p in $PROJECTS; do args="$args --project=$p"; done
+          npx playwright test e2e/home-smoothness.spec.ts $args --reporter=list

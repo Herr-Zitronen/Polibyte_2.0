@@ -18,6 +18,14 @@ Cada historia se trabaja en **un chat nuevo** de Claude Code. Así el contexto s
 
 Regla: **solo `main` y `staging` se despliegan en Cloudflare.** Las ramas `feat/*` se suben únicamente para que GitHub Actions corra las pruebas.
 
+### CI y minutos de Actions (desde el PR A de F12)
+- **Push a `feat/**`, `perf/**`, `fix/**`, `docs/**`, `chore/**`**: solo el job rápido (tipos + lint + Vitest, ~1-2 min).
+- **PR hacia `staging`/`main`** y **push a `staging`/`main`**: suite completa (build, Lighthouse, Playwright + axe) y, en `staging`/`main`, despliegue.
+- Cambios solo de `*.md`, `docs/`, `design/` o capturas base (`e2e/**/*-snapshots/`) no disparan corridas.
+- **Un solo push por PR**: acumula los commits en local y empuja una vez. Cada push a una rama con PR abierto repite la suite completa.
+- Diagnóstico de fluidez (`e2e/home-smoothness.spec.ts` con `PERF_DIAG=1`): manual, desde Actions → *Diagnóstico de fluidez* → *Run workflow*.
+- Capturas base: si se borran las PNG, la corrida del PR las genera (`updateSnapshots: 'missing'`); se descargan del artefacto `playwright-report`, se revisan y se versionan (ese commit no dispara CI).
+
 Dónde corre cada prueba (para no congelar la laptop):
 | Prueba | Local | GitHub Actions |
 |---|---|---|
@@ -28,8 +36,8 @@ Dónde corre cada prueba (para no congelar la laptop):
 
 Flujo por historia:
 1. `git switch staging && git pull` → `git switch -c feat/hX.Y-nombre`.
-2. **Rojo**: escribir las pruebas. Las unitarias se ven fallar localmente; las E2E se ven fallar haciendo push de la rama → Actions en rojo.
-3. **Verde + refactor**: push → Actions en verde.
+2. **Rojo**: escribir las pruebas. Las unitarias se ven fallar localmente. Las E2E se escriben primero pero no se empujan solo para verlas fallar (cuesta una corrida completa).
+3. **Verde + refactor**: `npm run test` local; luego un único push + PR → Actions en verde.
 4. PR `feat/hX.Y-nombre → staging`; solo se puede unir con CI en verde. Al unir → despliegue a staging.
 5. Revisar en la URL de staging (capturas 1440/1000/390 en los artefactos de Actions).
 6. PR `staging → main` (puede agrupar varias historias). Al unir → producción.

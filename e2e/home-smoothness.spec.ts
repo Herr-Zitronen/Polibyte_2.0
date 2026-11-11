@@ -95,6 +95,8 @@ test('Inicio cumple el presupuesto de fluidez y carga (CPU ×4)', async ({ page 
 });
 
 // Diagnóstico (no falla): cuánto cuesta cada ingrediente. Apaga uno a uno y compara los fps del scroll.
+// Solo corre con PERF_DIAG=1 (workflow manual perf-diag.yml), nunca en la suite normal.
+const DIAG = !!process.env['PERF_DIAG'];
 const VARIANTS: Record<string, Variant> = {
   base: {},
   'sin-animaciones-infinitas': {
@@ -103,11 +105,7 @@ const VARIANTS: Record<string, Variant> = {
   'sin-scroll-timelines': {
     js: `document.getAnimations().filter(a=>a.timeline&&a.timeline!==document.timeline).forEach(a=>a.cancel())`,
   },
-  // A/B en la misma corrida: restaura las capas de blur a pantalla completa (versión previa a F5).
-  'blur-original': {
-    css: `.pb-blur>.l2{bottom:0!important;-webkit-mask-image:linear-gradient(to top,transparent 30%,#000 65%)!important;mask-image:linear-gradient(to top,transparent 30%,#000 65%)!important}.pb-blur>.l3{bottom:0!important;-webkit-mask-image:linear-gradient(to top,transparent 60%,#000 100%)!important;mask-image:linear-gradient(to top,transparent 60%,#000 100%)!important}`,
-  },
-  'sin-lenis': { js: `try{window.lenis&&window.lenis.destroy()}catch(e){}` },
+  'sin-lenis': { js: `try{window.lenis&&window.lenis.destroy();window.lenis=undefined}catch(e){}` },
   'sin-backdrop-filter': { css: `*{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}` },
   'sin-grano': { css: `.pb-grain{display:none!important}` },
   'sin-fondos-paralaje': { css: `.pb-par{display:none!important}` },
@@ -117,6 +115,7 @@ const VARIANTS: Record<string, Variant> = {
 };
 
 test.describe('diagnóstico de costes', () => {
+  test.skip(!DIAG, 'solo con PERF_DIAG=1 (perf-diag.yml)');
   for (const [name, variant] of Object.entries(VARIANTS)) {
     test(`variante: ${name}`, async ({ page }, info) => {
       test.skip(info.project.name === 'mobile-390', 'solo escritorio y portátil');
@@ -126,14 +125,15 @@ test.describe('diagnóstico de costes', () => {
   }
 });
 
-// A/B intercalado (3 rondas) de la base contra el blur original: el runner compartido es ruidoso,
-// así que solo se comparan medianas dentro de la misma corrida.
-test('A/B: blur de 2 capas vs sin blur (cota superior) (medianas)', async ({ browser }, info) => {
+// A/B intercalado (3 rondas) de la base contra la página sin Lenis: el runner compartido es ruidoso,
+// así que solo se comparan medianas dentro de la misma corrida. Decide si Lenis se queda en escritorio (A4).
+test('A/B: con Lenis vs sin Lenis (medianas)', async ({ browser }, info) => {
+  test.skip(!DIAG, 'solo con PERF_DIAG=1 (perf-diag.yml)');
   test.skip(info.project.name === 'mobile-390', 'solo escritorio y portátil');
   test.setTimeout(180_000);
-  const fps: Record<string, number[]> = { recortado: [], sinblur: [] };
+  const fps: Record<string, number[]> = { lenis: [], nativo: [] };
   for (let i = 0; i < 3; i++) {
-    for (const [label, key] of [['recortado', 'base'], ['sinblur', 'sin-backdrop-filter']] as const) {
+    for (const [label, key] of [['lenis', 'base'], ['nativo', 'sin-lenis']] as const) {
       const ctx = await browser.newContext(info.project.use as BrowserContextOptions);
       const page = await ctx.newPage();
       fps[label]!.push((await measure(page, VARIANTS[key])).fps);
@@ -141,5 +141,5 @@ test('A/B: blur de 2 capas vs sin blur (cota superior) (medianas)', async ({ bro
     }
   }
   const med = (a: number[]) => [...a].sort((x, y) => x - y)[1]!;
-  console.log(`[F5-AB] ${info.project.name} recortado=${JSON.stringify(fps.recortado)} mediana=${med(fps.recortado!)} | sinblur=${JSON.stringify(fps.sinblur)} mediana=${med(fps.sinblur!)}`);
+  console.log(`[F5-AB] ${info.project.name} lenis=${JSON.stringify(fps.lenis)} mediana=${med(fps.lenis!)} | nativo=${JSON.stringify(fps.nativo)} mediana=${med(fps.nativo!)}`);
 });
