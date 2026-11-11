@@ -95,6 +95,28 @@
   transform: rotateX(-18deg) rotateY(-38deg);
 }
 
+/* PR C: el cubo gira al atravesar la pantalla (design/Main.dc.html). Sin soporte, queda en su pose media.
+   Reglas separadas: el minificador no puede fundir animation-timeline en el shorthand. */
+@supports (animation-timeline: view()) {
+  .pb-iso {
+    animation: pb-iso-spin linear both;
+  }
+
+  .pb-iso {
+    animation-timeline: view();
+    animation-range: cover 0% cover 100%;
+  }
+}
+
+@keyframes pb-iso-spin {
+  from {
+    transform: rotateX(-14deg) rotateY(-62deg);
+  }
+  to {
+    transform: rotateX(-22deg) rotateY(-12deg);
+  }
+}
+
 .pb-iso svg {
   position: absolute;
   inset: 0;
@@ -436,5 +458,9 @@
 
   .pb-row:hover .pb-name {
     transform: none;
+  }
+
+  .pb-iso {
+    animation: none;
   }
 }

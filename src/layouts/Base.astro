@@ -50,6 +50,10 @@ const speculation = JSON.stringify({
         document.documentElement.classList.add('pb-prerender');
         document.addEventListener('prerenderingchange', () => document.documentElement.classList.remove('pb-prerender'), { once: true });
       }
+      // PR C: si se llega por una transición de vista, la barra no repite su entrada (sigue quieta en pantalla).
+      addEventListener('pagereveal', (e) => {
+        if (e.viewTransition) document.documentElement.classList.add('pb-vt-nav');
+      });
     </script>
   </head>
   <body>

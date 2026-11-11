@@ -80,6 +80,8 @@ Prohibido: cursiva en titulares; MAYÚSCULAS manuales (Silkscreen ya es de caja 
 - **Primario** (`.pb-b1`): marco de 1px `rgba(242,244,250,.7)`, radio 6px, padding 4px; dentro, caja blanca `#FFFFFF` con texto `#1A2C78`, radio 3px, padding 14px 22px, 15px/500. Hover: la caja sube 2px.
 - **Secundario** (`.pb-b2`): contorno de 1px, radio 6px, padding 18px 26px (misma altura total que el primario). Hover: fondo blanco, texto azul.
 - Tamaño pequeño `.sm` para barra y listas.
+- Icono opcional antes del texto (`slot="icon"` de `Button.astro`, decorativo con `aria-hidden`): la terminal 18×18 de "Ver eventos" en la portada.
+- Títulos de sección pequeños (Próximos eventos, Directiva, Proyectos destacados) llevan delante el chip de 34×34 (`SectionChip.astro`, trazo 1.4 px del color del texto).
 - Sobre fondo claro (`.pb-on-light`) se invierten: caja `#13205A` con texto blanco; contorno `rgba(19,32,90,.6)`.
 - Nunca se estiran a ancho completo en escritorio. Nunca parten su texto salvo en ≤520px.
 
@@ -131,10 +133,11 @@ Cursor light (C) en cada fila. La fila seleccionada es un poco más clara, con b
 
 - Fija arriba, de lado a lado, altura 0 en el flujo (no empuja la página).
 - Tres columnas: logo | 01 club · 02 eventos · 03 equipo (centrado siempre) | 04 unirme (botón primario pequeño).
-- Solo en Inicio, al pasar el panel del próximo evento aparece un **chip** a la izquierda de "unirme" (barrido de máscara + dígitos que suben). Oculto en ≤1180.
+- Entrada: los tres enlaces y "unirme" bajan 8 px y aparecen escalonados (0.30 / 0.38 / 0.46 / 0.54 s), después de que arranque el titular. Al llegar por una transición de vista no se repite (la barra ya estaba en pantalla).
+- Solo en Inicio, al pasar el panel del próximo evento aparece un **chip** a la izquierda de "unirme" (barrido desde la derecha con `scaleX` + opacidad, y dígitos que suben por su ranura). El prototipo usaba una máscara animada (`clip-path`); se cambió porque no va al compositor. Oculto en ≤1180.
 - **Blur progresivo**: una capa de 8px con máscara progresiva, 92px de alto, y un tinte. Se apaga sobre las portadas (su fondo ya está difuminado). F8 probó quitar el blur y se revirtió: se queda así. Sobre secciones claras el tinte y el texto cambian a tema claro (botón invertido).
 - **Importante:** ningún ancestro del blur puede tener `view-transition-name` (lo convierte en "backdrop root" y el blur deja de verse). El nombre de transición va en la fila de contenido, no en el contenedor.
-- Celular (≤820): logo + "unirme" + botón de menú; el menú abre una hoja a pantalla completa con vidrio y links grandes numerados (01 club · 02 eventos · 03 equipo). "Unirme" no se repite en la lista: va en el botón "Quiero unirme" de la hoja.
+- Celular (≤820): logo + "unirme" + botón de menú; el menú abre una hoja a pantalla completa con fondo sólido `rgba(15,26,77,.94)` + grano (sin `backdrop-filter`, F13: la hoja tapa toda la pantalla y el desenfoque casi no se veía) y links grandes numerados (01 club · 02 eventos · 03 equipo) que suben escalonados (0.05 / 0.10 / 0.15 s). "Unirme" no se repite en la lista: va en el botón "Quiero unirme" de la hoja.
 
 ### 3.10 Pie de página
 
@@ -158,7 +161,11 @@ Animado por piezas (bits, llaves, núcleo), con pasos secos (`steps`):
 | Líneas de portada se dibujan, destello recorre, nodos parpadean | Carga / tiempo | `transform: scaleX` y brillo con `transform`; pausa fuera de pantalla |
 | Marco de portada se abre en 4 y el titular se aleja | Scroll | `animation-timeline: scroll(root)` |
 | Paralaje nevado/niebla | Scroll | `scroll(root)` en portadas, `view()` en secciones |
-| Vidrio acanalado y líneas siguen al cursor | Cursor | un solo listener + rAF, `transform` directo |
+| Titular: hover por letra | Cursor (solo con hover, tras el decodificado) | la letra sube 2 px y una copia clara `#CFE3FF` aparece por opacidad (F10). El prototipo cambiaba `font-weight` a 300: se descartó porque recalcula el ancho de la palabra y repinta. Tiempos de entrada: los rápidos actuales (LCP), no los del prototipo |
+| Vidrio acanalado y líneas siguen al cursor | Cursor | un solo listener + rAF, `transform` directo, solo en elementos visibles. Líneas del hero ±8/±6 px (`lineOffset`, transición 0.9 s); vidrio ±3.5 px en X (`reedOffset`, 1.1 s). `will-change` solo mientras el cursor está sobre la portada |
+| Barra y menú móvil entran escalonados | Carga / abrir | `opacity` + `translateY`, `animation-fill-mode: backwards` (visibles por defecto) |
+| Cubo iso del calendario gira | Scroll | `view()`, rango `cover 0% → 100%` |
+| Celdas de progreso se llenan, la actual parpadea; los 8 bits se teclean | Entrada del panel (`.is-in`) | `scaleY` con `steps(2)` escalonado 15 ms por celda; bits con opacidad + `translateY`, 80 ms entre bits; parpadeo pausado fuera de pantalla |
 | "soft" + "ware" se unen | Scroll | `view()`, rango `cover 0% → 40%` |
 | Apariciones de bloques | Scroll | `view()`, `entry 0% → cover 24%` |
 | Scroll con inercia | Rueda | **Lenis** en escritorio (no se carga en táctiles: el scroll nativo es mejor); se pausa al salir de la página |
@@ -192,6 +199,8 @@ View Transitions API nativa (`@view-transition { navigation: auto; }`), sin JS:
 | Unirme | `Unirme.dc.html` | Portada + panel con botón a Microsoft Forms (abre en otra pestaña) · Tres pasos: formulario → grupo → primera reunión presencial |
 | 404 | `NoEncontrado.dc.html` | "404" en pixel art + `110010100` + volver |
 | Marca | `Compartir.dc.html`, `Favicon.dc.html` | Imagen OG 1200×630 · favicon |
+
+**Títulos de pestaña** (F11, decisión de Joel): «Sección · PoliByte», de lo específico a lo general, para que en una pestaña estrecha se lea primero dónde estás. Inicio: «PoliByte · Club de la Carrera de Software». Detalle: «Imagine Cup · Eventos · PoliByte». 404: «Página no encontrada · PoliByte». Se generan con `pageTitle()` (`src/lib/page-title.ts`) y alimentan también `og:title`. El prototipo usa «PoliByte · Sección»: aquí manda este documento.
 
 ### 5.1 Panel del próximo evento (Inicio)
 
@@ -239,7 +248,7 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 
 - Presupuesto: LCP < 2.2s (temporal, WOR-101; objetivo original 2.0s), CLS < 0.05, INP < 200ms, JS de la página < 20 KB (sin contar Lenis).
 - Fondos estáticos (WebP 8–36 KB), grano en mosaico (21 KB).
-- Blur solo en la barra (1 capa) y en el menú móvil. Nunca se anima `filter` ni `backdrop-filter`.
+- Blur solo en la barra (1 capa). El menú móvil usa fondo sólido (F13). Nunca se anima `filter` ni `backdrop-filter`.
 - Grano: una sola capa fija por página (§3.8).
 - `content-visibility: auto` en secciones bajo el pliegue.
 - Animaciones infinitas pausadas fuera de pantalla (IntersectionObserver); el hero además suelta sus animaciones de scroll.
