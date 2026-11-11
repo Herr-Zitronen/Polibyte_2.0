@@ -1,6 +1,6 @@
 // F19 · WOR-105 · El repositorio público: licencia, plantilla de PR, política de seguridad,
 // Dependabot y un README para quien llega por primera vez. Pruebas de archivos, sin red.
-import { readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
@@ -17,6 +17,36 @@ describe('Licencia', () => {
     const license = read('LICENSE');
     expect(license).toMatch(/^MIT License/);
     expect(license).toMatch(/Copyright \(c\) 2026 Joel Guerrero/);
+  });
+});
+
+describe('Créditos de la foto del Chimborazo', () => {
+  // Foto n.º 02 de la galería de DescubrEcuador, de Go593, con licencia CC BY-SA 4.0.
+  // Los fondos difuminados son obras derivadas: llevan la misma licencia y el crédito.
+  const credits = () => read('CREDITS.md');
+
+  it('nombra autor, licencia, fuente y cambios', () => {
+    expect(credits()).toMatch(/Go593/);
+    expect(credits()).toMatch(/CC BY-SA 4\.0/);
+    expect(credits()).toContain('https://creativecommons.org/licenses/by-sa/4.0/');
+    expect(credits()).toContain('https://www.descubrecuador.com/item/volcan-chimborazo/');
+    expect(credits()).toMatch(/difumin/i);
+  });
+
+  it('lista cada fondo derivado que vive en el repositorio', () => {
+    for (const dir of ['src/assets/backgrounds', 'assets/backgrounds', 'design/assets']) {
+      for (const f of readdirSync(resolve(ROOT, dir)).filter((n) => n.startsWith('chimborazo-'))) {
+        expect(credits()).toContain(`${dir}/${f}`);
+      }
+    }
+  });
+
+  it('la foto original no se publica en el repositorio', () => {
+    expect(existsSync(resolve(ROOT, 'assets/backgrounds/chimborazo-original.png'))).toBe(false);
+  });
+
+  it('el README aclara que la licencia MIT no cubre la foto (LICENSE queda intacto para que GitHub lo reconozca)', () => {
+    expect(read('README.md')).toMatch(/MIT.*CREDITS\.md/);
   });
 });
 
