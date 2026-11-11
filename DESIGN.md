@@ -127,7 +127,7 @@ Cursor light (C) en cada fila. La fila seleccionada es un poco más clara, con b
 - Capas, de atrás hacia adelante: imagen del nevado (lejos) → niebla (cerca) → brillo (`.pb-sheen`) → vidrio acanalado (`.pb-reed`) → degradado a sólido en los bordes. Encima de todo, el grano de página.
 - **Una sola capa de grano por página** (`.pb-grain--page` en `Base.astro`): `position: fixed`, opacidad 0.55, `z-index` 10 (sobre el contenido, bajo la barra). Queda quieta respecto a la ventana, como grano de película, y no se rasteriza al hacer scroll (F12: antes había ~15 capas, una por sección y franja, y eran de lo más caro del scroll). Nunca dos granos superpuestos (forman rectángulos visibles); la única excepción es el menú móvil, que vive en la top layer.
 - Paralaje: cada capa sobresale solo lo que exige su recorrido (portada: lejos 170 px arriba, cerca 110 px abajo; secciones: ±90/±70 px). En ≤820 px solo se mueve el paralaje de las portadas.
-- Imágenes en `assets/backgrounds/` (8–12 KB cada una; la niebla 36 KB con transparencia).
+- Imágenes en `assets/backgrounds/` (8–12 KB cada una; la niebla con transparencia: original de 36 KB en `assets/`, y en `src/assets/` a 640 px y 14 KB).
 
 ### 3.9 Barra superior
 
@@ -268,7 +268,7 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 
 - Presupuesto: LCP < 2.2s (temporal, WOR-101; objetivo original 2.0s), CLS < 0.05, INP < 200ms, JS de la página < 20 KB (sin contar Lenis).
 - Lenis (escritorio) se carga en tiempo ocioso tras `load` y su rAF solo corre en movimiento (§4). En táctil y con movimiento reducido el scroll es nativo.
-- Fondos estáticos (WebP 8–36 KB), grano en mosaico (21 KB).
+- Fondos estáticos (WebP 8–14 KB), grano en mosaico (21 KB). La niebla va a 640 px con la transparencia sin pérdida: es difusa y, compuesta sobre el nevado, difiere de la original en menos de 2 niveles de 255. No bajar la calidad de su transparencia: aparecen bandas en el degradado.
 - Blur solo en la barra (1 capa). El menú móvil usa fondo sólido (F13). Nunca se anima `filter` ni `backdrop-filter`.
 - Grano: una sola capa fija por página (§3.8).
 - Sin `content-visibility: auto` (perf/fluidez-real): el navegador dejaba de dibujar la sección al salir de pantalla y la volvía a maquetar, pintar y rasterizar al regresar (hueco en blanco y un cuadro largo en cada pasada). El sitio es corto: maquetarlo todo una vez sale más barato.

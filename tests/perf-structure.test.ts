@@ -209,3 +209,13 @@ describe('A1 · CI barato', () => {
   });
 });
 
+
+describe('peso de los fondos (DESIGN §7)', () => {
+  it('ningún fondo pasa de 16 KB: la niebla es difusa y va a media resolución con la transparencia sin pérdida', () => {
+    const dir = resolve(ROOT, 'src/assets/backgrounds');
+    const heavy = readdirSync(dir)
+      .filter((f) => f !== 'grain.webp')
+      .filter((f) => statSync(join(dir, f)).size > 16 * 1024);
+    expect(heavy).toEqual([]);
+  });
+});
