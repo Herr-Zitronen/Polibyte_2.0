@@ -21,6 +21,17 @@ test('textos del pie y fondo #0D1438', async ({ page }) => {
   await expect(foot).toHaveCSS('background-color', 'rgb(13, 20, 56)');
 });
 
+// PR D: los enlaces salen de site.json; vacíos no se muestran y nunca hay marcadores como "[Correo]".
+test('enlaces del pie: sin marcadores ni anclas de relleno', async ({ page }) => {
+  await page.goto('/');
+  const links = page.locator('.pb-foot-links a');
+  for (const a of await links.all()) {
+    await expect(a).not.toHaveText(/\[|\]/);
+    expect(await a.getAttribute('href')).not.toBe('#contacto');
+    if ((await a.getAttribute('target')) === '_blank') await expect(a).toHaveAttribute('rel', /noopener/);
+  }
+});
+
 test.describe('linterna', () => {
   test.beforeEach(({ page }) => test.skip(page.viewportSize()!.width <= 820, 'solo con cursor (escritorio)'));
 

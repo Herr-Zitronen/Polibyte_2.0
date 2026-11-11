@@ -158,3 +158,4 @@ describe('A1 · CI barato', () => {
     expect(read('e2e/home-smoothness.spec.ts')).toMatch(/PERF_DIAG/);
   });
 });
+
