@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { parse } from 'yaml';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const read = (p: string) => readFileSync(resolve(ROOT, p), 'utf8');
@@ -22,9 +23,22 @@ describe('Pie de página desde site.json (contenido editable sin tocar código)'
 });
 
 describe('L1 · contenido real obligatorio solo hacia main', () => {
-  it('el workflow enciende CONTENT_READY en main y en PRs hacia main', () => {
-    const ci = read('.github/workflows/ci.yml');
-    expect(ci).toMatch(/CONTENT_READY: \$\{\{ \(github\.ref == 'refs\/heads\/main' \|\| github\.base_ref == 'main'\) && '1' \|\| '' \}\}/);
+  // Job propio con nombre propio: la protección de main lo exige, y una corrida de push a staging (mismo
+  // commit, mismos checks) no lo trae, así que no puede dejar pasar contenido de ejemplo a producción.
+  type Job = { name: string; if?: string; steps: { run?: string; env?: Record<string, string> }[] };
+  const jobs = () => (parse(read('.github/workflows/ci.yml')) as { jobs: Record<string, Job> }).jobs;
+
+  it('el job "Contenido real (hacia main)" corre content-ready con CONTENT_READY=1 solo hacia main', () => {
+    const job = jobs()['content'];
+    expect(job?.name).toBe('Contenido real (hacia main)');
+    expect(job?.if).toMatch(/github\.base_ref == 'main'/);
+    expect(job?.if).toMatch(/refs\/heads\/main/);
+    const step = job!.steps.find((s) => /content-ready/.test(s.run ?? ''));
+    expect(step?.env?.['CONTENT_READY']).toBe('1');
+  });
+
+  it('el resto de la suite no depende de CONTENT_READY (staging y main corren lo mismo)', () => {
+    expect(JSON.stringify(jobs()['verify'])).not.toMatch(/CONTENT_READY/);
   });
 });
 
