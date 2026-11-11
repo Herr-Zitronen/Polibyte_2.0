@@ -10,18 +10,20 @@ Cada historia se trabaja en **un chat nuevo** de Claude Code. Así el contexto s
 - **Repo**: https://github.com/Herr-Zitronen/Polibyte_2.0
 
 ## Ramas y despliegue
-| Rama | Dónde vive | Despliegue |
+Detalle y configuración en `docs/DEPLOY.md`.
+
+| Rama | Dónde vive | Despliegue (Cloudflare Workers Builds) |
 |---|---|---|
-| `main` | GitHub | **Producción** (Cloudflare) |
-| `staging` | GitHub | **Revisión** (URL de staging en Cloudflare) |
-| `feat/hX.Y-…` | GitHub, **solo para correr pruebas** | **Nunca se despliega** |
+| `main` | GitHub | **Producción** |
+| `staging` | GitHub | **Revisión** (preview con alias `staging`) |
+| `feat/…`, `fix/…`, `perf/…`, `docs/…`, `chore/…` | GitHub | Preview propia, nunca producción |
 
-Regla: **solo `main` y `staging` se despliegan en Cloudflare.** Las ramas `feat/*` se suben únicamente para que GitHub Actions corra las pruebas.
+Regla: **solo `main` llega a producción**, y a `staging`/`main` solo se fusiona por PR con todos los checks en verde (protección de ramas).
 
-### CI y minutos de Actions (desde el PR A de F12)
-- **Push a `feat/**`, `perf/**`, `fix/**`, `docs/**`, `chore/**`**: solo el job rápido (tipos + lint + Vitest, ~1-2 min).
-- **PR hacia `staging`/`main`** y **push a `staging`/`main`**: suite completa (build, Lighthouse, Playwright + axe) y, en `staging`/`main`, despliegue.
-- Cambios solo de `*.md`, `docs/`, `design/` o capturas base (`e2e/**/*-snapshots/`) no disparan corridas.
+### CI (GitHub Actions: solo pruebas)
+- **Push a ramas de trabajo**: solo el job rápido (tipos + lint + Vitest, ~1-2 min).
+- **PR hacia `staging`/`main`** y **push a `staging`/`main`**: suite completa (build, Lighthouse, Playwright + axe). CI no despliega.
+- En los push, cambios solo de `*.md`, `docs/`, `design/` o capturas base no disparan corridas; en los PR sí corren siempre (la protección de ramas exige los checks).
 - **Un solo push por PR**: acumula los commits en local y empuja una vez. Cada push a una rama con PR abierto repite la suite completa.
 - Diagnóstico de fluidez (`e2e/home-smoothness.spec.ts` con `PERF_DIAG=1`): manual, desde Actions → *Diagnóstico de fluidez* → *Run workflow*.
 - Capturas base: si se borran las PNG, la corrida del PR las genera (`updateSnapshots: 'missing'`); se descargan del artefacto `playwright-report`, se revisan y se versionan (ese commit no dispara CI).

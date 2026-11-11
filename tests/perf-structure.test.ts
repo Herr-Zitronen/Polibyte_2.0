@@ -2,6 +2,7 @@
 // Pruebas de código fuente: corren en el portátil en milisegundos; el efecto real lo mide perf-diag.yml.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
+import { parse } from 'yaml';
 import { describe, expect, it } from 'vitest';
 
 const ROOT = resolve(import.meta.dirname, '..');
@@ -188,6 +189,10 @@ describe('A1 · CI barato', () => {
   it('los pushes a ramas de trabajo solo corren el job rápido', () => {
     expect(ci).toMatch(/quick:/);
     expect(ci).toMatch(/paths-ignore/);
+  });
+  it('los PR siempre corren la suite (sin paths-ignore): la protección de ramas la exige', () => {
+    const on = (parse(ci) as { on: { pull_request: Record<string, unknown> } }).on;
+    expect(on.pull_request['paths-ignore']).toBeUndefined();
   });
   it('el diagnóstico de fluidez es manual', () => {
     expect(read('.github/workflows/perf-diag.yml')).toMatch(/workflow_dispatch/);

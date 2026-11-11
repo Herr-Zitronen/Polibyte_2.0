@@ -60,18 +60,28 @@ describe('H0.1 · criterio 2: CI en cada PR', () => {
     expect(on.pull_request.branches).toEqual(expect.arrayContaining(['staging', 'main']));
   });
 
-  it('solo despliega desde staging (preview-alias) y main (deploy), tras pasar las pruebas', () => {
-    const deploys = deployJobs();
-    expect(deploys.length).toBeGreaterThanOrEqual(2);
-    for (const [, j] of deploys) {
-      expect(j.needs, 'needs').toBeTruthy();
-      expect(j.if ?? '').toMatch(/github\.event_name\s*==\s*'push'/);
-      expect(j.if ?? '').toMatch(/refs\/heads\/(staging|main)/);
+  // WOR-105: el despliegue lo hace Workers Builds de Cloudflare (conectado al repo en el panel).
+  // CI solo prueba; la protección de ramas impide fusionar en staging/main con pruebas en rojo.
+  it('CI no despliega ni usa credenciales de Cloudflare', () => {
+    expect(deployJobs()).toHaveLength(0);
+    expect(read(ciPath)).not.toMatch(/CLOUDFLARE_API_TOKEN/);
+  });
+
+  it('docs/DEPLOY.md da la configuración de Workers Builds', () => {
+    const doc = read('docs/DEPLOY.md');
+    expect(doc).toMatch(/Workers Builds/);
+    expect(doc).toContain('npm run build');
+    expect(doc).toContain('npx wrangler deploy');
+    expect(doc).toContain('npx wrangler versions upload');
+    expect(doc).toMatch(/rama de producción.*`main`/i);
+  });
+
+  it('una sola versión de Node para CI y Cloudflare (.node-version)', () => {
+    expect(read('.node-version').trim()).toBe('22');
+    for (const wf of [ciPath, '.github/workflows/rebuild.yml']) {
+      expect(read(wf)).toMatch(/node-version-file: \.node-version/);
+      expect(read(wf)).not.toMatch(/node-version: /);
     }
-    const byRef = (ref: string) => deploys.find(([, j]) => (j.if ?? '').includes(`refs/heads/${ref}`))?.[1];
-    const runsOf = (j?: Job) => (j?.steps ?? []).map((s) => `${s.run ?? ''} ${JSON.stringify(s.with ?? {})}`).join('\n');
-    expect(runsOf(byRef('staging'))).toMatch(/versions upload.*--preview-alias staging/);
-    expect(runsOf(byRef('main'))).toMatch(/wrangler deploy|"command":"deploy"/);
   });
 
   it('sube el reporte de Playwright como artefacto', () => {
@@ -86,8 +96,7 @@ describe('H0.1 · criterio 2: CI en cada PR', () => {
     expect(runs).toMatch(/lhci/);
   });
 
-  it('publica un preview en Cloudflare', () => {
-    expect(allRuns()).toMatch(/wrangler(-action)?.*|versions upload/);
+  it('el Worker se configura en wrangler.jsonc', () => {
     expect(existsSync(resolve(root, 'wrangler.jsonc'))).toBe(true);
   });
 
