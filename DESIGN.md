@@ -141,7 +141,8 @@ Cursor light (C) en cada fila. La fila seleccionada es un poco más clara, con b
 
 ### 3.10 Pie de página
 
-- Fondo `#0D1438`. Línea `© 2026–2027 PoliByte · Club de la Carrera de Software`, ESPOCH debajo, enlaces a la derecha.
+- Fondo `#0D1438`. Línea `© {periodo} PoliByte · Club de la Carrera de Software`, ESPOCH debajo, enlaces a la derecha (Correo · Instagram · GitHub).
+- Periodo y enlaces salen de `src/content/site.json` (`period`, `links`): un enlace vacío no se muestra y, sin ninguno, no se pinta el bloque. Las redes abren en otra pestaña; el correo es `mailto:`.
 - Wordmark grande en tono sólido `#252D4F` (no transparente: la "y" y la "t" se solapan en el logo y la transparencia marcaría el cruce). Al pasar el mouse, una "linterna" ilumina las letras con un degradado blanco azulado → amarillo, en una capa sólida cuya opacidad (0.75) se aplica al grupo.
 
 ### 3.11 Isotipo
@@ -245,6 +246,7 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 - Filtros: `role="group"` + `aria-pressed`. Detalle de evento seleccionado: `aria-live="polite"`.
 - Menú móvil: `role="dialog"`, `aria-modal`, `aria-expanded` en el botón.
 - Decoración (líneas, cruces, píxeles, grano, palabra "software", wordmark) con `aria-hidden`.
+- Verificación (L1): axe (WCAG 2.2 AA) en todas las rutas públicas a 1440/1000/390 y con el menú abierto; con teclado el foco se ve siempre y el Tab sigue el orden del documento, sin `tabindex` positivo (`e2e/a11y.spec.ts`).
 
 ## 7. Rendimiento
 
@@ -256,4 +258,5 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 - `content-visibility: auto` en secciones bajo el pliegue.
 - Animaciones infinitas pausadas fuera de pantalla (IntersectionObserver). El hero, a más de medio viewport de distancia, oculta su marco con `visibility` pero **no suelta** sus animaciones de scroll: soltarlas y recrearlas al volver era un tirón (perf/scroll-fino).
 - Fuentes: `display=swap`; Instrument Sans subconjunto a "PoliByte"; JetBrains Mono (latín) precargada, con un respaldo local de métricas ajustadas para que el titular no salte.
-- Diagnóstico de fluidez: manual (`perf-diag.yml`), nunca en la suite normal.
+- Lighthouse CI mide Inicio, Eventos, un detalle de evento, Equipo y Unirme (mediana de 3).
+- Diagnóstico de fluidez: manual (`perf-diag.yml`), nunca en la suite normal. Dos modos: `script` (scrollTo por cuadro, comparable con mediciones antiguas) y `rueda` (gesto de rueda real por CDP, el que refleja el scroll del compositor).
