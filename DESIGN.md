@@ -184,6 +184,8 @@ Curvas: `cubic-bezier(.16,1,.3,1)` (entrada suave), `cubic-bezier(.7,0,.2,1)` (t
 - **Lenis vuelve, con su coste a la vista** (perf/fluidez-real). Mientras Lenis mueve el scroll con JS, las animaciones `scroll()`/`view()` dependen del hilo principal y cualquier trabajo de JS se nota como tirón. Mitigación: su rAF solo corre en movimiento (en reposo no hay ningún cuadro forzado), no se carga en táctiles ni con movimiento reducido, y nada más hace trabajo por cuadro durante el scroll. Ningún otro script mueve el scroll.
 - Un elemento dentro de una columna `sticky` no debe usar su propia `view()`: mientras está pegado su progreso no avanza. Usa la línea de tiempo con nombre de un ancestro que sí cruce la pantalla (`view-timeline-name`), como el cubo iso con `--pb-cal` de `.pb-calgrid`.
 
+**Portada en celular (≤ 820 px):** la caja del titular define su alto y el marco de líneas la rodea (margen de 168 px arriba y abajo); nunca hay texto encima de una línea. La altura usa `lvh` para llegar al borde de la pantalla bajo la barra flotante de Safari.
+
 ### 4.0 Pantalla de entrada (solo Inicio)
 
 Tapa el primer segundo, cuando el navegador decodifica el nevado, carga las fuentes y crea las capas de la portada (quien hacía scroll en ese momento notaba el peor tirón). No arregla el scroll: solo cubre el calentamiento.

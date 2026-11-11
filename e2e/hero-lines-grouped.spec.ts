@@ -38,6 +38,8 @@ test('las líneas centrales siguen a su grupo en todo el recorrido', async ({ pa
   test.setTimeout(60_000);
   await page.goto('/');
   await page.waitForSelector('[data-decode][data-decoded]', { timeout: 6000 });
+  // data-drawn cambia el estado del hero (suelta las entradas); sin esperarlo la captura dependía del momento.
+  await page.waitForSelector('.pb-hero[data-drawn]', { timeout: 8000 });
   await page.addStyleTag({ content: FREEZE });
   await page.waitForTimeout(1200); // entradas de la barra y del titular
 
