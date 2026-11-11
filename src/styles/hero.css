@@ -21,6 +21,19 @@
   pointer-events: none;
 }
 
+/* F7 (WOR-93): el marco sigue al cursor en sentido contrario (fx.ts escribe el transform, ±8/±6 px).
+   La transición larga suaviza el movimiento: un solo transform por cuadro, sin JS por cuadro de animación. */
+.pb-mouse {
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* will-change solo mientras el cursor está sobre la portada: no se reserva una capa todo el tiempo. */
+@media (hover: hover) {
+  .pb-hero-s:hover .pb-mouse {
+    will-change: transform;
+  }
+}
+
 .pb-tlg,
 .pb-trg,
 .pb-blg,
@@ -202,6 +215,22 @@
 
 [data-decoded] .pb-reel {
   display: none;
+}
+
+/* F10 (WOR-96): hover por letra. El prototipo cambiaba font-weight (recalcula el ancho de la palabra y
+   repinta); aquí una copia clara de la letra aparece por opacidad y la letra sube 2 px. Solo transform y opacity. */
+.pb-ci::after {
+  content: attr(data-c);
+  position: absolute;
+  inset: 0;
+  color: var(--pb-code);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.pb-h1[data-decoded] .pb-ci {
+  transition: transform 0.35s var(--pb-ease-out);
 }
 
 /* F4: si el respaldo fijó el titular (data-settled), las letras quedan en su sitio aunque la animación no haya terminado. */
@@ -444,6 +473,16 @@
   }
 }
 
+@media (hover: hover) {
+  .pb-h1[data-decoded] .pb-ch:hover .pb-ci {
+    transform: translateY(-2px);
+  }
+
+  .pb-h1[data-decoded] .pb-ch:hover .pb-ci::after {
+    opacity: 1;
+  }
+}
+
 /* F5: barridos y pulsos infinitos esperan a que el titular termine y se pausan fuera de pantalla (fx.ts). */
 @media (prefers-reduced-motion: no-preference) {
   .pb-hero:not(:has([data-decoded])) .pb-flow::after,
@@ -487,5 +526,14 @@
   .pb-h1-shadow {
     opacity: 1;
     transition: none;
+  }
+
+  .pb-mouse,
+  .pb-ci::after {
+    transition: none;
+  }
+
+  .pb-h1[data-decoded] .pb-ch:hover .pb-ci {
+    transform: none;
   }
 }

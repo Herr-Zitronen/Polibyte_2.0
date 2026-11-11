@@ -1,4 +1,5 @@
 // Paneles y efectos: UN IntersectionObserver y UN listener de cursor para todos (DESIGN §3.5).
+import { lineOffset, reedOffset, type Pointer } from '../lib/line-parallax';
 import { nearestEdge } from '../lib/nearest-edge';
 
 let started = false;
@@ -36,11 +37,53 @@ function initOffscreen(): void {
   }
 }
 
+/** F7 (WOR-93) + vidrio: el marco de líneas del hero (.pb-mouse) y el vidrio acanalado (.pb-reed) siguen al
+ *  cursor. Solo con cursor y sin movimiento reducido; solo se escriben los que están en pantalla, una vez por
+ *  cuadro, y solo `transform` (la transición CSS hace el resto). */
+function initFollow(): void {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(hover: hover)').matches) return;
+  const els = [...document.querySelectorAll<HTMLElement>('.pb-mouse, .pb-reed')];
+  if (!els.length) return;
+  const visible = new Set<HTMLElement>();
+  let pointer: Pointer | null = null;
+  let raf = 0;
+  const apply = () => {
+    raf = 0;
+    const view = { w: window.innerWidth, h: window.innerHeight };
+    const line = lineOffset(pointer, view);
+    const reed = reedOffset(pointer, view);
+    for (const el of visible)
+      el.style.transform = el.classList.contains('pb-mouse') ? `translate3d(${line.x}px, ${line.y}px, 0)` : `translate3d(${reed}px, 0, 0)`;
+  };
+  const schedule = () => {
+    if (!raf) raf = requestAnimationFrame(apply);
+  };
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      const el = e.target as HTMLElement;
+      if (e.isIntersecting) visible.add(el);
+      else visible.delete(el);
+    }
+    schedule();
+  });
+  els.forEach((el) => io.observe(el));
+  onPointer((x, y) => {
+    pointer = { x, y };
+    schedule();
+  });
+  // El cursor sale de la ventana: todo vuelve a reposo.
+  document.documentElement.addEventListener('pointerleave', () => {
+    pointer = null;
+    schedule();
+  });
+}
+
 /** Arranca una sola vez por página (Base.astro). */
 export function initFx(): void {
   if (started) return;
   started = true;
   initOffscreen();
+  initFollow();
   const panels = [...document.querySelectorAll<HTMLElement>('[data-fx]')];
   if (!panels.length) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;

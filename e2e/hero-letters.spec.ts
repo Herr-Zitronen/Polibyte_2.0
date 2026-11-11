@@ -49,3 +49,23 @@ test("scroll rápido durante la entrada y regreso: titular completo", async ({ p
   await expect.poll(async () => (await letters(page)).hidden, { timeout: 8000 }).toBe(0);
   expect((await letters(page)).text).toBe(LETTERS);
 });
+
+// F10 (WOR-96) · Hover por letra: copia clara por opacidad y subida de 2 px; nunca cambia el peso ni el ancho.
+test("hover sobre una letra: sube 2 px, aparece la copia clara y la palabra no cambia de ancho", async ({ page }) => {
+  test.skip(page.viewportSize()!.width <= 820, "solo con cursor");
+  await page.goto("/");
+  const h1 = page.locator("[data-decode]");
+  await expect(h1).toHaveAttribute("data-decoded", "", { timeout: 5000 });
+  const ch = h1.locator(".pb-ch").first();
+  const word = h1.locator(".pb-word").first();
+  const before = (await word.boundingBox())!.width;
+  await ch.hover();
+  const ci = ch.locator(".pb-ci");
+  await expect(ci).toHaveCSS("transform", "matrix(1, 0, 0, 1, 0, -2)");
+  await expect(ci).toHaveCSS("font-weight", "700");
+  await expect
+    .poll(() => ci.evaluate((el) => getComputedStyle(el, "::after").opacity))
+    .toBe("1");
+  expect(await ci.evaluate((el) => getComputedStyle(el, "::after").color)).toBe("rgb(207, 227, 255)");
+  expect((await word.boundingBox())!.width).toBe(before);
+});

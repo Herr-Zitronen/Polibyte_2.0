@@ -1,6 +1,7 @@
 ---
 // Portada de Inicio (DESIGN §4, design/Main.dc.html): marco de líneas que se abre al hacer scroll + titular decodificado.
 import Button from '../Button.astro';
+import TerminalIcon from '../TerminalIcon.astro';
 import GlassBackground from '../GlassBackground.astro';
 import { decodeReels } from '../../lib/decode';
 import '../../styles/hero.css';
@@ -22,7 +23,8 @@ const line = 'position: absolute; left: 0; right: 0; height: 1.5px';
 <section id="top" class="pb-glass pb-hero-s" data-bg>
   <GlassBackground image="hero" parallax="root" />
   <div class="pb-hero pb-content">
-    <div class="pb-hero__lines" aria-hidden="true">
+    {/* F7: pb-mouse → el marco sigue al cursor (fx.ts, lineOffset). */}
+    <div class="pb-hero__lines pb-mouse" aria-hidden="true">
       <div class="pb-tlg">
         <div class="pb-line pb-flow" style={`${line}; top: 72px`}></div>
         <div class="pb-line pb-flow" style={`${line}; top: 168px`}></div>
@@ -63,7 +65,7 @@ const line = 'position: absolute; left: 0; right: 0; height: 1.5px';
                   {w.map((ch) => (
                     <span class="pb-ch" style={`animation-delay: ${ch.delay}s`}>
                       {/* Carrete arriba de la letra (aria-hidden por .pb-word); una sola línea: sin espacios dentro de la letra. */}
-                      <span class="pb-ci" style={`--n: ${ch.reel.length}; animation-duration: ${ch.spin}ms`}><span class="pb-reel">{ch.reel.join('\n')}</span>{ch.c}</span>
+                      <span class="pb-ci" data-c={ch.c} style={`--n: ${ch.reel.length}; animation-duration: ${ch.spin}ms`}><span class="pb-reel">{ch.reel.join('\n')}</span>{ch.c}</span>
                     </span>
                   ))}
                 </span>{' '}
@@ -85,7 +87,7 @@ const line = 'position: absolute; left: 0; right: 0; height: 1.5px';
       <div class="pb-sub">
         <p>Eventos, competencias y comunidad para quien quiere construir. Abierto a toda la carrera y a todo público.</p>
         <div class="pb-actions">
-          <Button variant="primary" href="/eventos/">Ver eventos</Button>
+          <Button variant="primary" href="/eventos/"><TerminalIcon slot="icon" />Ver eventos</Button>
           <Button variant="secondary" href="/unirme/">Unirme al club</Button>
         </div>
       </div>
