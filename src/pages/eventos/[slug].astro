@@ -4,6 +4,7 @@ import { getCollection, render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import EventDetail from '../../components/event/EventDetail.astro';
 import Base from '../../layouts/Base.astro';
+import { pageTitle } from '../../lib/page-title';
 import { eventPaths } from '../../lib/event-detail';
 import { showcaseLayout } from '../../lib/showcase';
 
@@ -22,7 +23,7 @@ const projects = (await getCollection('projects')).map((p) => ({ ...p.data, even
 const showcase = showcaseLayout({ id: entry.id, showcase: entry.data.showcase }, projects);
 ---
 
-<Base title={`${entry.data.title} · Eventos · PoliByte`} description={entry.data.summary} cover="recap">
+<Base title={pageTitle(entry.data.title, 'Eventos')} description={entry.data.summary} cover="recap">
   <main>
     <EventDetail event={entry.data} now={new Date()} showcase={showcase}><Content /></EventDetail>
   </main>

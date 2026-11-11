@@ -76,3 +76,25 @@ test("favicons y manifiesto", async ({ page, request }) => {
   await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute("href", "/apple-touch-icon.png");
   await expect(page.locator('link[rel="manifest"]')).toHaveAttribute("href", "/manifest.webmanifest");
 });
+
+// F11 (WOR-97) · Decisión de Joel: «Sección · PoliByte» (no el «PoliByte · Sección» del prototipo).
+test("títulos de pestaña con el formato «Sección · PoliByte», también en og:title", async ({ page }) => {
+  test.skip(page.viewportSize()!.width !== 1440, "no depende del ancho");
+  const expected: Record<string, string> = {
+    "/": "PoliByte · Club de la Carrera de Software",
+    "/eventos/": "Eventos · PoliByte",
+    "/equipo/": "Equipo · PoliByte",
+    "/unirme/": "Unirme · PoliByte",
+  };
+  for (const [path, title] of Object.entries(expected)) {
+    await page.goto(path);
+    await expect(page).toHaveTitle(title);
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", title);
+  }
+  await page.goto("/eventos/");
+  const detail = page.locator('a[href^="/eventos/"][href$="/"]:not([href="/eventos/"])').first();
+  await detail.click();
+  await expect(page).toHaveTitle(/^.+ · Eventos · PoliByte$/);
+  await page.goto("/no-existe-esta-pagina/");
+  await expect(page).toHaveTitle("Página no encontrada · PoliByte");
+});

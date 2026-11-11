@@ -9,6 +9,7 @@ import UpcomingEvents from '../components/home/UpcomingEvents.astro';
 import WhatWeDo from '../components/home/WhatWeDo.astro';
 import PixelStrip from '../components/PixelStrip.astro';
 import Base from '../layouts/Base.astro';
+import { HOME_TITLE } from '../lib/page-title';
 import { nextEvent } from '../lib/events';
 import { EDGE } from '../lib/pixel-strip';
 import { upcomingRows } from '../lib/upcoming';
@@ -18,7 +19,7 @@ const rows = upcomingRows(events, new Date());
 const next = nextEvent(events, new Date()) as ((typeof events)[number] & { date: Date }) | undefined;
 ---
 
-<Base title="PoliByte · Club de la Carrera de Software" cover="hero">
+<Base title={HOME_TITLE} cover="hero">
   {next && <HeaderChip slot="chip" title={next.title} date={next.date} time={next.time} />}
   <main>
     <Hero>
