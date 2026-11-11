@@ -55,6 +55,15 @@ describe('F7 · líneas del hero y vidrio siguen al cursor', () => {
   });
 });
 
+describe('Líneas verticales centrales del hero (prototipo)', () => {
+  it('hay una arriba (viaja con el grupo superior izquierdo) y otra abajo (con el inferior izquierdo)', () => {
+    const hero = read('src/components/home/Hero.astro');
+    expect(hero).toMatch(/class="pb-tlg pb-cvl"[^>]*left: 50%; top: 80px; width: 1\.5px; height: 80px/);
+    expect(hero).toMatch(/class="pb-blg pb-cvl"[^>]*left: 50%; bottom: 82px; width: 1\.5px; height: 80px/);
+    expect(hero.match(/pb-cvl"[\s\S]*?<div class="pb-vline"/g) ?? []).toHaveLength(2);
+  });
+});
+
 describe('Entradas de la barra y del menú móvil', () => {
   const header = read('src/styles/header.css');
   const menu = read('src/styles/mobile-menu.css');
