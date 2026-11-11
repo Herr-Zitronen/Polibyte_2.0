@@ -68,3 +68,52 @@ test('captura de la barra', async ({ page }) => {
   const width = page.viewportSize()!.width;
   await expect(page).toHaveScreenshot('header.png', { clip: { x: 0, y: 0, width, height: 92 } });
 });
+
+// F17 · Escudo ESPOCH: [escudo] │ [isotipo + nombre], alineados y sin desbordar.
+test.describe('F17 · escudo ESPOCH en la barra', () => {
+  test('escudo, línea e isotipo comparten centro vertical y los huecos de la línea son iguales', async ({ page }) => {
+    await page.goto('/');
+    const box = async (s: string) => (await page.locator(s).first().boundingBox())!;
+    const shield = await box('.pb-hdr .pb-brand__shield');
+    const rule = await box('.pb-hdr .pb-brand__rule');
+    const iso = await box('.pb-hdr .pb-logo svg');
+    const cy = (b: { y: number; height: number }) => b.y + b.height / 2;
+    expect(Math.abs(cy(shield) - cy(iso))).toBeLessThanOrEqual(1);
+    expect(Math.abs(cy(rule) - cy(iso))).toBeLessThanOrEqual(1);
+    expect(Math.abs(shield.height - iso.height)).toBeLessThanOrEqual(1);
+    const left = rule.x - (shield.x + shield.width);
+    const right = iso.x - (rule.x + rule.width);
+    expect(Math.abs(left - right)).toBeLessThanOrEqual(1);
+    expect(shield.x).toBeLessThan(rule.x);
+  });
+
+  test('el escudo no es un enlace y se anuncia como ESPOCH', async ({ page }) => {
+    await page.goto('/');
+    const shield = page.locator('.pb-hdr .pb-brand__shield');
+    await expect(shield).toHaveAttribute('role', 'img');
+    await expect(shield).toHaveAttribute('aria-label', 'ESPOCH');
+    expect(await shield.evaluate((el) => !!el.closest('a'))).toBe(false);
+    await expect(page.locator('.pb-hdr .pb-logo')).toHaveAttribute('href', '/');
+  });
+
+  test('la barra no desborda la pantalla', async ({ page }) => {
+    await page.goto('/');
+    const vw = page.viewportSize()!.width;
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(vw);
+    for (const s of ['.pb-hdr .pb-brand', '.pb-hdr .pb-right']) {
+      const b = (await page.locator(s).boundingBox())!;
+      expect(b.x, s).toBeGreaterThanOrEqual(0);
+      expect(b.x + b.width, s).toBeLessThanOrEqual(vw);
+    }
+    const brand = (await page.locator('.pb-hdr .pb-brand').boundingBox())!;
+    const right = (await page.locator('.pb-hdr .pb-right').boundingBox())!;
+    expect(brand.x + brand.width, 'marca y botones no se pisan').toBeLessThanOrEqual(right.x);
+  });
+
+  test('sin violaciones de axe en la barra', async ({ page }) => {
+    await page.goto('/');
+    const { default: AxeBuilder } = await import('@axe-core/playwright');
+    const results = await new AxeBuilder({ page }).include('.pb-hdr').analyze();
+    expect(results.violations).toEqual([]);
+  });
+});

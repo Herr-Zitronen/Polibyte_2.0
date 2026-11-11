@@ -83,7 +83,7 @@
   view-transition-name: pb-header;
 }
 
-.pb-bar-in > .pb-logo {
+.pb-bar-in > .pb-brand {
   justify-self: start;
 }
 
@@ -204,6 +204,28 @@
 }
 
 /* Logo */
+/* F17: [escudo ESPOCH] │ [isotipo + nombre]. Huecos iguales a ambos lados de la línea. */
+.pb-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.pb-brand__shield {
+  flex: none;
+  display: block;
+}
+
+/* Línea de 1 px en el color del texto de la barra: blanca sobre azul, tinta sobre papel. */
+.pb-brand__rule {
+  flex: none;
+  width: 1px;
+  height: 28px;
+  background: currentColor;
+  opacity: 0.35;
+}
+
 .pb-logo {
   display: flex;
   align-items: center;
@@ -402,6 +424,13 @@
 @media (max-width: 480px) {
   .pb-logo__sub {
     display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .pb-brand,
+  .pb-logo {
+    gap: 10px;
   }
 }
 

@@ -132,7 +132,8 @@ Cursor light (C) en cada fila. La fila seleccionada es un poco más clara, con b
 ### 3.9 Barra superior
 
 - Fija arriba, de lado a lado, altura 0 en el flujo (no empuja la página).
-- Tres columnas: logo | 01 club · 02 eventos · 03 equipo (centrado siempre) | 04 unirme (botón primario pequeño).
+- Tres columnas: marca | 01 club · 02 eventos · 03 equipo (centrado siempre) | 04 unirme (botón primario pequeño).
+- **Marca** (F17): escudo de la ESPOCH │ isotipo de PoliByte + nombre. El escudo (`src/assets/brand/espoch-shield.svg`, solo escudo y libro, sin la palabra) mide lo mismo que el isotipo (33 px de alto), usa `currentColor` y es solo identidad: no es enlace (`role="img"`, `aria-label="ESPOCH"`). Los separa una línea de 1 px × 28 px en `currentColor` al 35 % (blanca sobre azul, tinta sobre papel) con 14 px a cada lado (10 px en ≤ 380). El enlace a Inicio sigue en el bloque de PoliByte.
 - Entrada: los tres enlaces y "unirme" bajan 8 px y aparecen escalonados (0.30 / 0.38 / 0.46 / 0.54 s), después de que arranque el titular. Al llegar por una transición de vista no se repite (la barra ya estaba en pantalla).
 - Solo en Inicio, al pasar el panel del próximo evento aparece un **chip** a la izquierda de "unirme" (barrido desde la derecha con `scaleX` + opacidad, y dígitos que suben por su ranura). El prototipo usaba una máscara animada (`clip-path`); se cambió porque no va al compositor. Oculto en ≤1180.
 - **Blur progresivo**: una capa de 8px con máscara progresiva, 92px de alto, y un tinte. Se apaga sobre las portadas (su fondo ya está difuminado) con `opacity: 0`, nunca con `visibility`/`display`: la capa existe siempre y no se crea ni destruye al cruzar el final de la portada. F8 probó quitar el blur y se revirtió: se queda así. Sobre secciones claras el tinte y el texto cambian a tema claro (botón invertido).
@@ -146,6 +147,8 @@ Cursor light (C) en cada fila. La fila seleccionada es un poco más clara, con b
 - Wordmark grande en tono sólido `#252D4F` (no transparente: la "y" y la "t" se solapan en el logo y la transparencia marcaría el cruce). Al pasar el mouse, una "linterna" ilumina las letras con un degradado blanco azulado → amarillo, en una capa sólida cuya opacidad (0.75) se aplica al grupo.
 
 ### 3.11 Isotipo
+
+En la barra y en la hoja del menú móvil va precedido del escudo de la ESPOCH (§3.9). El escudo no se anima.
 
 Animado por piezas (bits, llaves, núcleo), con pasos secos (`steps`):
 - **Carga:** los bits caen, las llaves entran desde los lados y el núcleo parpadea.
