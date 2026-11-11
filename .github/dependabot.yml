@@ -1,0 +1,30 @@
+# Actualizaciones de dependencias. Los PR van a staging, como cualquier historia, y pasan la misma CI.
+# Se agrupan para que una semana de cambios sea un solo PR (una sola corrida completa).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: staging
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: America/Guayaquil
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        update-types: [minor, patch]
+      runtime:
+        dependency-type: production
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: staging
+    schedule:
+      interval: monthly
+      timezone: America/Guayaquil
+    commit-message:
+      prefix: ci
