@@ -68,6 +68,18 @@ Una prueba **no debe caducar** porque pase el tiempo ni depender del contenido r
 - Actions tarda ~5 min y **un push nuevo cancela la corrida anterior de la rama**: espera a que termine la corrida en rojo antes del siguiente push.
 - Las capturas base nuevas salen como artefacto (`playwright-report`): descárgalas, revísalas y versiónalas en `e2e/*-snapshots`.
 
+## Panel de fluidez en tu PC (`?diag`)
+La medición de Actions rasteriza por software (sin gráfica): sirve para comparar variantes entre sí, no para saber cómo se siente en tu PC. Para eso está el panel.
+
+1. **Compila y sirve**: `npm run build && npm run preview`. Nunca `npm run dev`: Vite y la barra de herramientas de Astro añaden trabajo propio y falsean la medida.
+2. **Comprueba la gráfica** en `chrome://gpu`: «Rasterization» y «Compositing» deben decir *Hardware accelerated*. Si no, activa «Usar aceleración por hardware cuando esté disponible» en la configuración de Chrome y reinícialo. Cierra DevTools mientras mides.
+3. **Abre** `http://localhost:4321/?diag`. Aparece un panel fijo abajo a la derecha. Espera 4 s (las variantes se aplican cuando termina la entrada del titular).
+4. **Pasada base** (sin casillas): con la rueda, baja rápido de arriba abajo y vuelve. Al parar, «última pasada» muestra FPS, peor cuadro y % de cuadros de más de 20 ms. Pulsa «Copiar resultado».
+5. **Una casilla cada vez** (la página se recarga sola) y repite la misma pasada. Orden sugerido: `sin-lenis`, `sin-barridos`, `sin-nodos`, `lineas-estaticas`, `sin-backdrop-filter`, `blur-siempre`, `sin-paralaje`, `sin-scroll-timelines`, `sin-reveals`, `sin-cubo`.
+6. **Qué anotar**: por cada pasada, el texto copiado y si *se sintió* más fluida que la base (sí / no / igual). La sensación manda: el medidor cuenta cuadros del hilo principal, y un scroll puede sentirse bien aunque el número no cambie.
+
+Si quieres más detalle: graba en DevTools → Performance una pasada por la zona de la portada y mira la pista «Frames» (cuadros rojos o amarillos) y qué hay debajo en «Main» y «GPU».
+
 ## Orden recomendado (respeta dependencias)
 | Sprint | Issues |
 |---|---|

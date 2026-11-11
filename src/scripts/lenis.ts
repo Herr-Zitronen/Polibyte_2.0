@@ -9,11 +9,8 @@
 import type Lenis from 'lenis';
 import { createOnDemandLoop } from '../lib/on-demand-loop';
 
-declare global {
-  interface Window {
-    lenis?: Lenis;
-  }
-}
+// El paquete ya declara `window.lenis` (sus metadatos); aquí se guarda la instancia, con su propio tipo.
+const host = window as unknown as { lenis?: Lenis };
 
 let started = false;
 
@@ -25,14 +22,14 @@ async function start(): Promise<void> {
   // rAF propio en vez de autoRaf: se puede pausar sin lenis.stop(), que pone overflow: clip en <html>
   // (quitaría la barra de scroll justo antes de capturar la página saliente y la haría saltar).
   const lenis = new LenisCtor({ autoRaf: false, anchors: true });
-  window.lenis = lenis;
+  host.lenis = lenis;
   const loop = createOnDemandLoop({
     step: (t) => lenis.raf(t),
     // El diagnóstico de fluidez (variante sin-lenis) lo destruye y borra window.lenis: el bucle se apaga.
-    isActive: () => window.lenis === lenis && lenis.isScrolling === 'smooth',
+    isActive: () => host.lenis === lenis && lenis.isScrolling === 'smooth',
   });
   const wake = () => {
-    if (window.lenis === lenis) loop.wake();
+    if (host.lenis === lenis) loop.wake();
   };
   for (const ev of WAKE_EVENTS) addEventListener(ev, wake, { passive: true, capture: true });
   const resume = () => {

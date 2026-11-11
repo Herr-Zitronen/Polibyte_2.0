@@ -129,7 +129,8 @@ describe('A3 · efectos y pausa fuera de pantalla', () => {
 describe('A4 · Lenis', () => {
   const lenis = read('src/scripts/lenis.ts');
   it('se anuncia en window.lenis (el diagnóstico sin-lenis lo necesita)', () => {
-    expect(lenis).toMatch(/window\.lenis\s*=/);
+    expect(lenis).toMatch(/host\.lenis\s*=\s*lenis/);
+    expect(lenis).toMatch(/host = window/);
   });
   it('no se carga en pantallas táctiles ni con movimiento reducido', () => {
     expect(lenis).toMatch(/hover: none|pointer: coarse/);

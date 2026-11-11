@@ -2,6 +2,7 @@
 // Mide: LCP, tareas largas tras la carga y fotogramas durante un scroll programado.
 // El informe completo se imprime y se adjunta a la prueba (ver `test-results`).
 import { expect, test, type BrowserContextOptions, type CDPSession, type Page } from '@playwright/test';
+import { VARIANTS, variantByName, type Variant } from '../src/lib/perf-variants';
 
 const BUDGET = {
   lcpMs: 1800, // meta de WOR-91 (margen 10 % sobre los 2,0 s de Lighthouse)
@@ -20,17 +21,12 @@ interface Report {
   frames: number;
 }
 
-interface Variant {
-  css?: string;
-  js?: string;
-}
-
 /** `script`: scrollTo por cuadro (hilo principal; comparable con la tabla de referencia del plan).
  *  `rueda`: gesto de rueda sintetizado por CDP, que el navegador desplaza como una rueda real (en el
  *  compositor cuando nadie mueve el scroll con JS). Es el que refleja lo que siente quien usa el ratón. */
 type Mode = 'script' | 'rueda';
 
-async function measure(page: Page, variant: Variant = {}, mode: Mode = 'script'): Promise<Report> {
+async function measure(page: Page, variant: Pick<Variant, 'css' | 'js'> = {}, mode: Mode = 'script'): Promise<Report> {
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   await page.addInitScript(() => {
@@ -44,7 +40,7 @@ async function measure(page: Page, variant: Variant = {}, mode: Mode = 'script')
     }).observe({ type: 'longtask', buffered: true });
   });
   await page.goto('/', { waitUntil: 'load' });
-  // Deja pasar la entrada del titular.
+  // Deja pasar la entrada del titular y la carga ociosa de Lenis.
   await page.waitForTimeout(3500);
   if (variant.css) await page.addStyleTag({ content: variant.css });
   if (variant.js) await page.evaluate(variant.js);
@@ -132,42 +128,13 @@ test('Inicio cumple el presupuesto de fluidez y carga (CPU ×4)', async ({ page 
 // Diagnóstico (no falla): cuánto cuesta cada ingrediente. Apaga uno a uno y compara los fps del scroll.
 // Solo corre con PERF_DIAG=1 (workflow manual perf-diag.yml), nunca en la suite normal.
 const DIAG = !!process.env['PERF_DIAG'];
-const VARIANTS: Record<string, Variant> = {
-  base: {},
-  'sin-animaciones-infinitas': {
-    js: `document.getAnimations().filter(a=>a.effect&&a.effect.getComputedTiming().iterations===Infinity).forEach(a=>a.cancel())`,
-  },
-  'sin-scroll-timelines': {
-    js: `document.getAnimations().filter(a=>a.timeline&&a.timeline!==document.timeline).forEach(a=>a.cancel())`,
-  },
-  'sin-backdrop-filter': { css: `*{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}` },
-  'sin-grano': { css: `.pb-grain{display:none!important}` },
-  'sin-fondos-paralaje': { css: `.pb-par{display:none!important}` },
-  'sin-sombras': { css: `*{text-shadow:none!important;box-shadow:none!important}` },
-  'sin-content-visibility': { css: `*{content-visibility:visible!important}` },
-  'sin-will-change': { css: `*{will-change:auto!important}` },
-  // Tirón de las líneas del hero (perf/scroll-fino). La base ya lleva los cambios; cada variante prueba
-  // un sospechoso o devuelve una parte a como estaba antes, para medir cuánto aportó.
-  // (a) el hero nunca se marca .is-off: ni se oculta ni pausa sus barridos.
-  'sin-is-off': {
-    js: `(()=>{const h=document.querySelector('.pb-hero');if(!h)return;h.classList.remove('is-off');new MutationObserver(()=>{if(h.classList.contains('is-off'))h.classList.remove('is-off')}).observe(h,{attributes:true,attributeFilter:['class']})})()`,
-  },
-  // (a') comportamiento anterior: al marcarse .is-off se sueltan las animaciones de scroll (y se recrean al volver).
-  'is-off-suelta-animaciones': {
-    css: `.pb-hero.is-off .pb-hx,.pb-hero.is-off .pb-tlg,.pb-hero.is-off .pb-trg,.pb-hero.is-off .pb-blg,.pb-hero.is-off .pb-brg,.pb-hero.is-off .pb-flg,.pb-hero.is-off .pb-frg{animation:none!important}`,
-  },
-  // (c) sin los 8 barridos (.pb-flow::after) ni los 4 nodos que parpadean.
-  'sin-barridos': { css: `.pb-flow::after,.pb-node{display:none!important}` },
-  // Estructura anterior: líneas centrales como elementos aparte con la animación de su grupo (2 capas más).
-  'lineas-sueltas': {
-    css: `.pb-cvl-old .pb-vline{animation:none!important;transform:none!important}`,
-    js: `(()=>{const l=document.querySelector('.pb-hero__lines');if(!l)return;document.querySelectorAll('.pb-hero .pb-cvl').forEach(c=>{const top=!!c.closest('.pb-tlg');c.className=(top?'pb-tlg':'pb-blg')+' pb-cvl-old';c.setAttribute('style',top?'left:50%;top:80px;width:1.5px;height:80px':'left:50%;bottom:82px;width:1.5px;height:80px');l.appendChild(c)})})()`,
-  },
-};
+// Catálogo único, compartido con el panel ?diag (src/lib/perf-variants.ts).
+const DIAG_SKIP: readonly string[] = ['blur-siempre'];
 
 test.describe('diagnóstico de costes', () => {
   test.skip(!DIAG, 'solo con PERF_DIAG=1 (perf-diag.yml)');
-  for (const [name, variant] of Object.entries(VARIANTS)) {
+  for (const variant of VARIANTS.filter((v) => !DIAG_SKIP.includes(v.name))) {
+    const name = variant.name;
     test(`variante: ${name}`, async ({ page }, info) => {
       test.skip(info.project.name === 'mobile-390', 'solo escritorio y portátil');
       const r = await measure(page, variant);
@@ -178,8 +145,7 @@ test.describe('diagnóstico de costes', () => {
 
 // A/B intercalado (3 rondas) con gesto de rueda real: el runner compartido es ruidoso, así que solo se
 // comparan medianas dentro de la misma corrida. Sirve para el tirón de las líneas del hero (perf/scroll-fino).
-// (Lenis ya no existe: su coste se ve comparando la base con la tabla de referencia del plan.)
-const AB = ['base', 'sin-is-off', 'is-off-suelta-animaciones', 'sin-barridos', 'lineas-sueltas'] as const;
+const AB = ['base', 'sin-lenis', 'sin-is-off', 'sin-barridos', 'sin-nodos', 'lineas-estaticas'] as const;
 
 test('A/B con rueda: variantes del hero (medianas)', async ({ browser }, info) => {
   test.skip(!DIAG, 'solo con PERF_DIAG=1 (perf-diag.yml)');
@@ -189,7 +155,7 @@ test('A/B con rueda: variantes del hero (medianas)', async ({ browser }, info) =
   const dropped: Record<string, number[]> = {};
   for (let i = 0; i < 3; i++) {
     for (const key of AB) {
-      const variant = VARIANTS[key];
+      const variant = variantByName(key);
       if (!variant) continue;
       const ctx = await browser.newContext(info.project.use as BrowserContextOptions);
       const page = await ctx.newPage();
