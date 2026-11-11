@@ -57,6 +57,10 @@ test('agrupar las líneas centrales no cambia el dibujo del hero (0, 40 y 90 % d
   test.setTimeout(60_000);
   await page.goto('/');
   await page.waitForSelector('[data-decode][data-decoded]', { timeout: 6000 });
+  // Con data-drawn el hero suelta sus entradas y quedan las animaciones de salida con el scroll. Sin esperarlo,
+  // la primera tanda de capturas salía sin ellas y la segunda (segundos después) con ellas: el titular se veía
+  // desplazado y atenuado al 40 % y la comparación fallaba por el momento, no por el dibujo.
+  await page.waitForSelector('.pb-hero[data-drawn]', { timeout: 6000 });
   await page.addStyleTag({ content: FREEZE });
   await page.waitForTimeout(1200); // entradas de la barra y del titular
 
