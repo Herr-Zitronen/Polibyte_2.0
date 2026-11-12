@@ -230,3 +230,15 @@ describe('peso de los fondos (DESIGN §7)', () => {
     expect(heavy).toEqual([]);
   });
 });
+
+describe('fotos de la directiva (DESIGN §5.4)', () => {
+  it('sizes refleja la grilla real: 1 columna < 380 px, 2 por fila hasta 960 px, 360 px en escritorio', () => {
+    const css = read('src/styles/team.css');
+    // La grilla manda: si cambian los puntos de quiebre, hay que cambiar `sizes` a la vez.
+    expect(css).toMatch(/@media \(max-width: 379px\)[^{]*\{\s*\.pb-dir\s*\{\s*grid-template-columns:\s*1fr/);
+    expect(css).toMatch(/@media \(max-width: 960px\)[^{]*\{\s*\.pb-dir\s*\{\s*grid-template-columns:\s*repeat\(4,/);
+    const card = read('src/components/team/MemberCard.astro');
+    const sizes = card.match(/sizes="([^"]+)"/)?.[1];
+    expect(sizes).toBe('(max-width: 379px) 100vw, (max-width: 960px) 50vw, 360px');
+  });
+});

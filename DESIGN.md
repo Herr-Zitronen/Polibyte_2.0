@@ -251,6 +251,7 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 - Áreas táctiles de al menos 44 px con puntero grueso (botones pequeños, pestañas, enlaces sociales y del pie).
 - Portada de Inicio: altura `clamp(700px, 100svh − 64px, 860px)`.
 - Directiva: 2 por fila (la quinta centrada) hasta 380 px; una columna solo por debajo.
+- Las fotos de la directiva declaran `sizes` según esa grilla (`(max-width: 379px) 100vw, (max-width: 960px) 50vw, 360px`): con `100vw` hasta 520 px el celular descargaba la de 720 px para una tarjeta de ~190 px (unos 440 KB en `/equipo/`) y el LCP de Lighthouse se volvía inestable. Si cambia la grilla de `team.css`, cambia `sizes`.
 - Ninguna página desborda a lo ancho a 390 px (prueba E2E por página).
 
 ## 6. Accesibilidad
