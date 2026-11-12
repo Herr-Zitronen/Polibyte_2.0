@@ -12,7 +12,7 @@ test('"Ver proyectos" solo en eventos con vitrina publicada', async ({ page }) =
   await page.goto('/lab/archive/');
   const btns = page.locator('#archivo').getByRole('link', { name: 'Ver proyectos' });
   await expect(btns).toHaveCount(1);
-  await expect(page.locator('#archivo .pb-arow', { hasText: 'KIROWEEN 2026' }).getByRole('link', { name: 'Ver proyectos' })).toBeVisible();
+  await expect(page.locator('#archivo .pb-arow', { hasText: 'Hackathon ESPOCH' }).getByRole('link', { name: 'Ver proyectos' })).toBeVisible();
 });
 
 test('línea viva en cada año', async ({ page }) => {
