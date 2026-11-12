@@ -17,7 +17,7 @@ const links = socialLinks(m);
     <span class="pb-shade" aria-hidden="true"></span>
     {
       m.photo ? (
-        <Image src={m.photo} alt={m.name} widths={[360, 720]} sizes="(max-width: 520px) 100vw, 360px" class="pb-pic" />
+        <Image src={m.photo} alt={m.name} widths={[360, 720]} sizes="(max-width: 379px) 100vw, (max-width: 960px) 50vw, 360px" class="pb-pic" />
       ) : (
         <PixelInitials name={m.name} />
       )

@@ -31,7 +31,7 @@ describe('H0.2 · presupuestos en lighthouserc.cjs', () => {
     expect(urls).toHaveLength(5);
   });
 
-  it('usa la mediana de 3 ejecuciones', () => {
-    expect(lhrc.ci.collect.numberOfRuns).toBe(3);
+  it('usa la mediana de 5 ejecuciones (con 3, una mala racha del servidor de CI fallaba el PR)', () => {
+    expect(lhrc.ci.collect.numberOfRuns).toBe(5);
   });
 });

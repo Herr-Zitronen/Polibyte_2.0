@@ -16,7 +16,7 @@ module.exports = {
       staticDistDir: './dist',
       // L1 (WOR-85): Inicio, Eventos, un detalle, Equipo y Unirme.
       url: ['/', '/eventos/', `/eventos/${detail}/`, '/equipo/', '/unirme/'],
-      numberOfRuns: 3, // Lighthouse varía entre ejecuciones: se usa la mediana.
+      numberOfRuns: 5, // Lighthouse varía entre ejecuciones (CPU ×4 en un runner compartido): la mediana de 5 aguanta una mala racha.
     },
     assert: {
       assertions: {

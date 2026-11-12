@@ -251,6 +251,7 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 - Áreas táctiles de al menos 44 px con puntero grueso (botones pequeños, pestañas, enlaces sociales y del pie).
 - Portada de Inicio: altura `clamp(700px, 100svh − 64px, 860px)`.
 - Directiva: 2 por fila (la quinta centrada) hasta 380 px; una columna solo por debajo.
+- Las fotos de la directiva declaran `sizes` según esa grilla (`(max-width: 379px) 100vw, (max-width: 960px) 50vw, 360px`): con `100vw` hasta 520 px el celular descargaba la de 720 px para una tarjeta de ~190 px (unos 440 KB en `/equipo/`) y el LCP de Lighthouse se volvía inestable. Si cambia la grilla de `team.css`, cambia `sizes`.
 - Ninguna página desborda a lo ancho a 390 px (prueba E2E por página).
 
 ## 6. Accesibilidad
@@ -281,5 +282,5 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 - Fuentes: `display=swap`; Instrument Sans subconjunto a "PoliByte"; JetBrains Mono (latín) precargada, con un respaldo local de métricas ajustadas para que el titular no salte.
 - JetBrains Mono se declara solo en latín y latín extendido (`Fonts.astro`). Ninguna fuente se incrusta en el HTML en base64 (`assetsInlineLimit` en `astro.config.mjs`).
 - Caché: los archivos con hash de `/_astro/` se sirven con `immutable` durante un año (`public/_headers`); el HTML revalida siempre.
-- Lighthouse CI mide Inicio, Eventos, un detalle de evento, Equipo y Unirme (mediana de 3).
+- Lighthouse CI mide Inicio, Eventos, un detalle de evento, Equipo y Unirme (mediana de 5).
 - Diagnóstico de fluidez: manual (`perf-diag.yml`), nunca en la suite normal. Dos modos: `script` (scrollTo por cuadro, comparable con mediciones antiguas) y `rueda` (gesto de rueda real por CDP, el que refleja el scroll del compositor).
