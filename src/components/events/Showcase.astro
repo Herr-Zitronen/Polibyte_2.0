@@ -7,9 +7,9 @@
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 import type { ShowcaseLayout } from '../../lib/showcase';
-import Button from '../Button.astro';
 import Cross from '../Cross.astro';
 import SectionChip from '../SectionChip.astro';
+import ProjectActions from './ProjectActions.astro';
 import '../../styles/showcase.css';
 import '../../styles/tabs.css';
 
@@ -35,7 +35,6 @@ interface Props {
 const { eventTitle, layout, id = 'destacados' } = Astro.props;
 const { hero, cards, rows } = layout;
 const host = (url?: string) => (url ? new URL(url).host : 'sin demo pública');
-const hasLinks = (p: ShowcaseItem) => Boolean(p.demoUrl || p.repoUrl);
 const people = (p: ShowcaseItem) => p.members.filter((m) => m.trim()).join(', ');
 ---
 
@@ -92,14 +91,7 @@ const people = (p: ShowcaseItem) => p.members.filter((m) => m.trim()).join(', ')
           <p>{hero.problem}</p>
         </div>
         {hero.stack.length > 0 && <ul class="pb-stack">{hero.stack.map((t) => <li class="pb-tech">{t}</li>)}</ul>}
-        {
-          hasLinks(hero) && (
-            <div class="pb-actions">
-              {hero.demoUrl && <Button variant="primary" href={hero.demoUrl} external>Ver demo</Button>}
-              {hero.repoUrl && <Button variant="secondary" href={hero.repoUrl} external>Código</Button>}
-            </div>
-          )
-        }
+        <ProjectActions demoUrl={hero.demoUrl} repoUrl={hero.repoUrl} />
       </div>
     </article>
 
@@ -120,12 +112,7 @@ const people = (p: ShowcaseItem) => p.members.filter((m) => m.trim()).join(', ')
                 <span class="pb-meta">{people(p) ? `${p.team} · ${people(p)}` : p.team}</span>
                 <p>{p.problem}</p>
                 {p.stack.length > 0 && <ul class="pb-stack">{p.stack.map((t) => <li class="pb-tech">{t}</li>)}</ul>}
-                {hasLinks(p) && (
-                  <div class="pb-actions">
-                    {p.demoUrl && <Button variant="primary" size="sm" href={p.demoUrl} external>Ver demo</Button>}
-                    {p.repoUrl && <Button variant="secondary" size="sm" href={p.repoUrl} external>Código</Button>}
-                  </div>
-                )}
+                <ProjectActions demoUrl={p.demoUrl} repoUrl={p.repoUrl} size="sm" />
               </div>
             </article>
           ))}
@@ -147,12 +134,7 @@ const people = (p: ShowcaseItem) => p.members.filter((m) => m.trim()).join(', ')
                   <span class="pb-meta">{p.team}</span>
                 </div>
                 {p.stack.length > 0 ? <ul class="pb-stack">{p.stack.map((t) => <li class="pb-tech">{t}</li>)}</ul> : <span />}
-                {hasLinks(p) && (
-                  <div class="pb-actions">
-                    {p.demoUrl && <Button variant="primary" size="sm" href={p.demoUrl} external>Ver demo</Button>}
-                    {p.repoUrl && <Button variant="secondary" size="sm" href={p.repoUrl} external>Código</Button>}
-                  </div>
-                )}
+                <ProjectActions demoUrl={p.demoUrl} repoUrl={p.repoUrl} size="sm" />
               </div>
             ))}
           </div>
