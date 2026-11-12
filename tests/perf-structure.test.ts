@@ -42,6 +42,16 @@ describe('A2 · una sola capa de grano por página, fija', () => {
     expect(z).toBeLessThan(20);
   });
 
+  it('fotos y capturas quedan por encima del grano y bajo la barra', () => {
+    const glass = read('src/styles/glass.css');
+    const grainZ = Number(glass.match(/\.pb-grain--page\s*\{[^}]*z-index:\s*(\d+)/)?.[1]);
+    const rule = glass.match(/\.pb-mem,\s*\.pb-tutor-photo,\s*\.pb-browser,\s*\.pb-phone\s*\{([^}]*)\}/)?.[1] ?? '';
+    const z = Number(rule.match(/z-index:\s*(\d+)/)?.[1]);
+    expect(rule).toMatch(/position:\s*relative/);
+    expect(z).toBeGreaterThan(grainZ);
+    expect(z).toBeLessThan(20);
+  });
+
   it('el menú móvil no duplica la regla del grano', () => {
     expect(read('src/styles/mobile-menu.css')).not.toMatch(/\.pb-sheet \.pb-grain\s*\{[^}]*background-image/);
   });

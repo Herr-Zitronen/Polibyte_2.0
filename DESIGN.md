@@ -80,7 +80,7 @@ Prohibido: cursiva en titulares; MAYÚSCULAS manuales (Silkscreen ya es de caja 
 - **Primario** (`.pb-b1`): marco de 1px `rgba(242,244,250,.7)`, radio 6px, padding 4px; dentro, caja blanca `#FFFFFF` con texto `#1A2C78`, radio 3px, padding 14px 22px, 15px/500. Hover: la caja sube 2px.
 - **Secundario** (`.pb-b2`): contorno de 1px, radio 6px, padding 18px 26px (misma altura total que el primario). Hover: fondo blanco, texto azul.
 - Tamaño pequeño `.sm` para barra y listas.
-- Icono opcional antes del texto (`slot="icon"` de `Button.astro`, decorativo con `aria-hidden`): la terminal 18×18 de "Ver eventos" en la portada.
+- Icono opcional antes del texto (`slot="icon"` de `Button.astro`, decorativo con `aria-hidden`): la terminal 18×18 de "Ver eventos" en la portada y la marca de GitHub de la vitrina (`GitHubIcon.astro`, 1.2em: 18 px en tamaño normal, 16,8 px en `.sm`; `currentColor`).
 - Títulos de sección pequeños (Próximos eventos, Directiva, Proyectos destacados) llevan delante el chip de 34×34 (`SectionChip.astro`, trazo 1.4 px del color del texto).
 - Sobre fondo claro (`.pb-on-light`) se invierten: caja `#13205A` con texto blanco; contorno `rgba(19,32,90,.6)`.
 - Nunca se estiran a ancho completo en escritorio. Nunca parten su texto salvo en ≤520px.
@@ -231,6 +231,7 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 - Por proyecto, `featured: boolean`. El primero destacado va en el panel grande (con conmutador Escritorio/Móvil); los dos siguientes en tarjetas; el resto en filas.
 - Nunca se muestra una vitrina vacía o a medias:
   - 1 destacado: solo el panel grande. 2 destacados: panel + una tarjeta horizontal a ancho completo (se apila en ≤960). 3 o más: panel + 2 tarjetas + filas.
+  - Botones por proyecto (`ProjectActions.astro`): "Ver demo" (primario, `demoUrl`) y "GitHub" con icono (secundario, `repoUrl`). Cada uno aparece solo si su dato existe.
   - Sin `demoUrl` ni `repoUrl` no hay fila de botones; sin `demoUrl` la barra del navegador dice "sin demo pública". Sin integrantes ni stack no se pinta la píldora ni la lista.
 - En Eventos se muestra la vitrina del **evento concluido más reciente que la tenga** (un taller posterior al hackathon no la apaga). Si ningún evento tiene vitrina, la sección no existe y el botón del resumen dice "Ver calendario".
 - Cada evento con vitrina publicada muestra sus proyectos en su página de detalle (`#proyectos`), y "Ver proyectos" del archivo lleva ahí.

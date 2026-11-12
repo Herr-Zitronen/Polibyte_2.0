@@ -63,4 +63,35 @@ describe('projectSchema', () => {
     expect(p.featured).toBe(false);
     expect(p.order).toBe(0);
   });
+
+  // Botones de la vitrina: cada uno se activa por proyecto solo con su dato (demoUrl → "Ver demo",
+  // repoUrl → "GitHub"). Los proyectos ya existentes deben seguir validando sin ninguno de los dos.
+  describe('enlaces opcionales (demoUrl, repoUrl)', () => {
+    const minimal = {
+      event: 'kiroween-2026',
+      title: 'Cuotas',
+      team: 'Crew',
+      members: [],
+      problem: 'Limita eventos.',
+      stack: [],
+      shotDesktop: 'x.webp',
+    };
+    const parse = (extra: object) => projectSchema(fakeImage, fakeRef).parse({ ...minimal, ...extra });
+
+    it('acepta un proyecto sin demoUrl ni repoUrl', () => {
+      const p = parse({});
+      expect(p.demoUrl).toBeUndefined();
+      expect(p.repoUrl).toBeUndefined();
+    });
+
+    it('acepta cada enlace por separado', () => {
+      expect(parse({ repoUrl: 'https://github.com/polibyte-espoch/x' }).demoUrl).toBeUndefined();
+      expect(parse({ demoUrl: 'https://x.example.com/' }).repoUrl).toBeUndefined();
+    });
+
+    it('rechaza enlaces que no son URL', () => {
+      expect(() => parse({ demoUrl: 'x.example.com' })).toThrow();
+      expect(() => parse({ repoUrl: 'polibyte-espoch/x' })).toThrow();
+    });
+  });
 });
