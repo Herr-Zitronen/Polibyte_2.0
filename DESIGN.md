@@ -282,5 +282,5 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 - Fuentes: `display=swap`; Instrument Sans subconjunto a "PoliByte"; JetBrains Mono (latín) precargada, con un respaldo local de métricas ajustadas para que el titular no salte.
 - JetBrains Mono se declara solo en latín y latín extendido (`Fonts.astro`). Ninguna fuente se incrusta en el HTML en base64 (`assetsInlineLimit` en `astro.config.mjs`).
 - Caché: los archivos con hash de `/_astro/` se sirven con `immutable` durante un año (`public/_headers`); el HTML revalida siempre.
-- Lighthouse CI mide Inicio, Eventos, un detalle de evento, Equipo y Unirme (mediana de 3).
+- Lighthouse CI mide Inicio, Eventos, un detalle de evento, Equipo y Unirme (mediana de 5).
 - Diagnóstico de fluidez: manual (`perf-diag.yml`), nunca en la suite normal. Dos modos: `script` (scrollTo por cuadro, comparable con mediciones antiguas) y `rueda` (gesto de rueda real por CDP, el que refleja el scroll del compositor).
