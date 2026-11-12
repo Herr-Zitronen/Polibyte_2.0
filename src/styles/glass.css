@@ -130,6 +130,17 @@
   view-transition-name: pb-grain;
 }
 
+/* Fotos y capturas nítidas: la capa de grano (z 10) no debe cubrirlas. Se suben a z 11, bajo la barra (z 20).
+   La tarjeta de miembro entera (.pb-mem) sube porque .pb-fx aísla su contexto de apilamiento: la foto sola no podría.
+   Cualquier miembro, tutor o captura nuevo usa estos mismos componentes y hereda la regla. */
+.pb-mem,
+.pb-tutor-photo,
+.pb-browser,
+.pb-phone {
+  position: relative;
+  z-index: 11;
+}
+
 /* Paralaje: el estado por defecto es el final visible; solo se anima transform.
    El timeline va en reglas aparte (otro selector): si comparte regla con el shorthand
    `animation`, el minificador los fusiona en uno solo y Chromium descarta la declaración. */
