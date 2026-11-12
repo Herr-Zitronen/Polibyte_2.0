@@ -104,8 +104,19 @@ describe('A3 · efectos y pausa fuera de pantalla', () => {
 
   it('la especulación es conservadora: pre-renderiza al pulsar, no al pasar el cursor', () => {
     const base = read('src/layouts/Base.astro');
-    expect(base).toMatch(/eagerness:\s*'conservative'/);
-    expect(base).not.toMatch(/eagerness:\s*'(moderate|eager)'/);
+    const prerender = base.match(/prerender:\s*\[\{([^}]*)\}\]/)?.[1] ?? '';
+    expect(prerender).toMatch(/where:\s*INTERNAL\b/);
+    expect(prerender).toMatch(/eagerness:\s*'conservative'/);
+    expect(base).not.toMatch(/eagerness:\s*'(eager|immediate)'/);
+  });
+
+  it('al pasar el cursor solo se descarga el HTML de la página siguiente (prefetch): sin renderizar, no roba CPU ni GPU', () => {
+    const base = read('src/layouts/Base.astro');
+    const prefetch = base.match(/prefetch:\s*\[\{([^}]*)\}\]/)?.[1] ?? '';
+    // Mismo filtro que el prerender: solo enlaces internos y nunca /lab/.
+    expect(prefetch).toMatch(/where:\s*INTERNAL\b/);
+    expect(prefetch).toMatch(/eagerness:\s*'moderate'/);
+    expect(base).toMatch(/const INTERNAL = [^;]*href_matches: '\/\*'[^;]*not: \{ href_matches: '\/lab\/\*' \}/);
   });
 
   it('el hero se marca fuera de pantalla con medio viewport de margen, lejos de donde se mira', () => {
@@ -209,3 +220,13 @@ describe('A1 · CI barato', () => {
   });
 });
 
+
+describe('peso de los fondos (DESIGN §7)', () => {
+  it('ningún fondo pasa de 16 KB: la niebla es difusa y va a media resolución con la transparencia sin pérdida', () => {
+    const dir = resolve(ROOT, 'src/assets/backgrounds');
+    const heavy = readdirSync(dir)
+      .filter((f) => f !== 'grain.webp')
+      .filter((f) => statSync(join(dir, f)).size > 16 * 1024);
+    expect(heavy).toEqual([]);
+  });
+});

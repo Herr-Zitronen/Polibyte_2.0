@@ -35,8 +35,12 @@ const { title, cover, description = 'PoliByte · Club de la Carrera de Software 
 // Prerender de la página siguiente (Chromium): la transición arranca con ella ya renderizada. Fuera /lab/.
 // perf/fluidez-real: 'conservative' pre-renderiza al pulsar el enlace, no al dejar el cursor encima (con
 // 'moderate' se pre-renderizaba una página entera en mitad del scroll si el puntero caía sobre un enlace).
+// Además, 'prefetch' con 'moderate': al dejar el cursor 200 ms sobre un enlace solo se descarga su HTML (unos
+// 20 KB), sin renderizar nada: no toca CPU ni GPU de esta página y al pulsar el prerender ya lo tiene en mano.
+const INTERNAL = { and: [{ href_matches: '/*' }, { not: { href_matches: '/lab/*' } }] };
 const speculation = JSON.stringify({
-  prerender: [{ where: { and: [{ href_matches: '/*' }, { not: { href_matches: '/lab/*' } }] }, eagerness: 'conservative' }],
+  prefetch: [{ where: INTERNAL, eagerness: 'moderate' }],
+  prerender: [{ where: INTERNAL, eagerness: 'conservative' }],
 });
 ---
 

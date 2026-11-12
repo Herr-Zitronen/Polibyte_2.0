@@ -34,6 +34,6 @@ test('sin eventos pasados → estado alternativo', async ({ page }) => {
 test('/eventos encabeza con el último evento concluido del contenido', async ({ page }) => {
   await page.goto('/eventos/');
   await expect(page.locator('h1')).toHaveCount(1);
-  await expect(page.locator('#recap h1')).toHaveAccessibleName('Hackathon ESPOCH');
-  await expect(page.locator('#recap .pb-statn')).toHaveText(['12', '11', '44']);
+  await expect(page.locator('#recap h1')).toHaveAccessibleName('KIROWEEN 2026');
+  await expect(page.locator('#recap .pb-statn')).toHaveText(['2', '2', '6']);
 });

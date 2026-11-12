@@ -1,5 +1,5 @@
 // H1.1 / H4.1 · Fuentes propias: nada de hojas externas (sin conexiones a terceros antes del primer pintado).
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -30,13 +30,38 @@ describe('Fonts.astro', () => {
     expect(read('../styles/tokens.css')).toMatch(/--pb-font-mono:\s*'JetBrains Mono Variable',\s*'JetBrains Mono Fallback'/);
   });
 
-  it('importa solo las tres familias, con los pesos de DESIGN §2.2', () => {
+  it('JetBrains Mono se declara a mano, solo latín y latín extendido (los que usa un sitio en español)', () => {
+    const faces = [...src.matchAll(/@font-face\s*\{([^}]*)\}/g)].map((m) => m[1] ?? '').filter((f) => /'JetBrains Mono Variable'/.test(f));
+    expect(faces).toHaveLength(2);
+    expect(faces.map((f) => /jetbrains-mono-([a-z-]+)-wght-normal\.woff2/.exec(f)?.[1]).sort()).toEqual(['latin', 'latin-ext']);
+    for (const f of faces) {
+      expect(f).toMatch(/font-display:\s*swap/);
+      expect(f).toMatch(/font-weight:\s*100 800/);
+      expect(f).toMatch(/unicode-range:/);
+    }
+    // La hoja completa de Fontsource traía cirílico, griego y vietnamita; el más pequeño (2 KB) acababa
+    // incrustado en base64 en el HTML de todas las páginas.
+    expect(src).not.toMatch(/jetbrains-mono\/wght\.css/);
+    expect(src).not.toMatch(/cyrillic|greek|vietnamese/);
+  });
+
+  it('ninguna fuente se incrusta en el HTML como data: (astro.config.mjs)', () => {
+    const config = read('../../astro.config.mjs');
+    expect(config).toMatch(/assetsInlineLimit/);
+    expect(config).toMatch(/woff2\?/);
+  });
+
+  it('importa solo las hojas de Silkscreen, con los pesos de DESIGN §2.2', () => {
     const imports = [...src.matchAll(/^import '([^']+)';/gm)].map((m) => m[1]);
-    expect(imports).toEqual([
-      '@fontsource-variable/jetbrains-mono/wght.css',
-      '@fontsource/silkscreen/latin-400.css',
-      '@fontsource/silkscreen/latin-700.css',
-      '@fontsource/instrument-sans/latin-600.css',
-    ]);
+    expect(imports).toEqual(['@fontsource/silkscreen/latin-400.css', '@fontsource/silkscreen/latin-700.css']);
+  });
+
+  it('Instrument Sans va reducida a las letras de «PoliByte» (DESIGN §2.2): solo dibuja el wordmark del pie', () => {
+    const face = [...src.matchAll(/@font-face\s*\{([^}]*)\}/g)].map((m) => m[1] ?? '').find((f) => /'Instrument Sans'/.test(f)) ?? '';
+    expect(face).toMatch(/assets\/fonts\/instrument-sans-polibyte\.woff2/);
+    expect(face).toMatch(/font-weight:\s*600/);
+    expect(face).toMatch(/font-display:\s*swap/);
+    // La latina completa pesa 17 KB; con ocho letras quedan menos de 2 KB.
+    expect(statSync(resolve(import.meta.dirname, '../assets/fonts/instrument-sans-polibyte.woff2')).size).toBeLessThan(2048);
   });
 });

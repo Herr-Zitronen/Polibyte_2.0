@@ -1,7 +1,7 @@
 // PR B · Celular: ninguna página desborda a lo ancho a 390 px y las áreas táctiles miden ≥ 44 px.
 import { expect, test } from '@playwright/test';
 
-const PAGES = ['/', '/eventos/', '/eventos/hackathon-espoch-2026/', '/eventos/imagine-cup-2027/', '/equipo/', '/unirme/', '/no-existe/'];
+const PAGES = ['/', '/eventos/', '/eventos/kiroween-2026/', '/eventos/imagine-cup-2027/', '/equipo/', '/unirme/', '/no-existe/'];
 
 test.describe('celular (390)', () => {
   test.beforeEach(({ page }) => test.skip(page.viewportSize()!.width !== 390, 'solo 390'));

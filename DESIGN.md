@@ -48,7 +48,7 @@ Líneas sobre oscuro: `rgba(242,244,250,.25)` (separadores), `.45` (marcos), `.6
 |---|---|---|
 | JetBrains Mono | 300–800 (variable, sin cursiva) | Todo el texto |
 | Silkscreen | 400, 700 | Etiquetas pequeñas, fechas en listas, números grandes (cuenta regresiva, cifras, 404), binario |
-| Instrument Sans | 600, **solo las letras de "PoliByte"** (`&text=PoliByte`) | Wordmark del pie |
+| Instrument Sans | 600, **solo las letras de "PoliByte"** (`src/assets/fonts/instrument-sans-polibyte.woff2`, 1,3 KB) | Wordmark del pie |
 
 Escala principal:
 
@@ -127,7 +127,7 @@ Cursor light (C) en cada fila. La fila seleccionada es un poco más clara, con b
 - Capas, de atrás hacia adelante: imagen del nevado (lejos) → niebla (cerca) → brillo (`.pb-sheen`) → vidrio acanalado (`.pb-reed`) → degradado a sólido en los bordes. Encima de todo, el grano de página.
 - **Una sola capa de grano por página** (`.pb-grain--page` en `Base.astro`): `position: fixed`, opacidad 0.55, `z-index` 10 (sobre el contenido, bajo la barra). Queda quieta respecto a la ventana, como grano de película, y no se rasteriza al hacer scroll (F12: antes había ~15 capas, una por sección y franja, y eran de lo más caro del scroll). Nunca dos granos superpuestos (forman rectángulos visibles); la única excepción es el menú móvil, que vive en la top layer.
 - Paralaje: cada capa sobresale solo lo que exige su recorrido (portada: lejos 170 px arriba, cerca 110 px abajo; secciones: ±90/±70 px). En ≤820 px solo se mueve el paralaje de las portadas.
-- Imágenes en `assets/backgrounds/` (8–12 KB cada una; la niebla 36 KB con transparencia).
+- Imágenes en `assets/backgrounds/` (8–12 KB cada una; la niebla con transparencia: original de 36 KB en `assets/`, y en `src/assets/` a 640 px y 14 KB).
 
 ### 3.9 Barra superior
 
@@ -268,7 +268,7 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 
 - Presupuesto: LCP < 2.2s (temporal, WOR-101; objetivo original 2.0s), CLS < 0.05, INP < 200ms, JS de la página < 20 KB (sin contar Lenis).
 - Lenis (escritorio) se carga en tiempo ocioso tras `load` y su rAF solo corre en movimiento (§4). En táctil y con movimiento reducido el scroll es nativo.
-- Fondos estáticos (WebP 8–36 KB), grano en mosaico (21 KB).
+- Fondos estáticos (WebP 8–14 KB), grano en mosaico (21 KB). La niebla va a 640 px con la transparencia sin pérdida: es difusa y, compuesta sobre el nevado, difiere de la original en menos de 2 niveles de 255. No bajar la calidad de su transparencia: aparecen bandas en el degradado.
 - Blur solo en la barra (1 capa). El menú móvil usa fondo sólido (F13). Nunca se anima `filter` ni `backdrop-filter`.
 - Grano: una sola capa fija por página (§3.8).
 - Sin `content-visibility: auto` (perf/fluidez-real): el navegador dejaba de dibujar la sección al salir de pantalla y la volvía a maquetar, pintar y rasterizar al regresar (hueco en blanco y un cuadro largo en cada pasada). El sitio es corto: maquetarlo todo una vez sale más barato.
@@ -276,7 +276,10 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 - Las animaciones de entrada con `forwards` del hero (líneas, letras, subtítulo) se sueltan al terminar (`data-drawn` en `.pb-hero`, lo pone `decode.ts` en el `animationend` del subtítulo, con respaldo a los 3 s): misma imagen, sin capas vivas durante el scroll.
 - Ningún `will-change` ligado a `:hover`: crea y destruye capas mientras el contenido pasa bajo el cursor.
 - Reglas de especulación con `eagerness: 'conservative'`: la página siguiente se pre-renderiza al pulsar, no al dejar el cursor sobre un enlace (eso robaba CPU y GPU en mitad del scroll).
+- Además, `prefetch` con `eagerness: 'moderate'`: al dejar el cursor sobre un enlace interno solo se descarga su HTML (sin renderizar, sin coste de CPU ni GPU). Al pulsar, el prerender ya lo tiene.
 - La medición de `perf-diag.yml` corre en Actions, que rasteriza por software (sin GPU): sirve para comparar variantes entre sí, no para predecir un PC con gráfica. Para eso está el panel `?diag` (`docs/SESSIONS.md`).
 - Fuentes: `display=swap`; Instrument Sans subconjunto a "PoliByte"; JetBrains Mono (latín) precargada, con un respaldo local de métricas ajustadas para que el titular no salte.
+- JetBrains Mono se declara solo en latín y latín extendido (`Fonts.astro`). Ninguna fuente se incrusta en el HTML en base64 (`assetsInlineLimit` en `astro.config.mjs`).
+- Caché: los archivos con hash de `/_astro/` se sirven con `immutable` durante un año (`public/_headers`); el HTML revalida siempre.
 - Lighthouse CI mide Inicio, Eventos, un detalle de evento, Equipo y Unirme (mediana de 3).
 - Diagnóstico de fluidez: manual (`perf-diag.yml`), nunca en la suite normal. Dos modos: `script` (scrollTo por cuadro, comparable con mediciones antiguas) y `rueda` (gesto de rueda real por CDP, el que refleja el scroll del compositor).

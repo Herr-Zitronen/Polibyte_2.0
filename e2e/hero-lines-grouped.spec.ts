@@ -57,6 +57,11 @@ test('las líneas centrales siguen a su grupo en todo el recorrido', async ({ pa
     for (const [j, l] of geo.entries()) {
       expect(Math.abs(l.x - l.expected), `línea ${j} sigue a su grupo al ${p * 100} %`).toBeLessThanOrEqual(1);
     }
-    await expect(page, `captura base del hero al ${p * 100} %`).toHaveScreenshot(`hero-lines-${p * 100}.png`, { maxDiffPixelRatio: 0.002 });
+    await expect(page, `captura base del hero al ${p * 100} %`).toHaveScreenshot(`hero-lines-${p * 100}.png`, {
+      maxDiffPixelRatio: 0.002,
+      // La cuenta atrás y la barra de progreso del próximo evento cambian con la hora: sin máscara, la captura
+      // caduca cada día (días, horas, bits y celdas llenas).
+      mask: [page.locator('.pb-pc-mid'), page.locator('.pb-prog')],
+    });
   }
 });
