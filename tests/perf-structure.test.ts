@@ -242,3 +242,20 @@ describe('fotos de la directiva (DESIGN §5.4)', () => {
     expect(sizes).toBe('(max-width: 379px) 100vw, (max-width: 960px) 50vw, 360px');
   });
 });
+
+describe('capturas que no caducan', () => {
+  it('una prueba que abre Inicio y captura la página entera enmascara la cuenta atrás del próximo evento', () => {
+    const offenders: string[] = [];
+    for (const f of files(resolve(ROOT, 'e2e'), /\.spec\.ts$/)) {
+      const blocks = readFileSync(f, 'utf8').split(/\btest\(/).slice(1);
+      for (const b of blocks) {
+        const opensHome = /goto\((['"`])\/\1\)/.test(b);
+        // Solo la página entera: un recorte (clip) o un elemento ajeno al panel, como el pie, no incluye la cuenta atrás.
+        const wholePage = /expect\(page[,)][^;]*toHaveScreenshot\(/.test(b) && !/clip:/.test(b);
+        if (opensHome && wholePage && !/mask:\s*\[[^\]]*pb-pc-mid/.test(b)) offenders.push(relative(ROOT, f));
+      }
+    }
+    // La cuenta atrás (días, horas, bits y celdas) cambia con el reloj: sin máscara la captura caduca cada día.
+    expect(offenders).toEqual([]);
+  });
+});
