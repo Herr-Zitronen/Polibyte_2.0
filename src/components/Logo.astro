@@ -1,0 +1,34 @@
+---
+// Marca de la barra (DESIGN §3.9, §3.11): [escudo ESPOCH] │ [isotipo animado por piezas + nombre del club].
+// F17: el escudo es solo identidad visual. No es enlace ni lleva la palabra «espoch»; usa currentColor,
+// así cambia con el tema claro u oscuro de la barra igual que el isotipo.
+import shieldSvg from '../assets/brand/espoch-shield.svg?raw';
+
+interface Props {
+  href?: string;
+  subtitle?: boolean;
+}
+
+const { href = '/', subtitle = true } = Astro.props;
+const shieldPath = /\sd="([^"]+)"/.exec(shieldSvg)?.[1] ?? '';
+---
+
+<div class="pb-brand">
+  <svg class="pb-brand__shield" role="img" aria-label="ESPOCH" viewBox="0 0 663 852" width="26" height="33">
+    <path fill="currentColor" fill-rule="evenodd" d={shieldPath}></path>
+  </svg>
+  <span class="pb-brand__rule" aria-hidden="true"></span>
+  <a href={href} class="pb-logo">
+    <svg viewBox="0 0 913 1264" width="24" height="33" role="img" aria-label="PoliByte">
+      <path class="lg-d" fill="currentColor" d="M0 0H180V184H0Z"></path>
+      <path class="lg-d r" fill="currentColor" d="M736 0H913V184H736Z"></path>
+      <path class="lg-bl" fill="currentColor" d="M0 269H433V410L258 411V1120H433V1264H0Z"></path>
+      <path class="lg-br" fill="currentColor" d="M483 269H913V1264H483V1120H659V411L483 410Z"></path>
+      <path class="lg-c" fill="currentColor" d="M330 847V621Q330 611 340 611H573Q583 611 583 621V847Z"></path>
+    </svg>
+    <span class="pb-logo__text" aria-hidden="true">
+      <span class="pb-logo__name">PoliByte</span>
+      {subtitle && <span class="pb-logo__sub">Club de la Carrera de Software</span>}
+    </span>
+  </a>
+</div>

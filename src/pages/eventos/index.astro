@@ -1,0 +1,55 @@
+---
+// Eventos: portada con el último evento concluido (H5.1) y su vitrina (H5.2). Calendario (H5.3) antes del archivo (H5.4).
+import { getCollection } from 'astro:content';
+import Calendar from '../../components/events/Calendar.astro';
+import Archive from '../../components/events/Archive.astro';
+import Recap from '../../components/events/Recap.astro';
+import Showcase from '../../components/events/Showcase.astro';
+import PixelStrip from '../../components/PixelStrip.astro';
+import Base from '../../layouts/Base.astro';
+import { pageTitle } from '../../lib/page-title';
+import { archiveView } from '../../lib/archive';
+import { EDGE } from '../../lib/pixel-strip';
+import { calendarRows } from '../../lib/filter';
+import { recapView } from '../../lib/recap';
+import { latestShowcase } from '../../lib/showcase';
+
+const events = (await getCollection('events')).map((e) => ({ ...e.data, id: e.id }));
+const projects = (await getCollection('projects')).map((p) => ({ ...p.data, event: p.data.event.id }));
+const now = new Date();
+const view = recapView(events, projects, now);
+const archive = archiveView(events, projects, now);
+const calendar = calendarRows(events, now);
+const year = now.getFullYear();
+// PR B: la vitrina es la del evento concluido más reciente que la tenga (no necesariamente el del resumen).
+const showcase = latestShowcase(events, projects, now);
+---
+
+<Base title={pageTitle('Eventos')} description="Calendario, archivo y proyectos del club." cover="recap">
+  <main>
+    <Recap view={view} />
+    {
+      showcase ? (
+        <>
+          <PixelStrip seed={61} top={EDGE.cover} bottom={EDGE.navy} />
+          <Showcase eventTitle={showcase.event.title} layout={showcase.layout} />
+          <PixelStrip seed={73} top={EDGE.navy} bottom={EDGE.paper} />
+        </>
+      ) : (
+        <PixelStrip seed={67} top={EDGE.cover} bottom={EDGE.paper} />
+      )
+    }
+    <Calendar rows={calendar} span={`${year}–${year + 1}`} hasArchive={archive.length > 0} />
+    {
+      archive.length > 0 ? (
+        <>
+          <PixelStrip seed={89} top={EDGE.paper} bottom={EDGE.image} />
+          <Archive years={archive} />
+          <PixelStrip seed={97} top={EDGE.archive} bottom={EDGE.footer} />
+        </>
+      ) : (
+        <PixelStrip seed={89} top={EDGE.paper} bottom={EDGE.footer} />
+      )
+    }
+  </main>
+</Base>

@@ -1,0 +1,171 @@
+---
+// Pantalla de entrada de Inicio (perf/fluidez-real). Elegida por Joel: el ensamblaje del isotipo, hecho
+// de píxeles, y salida hacia arriba con el borde de la franja de píxeles.
+// - Solo se ve si el script de <head> (Base.astro) pone `pb-intro-on` en <html>: primera página de la
+//   visita, sin movimiento reducido y sin pre-render. Sin esa clase no se pinta nada.
+// - CSS en línea, sin imágenes ni peticiones. Solo transform y opacity, con steps().
+// - Queda bajo el grano fijo de la página (z 10): no pinta un grano propio. La barra espera oculta.
+// - LCP: debajo, el titular ya está pintado en su sitio; su decodificado arranca cuando la entrada se va.
+import { INTRO_BITS, introCells } from '../lib/intro';
+import { COLS, pixelRuns } from '../lib/pixel-strip';
+
+const cells = introCells(51);
+const runs = pixelRuns(7);
+---
+
+<div class="pb-intro" aria-hidden="true">
+  <div class="pb-intro__iso">
+    {cells.map((c) => <i class={c.piece === 'empty' ? undefined : `p ${c.piece}`} style={c.delay ? `--d: ${c.delay}s` : undefined} />)}
+  </div>
+  <div class="pb-intro__bits">{[...INTRO_BITS].map((b, i) => <span style={`--i: ${i}`}>{b}</span>)}</div>
+  {/* Borde inferior: la franja de píxeles del sitio, del revés (más densa junto a la entrada). */}
+  <svg class="pb-intro__edge" viewBox={`0 0 ${COLS} 4`} preserveAspectRatio="none">
+    {runs.map((r) => <rect x={r.x} y={r.row} width={r.cells + 0.04} height="1.04" fill="currentColor" />)}
+  </svg>
+</div>
+
+<style is:inline>
+  .pb-intro {
+    display: none;
+  }
+
+  html.pb-intro-on .pb-intro {
+    position: fixed;
+    inset: 0;
+    z-index: 9;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 20px;
+    background: #0f1a4d;
+    color: #f2f4fa;
+    cursor: pointer;
+  }
+
+  .pb-intro__iso {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    width: clamp(63px, 7vw, 99px);
+    aspect-ratio: 9 / 12;
+  }
+
+  .pb-intro__iso .p {
+    background: currentColor;
+  }
+
+  .pb-intro__iso .core {
+    background: #f2e0a0;
+    animation: pb-intro-core 0.35s steps(1) 0.45s both;
+  }
+
+  .pb-intro__iso .dot {
+    animation: pb-intro-drop 0.2s steps(3) var(--d, 0s) both;
+  }
+
+  .pb-intro__iso .left {
+    animation: pb-intro-left 0.2s steps(3) calc(0.14s + var(--d, 0s)) both;
+  }
+
+  .pb-intro__iso .right {
+    animation: pb-intro-right 0.2s steps(3) calc(0.14s + var(--d, 0s)) both;
+  }
+
+  .pb-intro__bits {
+    font: 400 14px/1 'Silkscreen', monospace;
+    color: #cfe3ff;
+  }
+
+  .pb-intro__bits span {
+    animation: pb-intro-bit 0.04s steps(1) calc(0.4s + var(--i) * 0.045s) both;
+  }
+
+  .pb-intro__edge {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 18vh;
+    margin-top: -1px;
+    color: #0f1a4d;
+    transform: scaleY(-1);
+  }
+
+  .pb-intro.is-out {
+    animation: pb-intro-out 0.4s steps(9) forwards;
+  }
+
+  /* Mientras dura la entrada: el titular queda pintado en su sitio (LCP) y el resto de la portada y la
+     barra esperan sin animarse. Al quitarse la clase, sus animaciones de entrada arrancan desde cero. */
+  html.pb-intro-on .pb-ch,
+  html.pb-intro-on .pb-ci {
+    transform: none;
+    animation: none;
+  }
+
+  html.pb-intro-on .pb-line,
+  html.pb-intro-on .pb-vline,
+  html.pb-intro-on .pb-node,
+  html.pb-intro-on .pb-sub,
+  html.pb-intro-on .pb-flow::after,
+  html.pb-intro-on .pb-hdr,
+  html.pb-intro-on .pb-hdr * {
+    animation: none !important;
+  }
+
+  html.pb-intro-on .pb-hdr {
+    visibility: hidden;
+  }
+
+  @keyframes pb-intro-drop {
+    from {
+      transform: translateY(-600%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes pb-intro-left {
+    from {
+      transform: translateX(-500%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes pb-intro-right {
+    from {
+      transform: translateX(500%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes pb-intro-core {
+    0%,
+    30%,
+    60% {
+      opacity: 0;
+    }
+
+    20%,
+    80%,
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes pb-intro-bit {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes pb-intro-out {
+    to {
+      transform: translateY(calc(-100% - 18vh));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pb-intro {
+      display: none !important;
+    }
+  }
+</style>

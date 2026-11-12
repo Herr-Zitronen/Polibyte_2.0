@@ -1,0 +1,5 @@
+# Cabeceras de los assets estáticos (Cloudflare las lee de la carpeta publicada, ver docs/DEPLOY.md).
+# /_astro/ solo contiene archivos con hash en el nombre: si el contenido cambia, cambia la URL.
+# Se guardan un año sin revalidar. El HTML y los iconos sin hash conservan el valor por defecto (revalidan).
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

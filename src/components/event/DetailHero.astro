@@ -1,0 +1,81 @@
+---
+// Portada del detalle (design/EventoDetalle.dc.html #top): ruta, tipo, título, fecha/lugar/modalidad
+// y cuenta regresiva, o "Realizado" / "Por confirmar".
+import type { DetailTiming } from '../../lib/event-detail';
+import { TIME_ZONE } from '../../lib/events';
+import { modeLabel } from '../../lib/mode-label';
+import { nextEventView } from '../../lib/next-event-view';
+import Button from '../Button.astro';
+import Cross from '../Cross.astro';
+import GlassBackground from '../GlassBackground.astro';
+import LiveLine from '../LiveLine.astro';
+import Tag from '../Tag.astro';
+import TagPair from '../TagPair.astro';
+
+interface Props {
+  title: string;
+  typeLine: string;
+  date?: Date | undefined;
+  place?: string | undefined;
+  mode?: 'presencial' | 'remoto' | 'híbrido' | undefined;
+  timing: DetailTiming;
+  now: Date;
+  registration: boolean;
+}
+
+const { title, typeLine, date, place, mode, timing, now, registration } = Astro.props;
+const short = (d: Date) =>
+  new Intl.DateTimeFormat('es-EC', { timeZone: TIME_ZONE, day: 'numeric', month: 'short', year: 'numeric' })
+    .format(d)
+    .replace('.', '');
+const dateText = date ? short(date) : 'Por confirmar';
+const start = timing.kind === 'countdown' ? timing.start : null;
+const cd = start && nextEventView({ date: start }, now);
+---
+
+<section id="top" class="pb-glass" data-bg>
+  <GlassBackground image="recap" parallax="root" />
+  <div class="pb-content pb-container pb-thero">
+    <div class="pb-thero__head">
+      <nav class="pb-crumb" aria-label="Ruta">
+        <a href="/eventos/">Eventos</a><span aria-hidden="true">/</span><span aria-current="page">{title}</span>
+      </nav>
+      <span class="pb-dtype"><span class="pb-dot" aria-hidden="true"></span>{typeLine}</span>
+      <h1 class="pb-th1">{title}</h1>
+      <div class="pb-thero__tags">
+        {place ? <TagPair label={dateText} pill={place} /> : <Tag>{dateText}</Tag>}
+        {mode && <Tag>{modeLabel(mode)}</Tag>}
+      </div>
+    </div>
+    <div class="pb-thero__foot">
+      <LiveLine style="left: 0; right: 0; top: -1px" />
+      <Cross x="0" y="0" />
+      <Cross x="100%" y="0" />
+      {
+        start && cd ? (
+          <div data-countdown={start.toISOString()}>
+            <div class="pb-dcount" role="timer" aria-label={cd.aria} data-cd="aria">
+              <span class="n" aria-hidden="true" data-cd="days">{cd.days}</span>
+              <span class="pb-dcount__u" aria-hidden="true">
+                <span class="pb-dcount__l">días</span>
+                <span class="pb-dcount__h"><span data-cd="hours">{cd.hours}</span> h</span>
+              </span>
+            </div>
+          </div>
+        ) : (
+          timing.kind !== 'countdown' && <span class="pb-dstate">{timing.label}</span>
+        )
+      }
+      <div class="pb-thero__actions">
+        {registration && <Button variant="primary" href="#inscripcion">Inscribir a mi equipo</Button>}
+        <Button variant="secondary" href="/eventos/">Volver a eventos</Button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Sin [data-countdown] (pasado o por confirmar) la isla no hace nada.
+  import { initCountdown } from '../../scripts/countdown';
+  initCountdown();
+</script>

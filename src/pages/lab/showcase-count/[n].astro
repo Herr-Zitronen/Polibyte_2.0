@@ -1,0 +1,21 @@
+---
+// Laboratorio PR B: vitrina con 1 o 2 destacados (nunca media columna vacía). Reloj fijo de recap-fixtures.
+import Showcase from '../../../components/events/Showcase.astro';
+import Base from '../../../layouts/Base.astro';
+import { RECAP_NOW, recapEvents } from '../../../lib/recap-fixtures';
+import { latestShowcase } from '../../../lib/showcase';
+import { showcaseProjects } from '../../../lib/showcase-fixtures';
+
+export function getStaticPaths() {
+  return [{ params: { n: '1' } }, { params: { n: '2' } }];
+}
+
+const n = Number(Astro.params.n);
+// Solo los n primeros son destacados; el resto pasa a filas.
+const projects = showcaseProjects.map((p, i) => ({ ...p, featured: i < n }));
+const s = latestShowcase(recapEvents, projects, RECAP_NOW);
+---
+
+<Base title={`Laboratorio · Vitrina con ${n} destacado(s)`} noindex header={false}>
+  <main>{s && <Showcase eventTitle={s.event.title} layout={s.layout} />}</main>
+</Base>

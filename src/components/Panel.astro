@@ -1,0 +1,37 @@
+---
+// Panel con efectos (DESIGN §3.5): A dibujo del borde, B pulso, C luz que sigue al cursor.
+// Los efectos (scripts/fx.ts) los arranca Base.astro una sola vez por página.
+import Cross from './Cross.astro';
+import '../styles/fx.css';
+
+interface Props {
+  as?: 'div' | 'article' | 'section' | 'aside';
+  draw?: boolean;
+  pulse?: boolean;
+  /** Pulso solo mientras hay hover (tarjetas de directiva). */
+  hoverPulse?: boolean;
+  class?: string;
+  id?: string;
+}
+const { as: Tag = 'div', draw = false, pulse = false, hoverPulse = false, class: cls, id } = Astro.props;
+const crosses = draw || pulse;
+---
+
+<Tag id={id} class:list={['pb-fx', draw && 'pb-draw', (pulse || hoverPulse) && 'pb-pulse', hoverPulse && 'pb-hp', cls]} data-fx>
+  <span class="pb-glow" aria-hidden="true"><span></span></span>
+  <span class="pb-fxl" aria-hidden="true">
+    <span class="pb-e t"></span><span class="pb-e r"></span><span class="pb-e b"></span><span class="pb-e l"></span>
+    {
+      crosses && (
+        <>
+          <Cross x="0" y="0" n={1} />
+          <Cross x="100%" y="0" n={2} />
+          <Cross x="100%" y="100%" n={3} />
+          <Cross x="0" y="100%" n={4} />
+        </>
+      )
+    }
+  </span>
+  <span class="pb-edge" aria-hidden="true"></span>
+  <div class="pb-fxc"><slot /></div>
+</Tag>

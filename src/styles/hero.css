@@ -1,0 +1,566 @@
+/* Portada de Inicio (DESIGN §4). Estado por defecto = estado final visible; el scroll solo añade movimiento. */
+.pb-hero-s {
+  /* Altura del hero: los rangos de las animaciones de scroll se escalan con ella (no px fijos de escritorio). */
+  --pb-hero-h: 960px;
+  display: flow-root;
+  position: relative;
+  overflow: clip;
+  color: var(--pb-white);
+}
+
+.pb-hero {
+  position: relative;
+  min-height: var(--pb-hero-h);
+  max-width: var(--pb-container);
+  margin: 64px auto 0;
+}
+
+.pb-hero__lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* F7 (WOR-93): el marco sigue al cursor en sentido contrario (fx.ts escribe el transform, ±8/±6 px).
+   La transición larga suaviza el movimiento: un solo transform por cuadro, sin JS por cuadro de animación. */
+.pb-mouse {
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* perf/fluidez-real: sin will-change ligado al cursor (creaba y destruía la capa mientras el contenido pasaba
+   bajo el puntero). El translate3d en línea de fx.ts ya mantiene la capa. */
+
+.pb-tlg,
+.pb-trg,
+.pb-blg,
+.pb-brg {
+  position: absolute;
+  width: 45%;
+  height: 170px;
+}
+
+.pb-tlg {
+  top: 0;
+  left: 0;
+}
+
+.pb-trg {
+  top: 0;
+  right: 0;
+}
+
+.pb-blg {
+  bottom: 0;
+  left: 0;
+}
+
+.pb-brg {
+  right: 0;
+  bottom: 0;
+}
+
+/* Líneas verticales cortas del centro. Viven dentro de .pb-tlg / .pb-blg (45 % del marco) y viajan con su
+   animación de scroll; 100 % × 10/9 del grupo = 50 % del marco, justo donde estaban como elementos sueltos.
+   perf/scroll-fino: antes eran elementos aparte con la misma animación (2 animaciones y 2 capas de más). */
+.pb-cvl {
+  position: absolute;
+  left: calc(100% * 10 / 9);
+  width: 1.5px;
+}
+
+.pb-flg,
+.pb-frg {
+  position: absolute;
+  top: 168px;
+  bottom: 168px;
+  width: 7%;
+}
+
+.pb-flg {
+  left: 18%;
+}
+
+.pb-frg {
+  right: 18%;
+}
+
+.pb-line,
+.pb-vline {
+  background: rgba(242, 244, 250, 0.6);
+}
+
+.pb-line {
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: pb-line 1.3s cubic-bezier(0.7, 0, 0.2, 1) 0.15s forwards;
+}
+
+.pb-line.r {
+  transform-origin: right;
+}
+
+.pb-vline {
+  transform: scaleY(0);
+  transform-origin: top;
+  animation: pb-vline 1.1s cubic-bezier(0.7, 0, 0.2, 1) 0.5s forwards;
+}
+
+.pb-flow {
+  overflow: clip;
+}
+
+.pb-flow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 22%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff, rgba(255, 255, 255, 0));
+  transform: translateX(-100%);
+  animation: pb-sweep 5.5s linear 1.4s infinite;
+}
+
+.pb-line.r.pb-flow::after {
+  animation-name: pb-sweep-r;
+}
+
+.pb-node {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  margin: -4px 0 0 -4px;
+  background: #fff;
+  opacity: 0;
+  /* Una sola animación (aparecer + parpadear): dos sobre el mismo elemento impiden que vaya al compositor. */
+  animation: pb-node 2.4s steps(1) 1.3s infinite backwards;
+}
+
+.pb-box {
+  position: absolute;
+  inset: 168px 18%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 56px 32px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.pb-h1w {
+  position: relative;
+  isolation: isolate;
+}
+
+.pb-h1 {
+  margin: 0;
+  font-size: clamp(40px, 6.2vw, 96px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.06em;
+}
+
+/* WOR-101: la sombra grande vive en una copia detrás del titular y aparece por opacidad al terminar el
+   decodificado. Antes se encendía text-shadow en el h1 y se repintaba el titular entero. */
+.pb-h1-shadow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  color: transparent;
+  text-shadow: 0 2px 40px rgba(15, 26, 77, 0.35);
+  /* 0.01 y no 0: Chrome toma como LCP nuevo a un elemento que pasa de opacidad 0 a visible. Con 0 la sombra
+     (palabras enteras, más grandes que cada letra del carrete) era el LCP al terminar el decodificado
+     (~2,3 s con CPU ×4). Con 0.01 se pinta junto al titular y no se nota (sombra al 0,35 % de opacidad). */
+  opacity: 0.01;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+  user-select: none;
+}
+
+.pb-h1[data-decoded] + .pb-h1-shadow {
+  opacity: 1;
+}
+
+.pb-word {
+  display: inline-block;
+  overflow: clip;
+  margin: -0.2em 0 -0.14em;
+  padding: 0.2em 0.02em 0.14em;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.pb-ch {
+  display: inline-block;
+  transform: translateY(112%);
+  animation: pb-ch 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* WOR-101: carrete de glifos encima de cada letra. .pb-ci baja n pasos de 1.5em y sube uno por cuadro
+   (transform + steps, en el compositor); al final queda la letra real, que nunca se reescribe.
+   El carrete empieza 0.25em por encima de la letra: así el glifo de al lado nunca asoma por la ranura. */
+.pb-ci {
+  position: relative;
+  display: inline-block;
+  animation: pb-spin linear both;
+  animation-timing-function: steps(var(--n), end);
+}
+
+.pb-reel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.25em);
+  left: 0;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+[data-decoded] .pb-ci {
+  animation: none;
+}
+
+[data-decoded] .pb-reel {
+  display: none;
+}
+
+/* F10 (WOR-96): hover por letra. El prototipo cambiaba font-weight (recalcula el ancho de la palabra y
+   repinta); aquí una copia clara de la letra aparece por opacidad y la letra sube 2 px. Solo transform y opacity. */
+.pb-ci::after {
+  content: attr(data-c);
+  position: absolute;
+  inset: 0;
+  color: var(--pb-code);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.pb-h1[data-decoded] .pb-ci {
+  transition: transform 0.35s var(--pb-ease-out);
+}
+
+/* F4: si el respaldo fijó el titular (data-settled), las letras quedan en su sitio aunque la animación no haya terminado. */
+[data-settled] .pb-ch,
+[data-settled] .pb-ci {
+  transform: none;
+  animation: none;
+}
+
+.pb-sub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  opacity: 0;
+  animation: pb-up 1s cubic-bezier(0.16, 1, 0.3, 1) 1.5s forwards;
+}
+
+.pb-sub p {
+  max-width: 460px;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  text-shadow: 0 1px 12px rgba(15, 26, 77, 0.4);
+}
+
+.pb-sub .pb-actions {
+  justify-content: center;
+}
+
+@keyframes pb-line {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes pb-vline {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes pb-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(460%);
+  }
+}
+
+@keyframes pb-sweep-r {
+  from {
+    transform: translateX(460%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes pb-node {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes pb-spin {
+  from {
+    transform: translateY(calc(var(--n) * 1.5em));
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes pb-ch {
+  to {
+    transform: none;
+  }
+}
+
+@keyframes pb-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pb-hero-out {
+  to {
+    opacity: 0;
+    transform: translateY(-120px) scale(0.92);
+  }
+}
+
+@keyframes pb-split-tl {
+  to {
+    transform: translate3d(-22vw, -160px, 0);
+  }
+}
+
+@keyframes pb-split-tr {
+  to {
+    transform: translate3d(22vw, -160px, 0);
+  }
+}
+
+@keyframes pb-split-bl {
+  to {
+    transform: translate3d(-26vw, 0, 0);
+  }
+}
+
+@keyframes pb-split-br {
+  to {
+    transform: translate3d(26vw, 0, 0);
+  }
+}
+
+@keyframes pb-frame-l {
+  to {
+    opacity: 0.2;
+    transform: translate3d(-12vw, 0, 0);
+  }
+}
+
+@keyframes pb-frame-r {
+  to {
+    opacity: 0.2;
+    transform: translate3d(12vw, 0, 0);
+  }
+}
+
+/* Reglas separadas: el minificador no puede fundir animation-timeline en el shorthand. */
+@supports (animation-timeline: scroll()) {
+  .pb-hx {
+    animation: pb-hero-out linear both;
+  }
+
+  .pb-tlg {
+    animation: pb-split-tl linear both;
+  }
+
+  .pb-trg {
+    animation: pb-split-tr linear both;
+  }
+
+  .pb-blg {
+    animation: pb-split-bl linear both;
+  }
+
+  .pb-brg {
+    animation: pb-split-br linear both;
+  }
+
+  .pb-flg {
+    animation: pb-frame-l linear both;
+  }
+
+  .pb-frg {
+    animation: pb-frame-r linear both;
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .pb-hx,
+  .pb-tlg,
+  .pb-trg,
+  .pb-blg,
+  .pb-brg,
+  .pb-flg,
+  .pb-frg {
+    animation-timeline: scroll(root);
+  }
+
+  /* Proporciones de los rangos originales sobre 960 px (120–760, 0–900, 60–820). */
+  .pb-hx {
+    animation-range: calc(var(--pb-hero-h) * 0.125) calc(var(--pb-hero-h) * 0.79);
+  }
+
+  .pb-tlg,
+  .pb-trg,
+  .pb-blg,
+  .pb-brg {
+    animation-range: 0px calc(var(--pb-hero-h) * 0.9375);
+  }
+
+  .pb-flg,
+  .pb-frg {
+    animation-range: calc(var(--pb-hero-h) * 0.0625) calc(var(--pb-hero-h) * 0.854);
+  }
+}
+
+/* Hero lejos de la pantalla (fx.ts marca .is-off con medio viewport de margen): no se oculta nada ni se
+   sueltan las animaciones de scroll. perf/fluidez-real: ocultar el marco con visibility hacía que las líneas
+   aparecieran tarde al volver rápido. Solo se pausan los barridos y nodos infinitos (más abajo). */
+
+/* perf/fluidez-real: terminada la entrada (decode.ts pone data-drawn), las animaciones forwards se sueltan.
+   Misma imagen, pero sin mantener vivas las animaciones ni sus capas durante todo el scroll. */
+.pb-hero[data-drawn] .pb-line,
+.pb-hero[data-drawn] .pb-vline,
+.pb-hero[data-drawn] .pb-ch {
+  transform: none;
+  animation: none;
+}
+
+.pb-hero[data-drawn] .pb-sub {
+  opacity: 1;
+  animation: none;
+}
+
+@media (max-width: 820px) {
+  /* PR B: altura según la pantalla, acotada: el panel del próximo evento queda cerca de la primera pantalla.
+     lvh y no svh: con la barra flotante de Safari, svh termina la portada encima de la barra y debajo asomaba
+     la sección siguiente como un bloque oscuro. Con lvh el nevado llega al borde y se ve a través de la barra. */
+  .pb-hero-s {
+    --pb-hero-h: clamp(700px, calc(100lvh - 64px), 860px);
+  }
+
+  .pb-flg {
+    left: 16px;
+  }
+
+  .pb-frg {
+    right: 16px;
+  }
+
+  /* La caja define su alto y empuja al marco: en un celular el titular, el subtítulo y los dos botones apilados
+     no caben en el hueco fijo entre líneas (alto − 2 × 168 px) y, centrados, se salían encima de ellas. Los grupos
+     de líneas están anclados arriba y abajo de .pb-hero, así que rodean al contenido sea cual sea su alto. */
+  /* flow-root: sin él, el margen de 168 px de la caja (primer hijo en flujo) colapsaba hacia afuera y bajaba la
+     portada entera en vez de separar el texto de las líneas. */
+  .pb-hero {
+    display: flow-root;
+  }
+
+  .pb-box {
+    position: relative;
+    inset: auto;
+    /* Arriba la línea interior está a 168 px; abajo, el grupo mide 170: 172 deja el mismo aire a los dos lados. */
+    min-height: calc(var(--pb-hero-h) - 340px);
+    margin: 168px 16px 172px;
+    gap: 24px;
+    padding: 12px 10px;
+  }
+
+  .pb-h1 {
+    font-size: 34px;
+  }
+}
+
+@media (hover: hover) {
+  .pb-h1[data-decoded] .pb-ch:hover .pb-ci {
+    transform: translateY(-2px);
+  }
+
+  .pb-h1[data-decoded] .pb-ch:hover .pb-ci::after {
+    opacity: 1;
+  }
+}
+
+/* F5: barridos y pulsos infinitos esperan a que el titular termine y se pausan fuera de pantalla (fx.ts). */
+@media (prefers-reduced-motion: no-preference) {
+  .pb-hero:not(:has([data-decoded])) .pb-flow::after,
+  .pb-hero:not(:has([data-decoded])) .pb-node,
+  .pb-hero.is-off .pb-flow::after,
+  .pb-hero.is-off .pb-node {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-line,
+  .pb-vline,
+  .pb-ch,
+  .pb-ci,
+  .pb-hx,
+  .pb-tlg,
+  .pb-trg,
+  .pb-blg,
+  .pb-brg,
+  .pb-flg,
+  .pb-frg {
+    transform: none;
+    animation: none;
+  }
+
+  .pb-node,
+  .pb-sub {
+    opacity: 1;
+    animation: none;
+  }
+
+  .pb-flow::after {
+    animation: none;
+  }
+
+  .pb-reel {
+    display: none;
+  }
+
+  .pb-h1-shadow {
+    opacity: 1;
+    transition: none;
+  }
+
+  .pb-mouse,
+  .pb-ci::after {
+    transition: none;
+  }
+
+  .pb-h1[data-decoded] .pb-ch:hover .pb-ci {
+    transform: none;
+  }
+}

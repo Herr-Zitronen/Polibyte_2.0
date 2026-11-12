@@ -1,0 +1,30 @@
+---
+// 404 (H9.2, design/NoEncontrado.dc.html). Cloudflare la sirve con estado 404 gracias a
+// `not_found_handling: "404-page"` en wrangler.jsonc.
+import Base from '../layouts/Base.astro';
+import { pageTitle } from '../lib/page-title';
+import Button from '../components/Button.astro';
+import GlassBackground from '../components/GlassBackground.astro';
+import PixelStrip from '../components/PixelStrip.astro';
+import { EDGE } from '../lib/pixel-strip';
+import '../styles/not-found.css';
+---
+
+<Base title={pageTitle('Página no encontrada')} description="Esta página no existe." noindex cover="hero">
+  <main>
+    <section id="top" class="pb-glass pb-nf" data-bg>
+      <GlassBackground image="hero" parallax="root" />
+      <div class="pb-content pb-container pb-nf__in">
+        <div class="pb-404" aria-hidden="true">404</div>
+        <span class="pb-nf__bin" aria-hidden="true">110010100</span>
+        <h1 class="pb-nf__h1">Esta página no existe.</h1>
+        <p class="pb-nf__p">Puede que el enlace esté roto o que el contenido ya no esté publicado.</p>
+        <div class="pb-nf__actions">
+          <Button variant="primary" href="/">Volver al inicio</Button>
+          <Button variant="secondary" href="/eventos/">Ver eventos</Button>
+        </div>
+      </div>
+    </section>
+    <PixelStrip seed={191} top={EDGE.cover} bottom={EDGE.footer} />
+  </main>
+</Base>

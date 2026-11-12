@@ -1,0 +1,148 @@
+---
+import Fonts from '../components/Fonts.astro';
+import Header from '../components/Header.astro';
+import MobileMenu from '../components/MobileMenu.astro';
+import Footer from '../components/Footer.astro';
+import Seo from '../components/Seo.astro';
+import Intro from '../components/Intro.astro';
+import { INTRO } from '../lib/intro';
+import { assertContentIntegrity } from '../content/integrity';
+import '../styles/global.css';
+import '../styles/glass.css';
+import '../styles/transitions.css';
+// `?url` pasa por el mismo pipeline de Vite que los `url()` del CSS: misma ruta con hash, sin doble descarga.
+import heroBg from '../assets/backgrounds/chimborazo-hero.webp?url';
+import joinBg from '../assets/backgrounds/chimborazo-join.webp?url';
+import recapBg from '../assets/backgrounds/chimborazo-recap.webp?url';
+
+const COVERS = { hero: heroBg, join: joinBg, recap: recapBg } as const;
+
+interface Props {
+  title: string;
+  /** Fondo de la portada de la página: se precarga para que no aparezca a media transición. */
+  cover?: keyof typeof COVERS;
+  description?: string;
+  noindex?: boolean;
+  /** Las páginas de laboratorio lo apagan para que sus capturas no dependan de la barra. */
+  header?: boolean;
+  /** Pantalla de entrada (solo Inicio): una vez por visita, ver Intro.astro. */
+  intro?: boolean;
+}
+
+await assertContentIntegrity();
+
+const { title, cover, description = 'PoliByte · Club de la Carrera de Software (ESPOCH)', noindex = false, header = true, intro = false } = Astro.props;
+// Prerender de la página siguiente (Chromium): la transición arranca con ella ya renderizada. Fuera /lab/.
+// perf/fluidez-real: 'conservative' pre-renderiza al pulsar el enlace, no al dejar el cursor encima (con
+// 'moderate' se pre-renderizaba una página entera en mitad del scroll si el puntero caía sobre un enlace).
+// Además, 'prefetch' con 'moderate': al dejar el cursor 200 ms sobre un enlace solo se descarga su HTML (unos
+// 20 KB), sin renderizar nada: no toca CPU ni GPU de esta página y al pulsar el prerender ya lo tiene en mano.
+const INTERNAL = { and: [{ href_matches: '/*' }, { not: { href_matches: '/lab/*' } }] };
+const speculation = JSON.stringify({
+  prefetch: [{ where: INTERNAL, eagerness: 'moderate' }],
+  prerender: [{ where: INTERNAL, eagerness: 'conservative' }],
+});
+---
+
+<!doctype html>
+<html lang="es" data-intro={intro ? '' : undefined}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Seo title={title} description={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <Fonts />
+    {cover && <link rel="preload" as="image" href={COVERS[cover]} />}
+    {header && <script type="speculationrules" is:inline set:html={speculation} />}
+    {/* F12: una página pre-renderizada no corre sus animaciones de entrada hasta que se muestra. */}
+    <script is:inline>
+      if (document.prerendering) {
+        document.documentElement.classList.add('pb-prerender');
+        document.addEventListener('prerenderingchange', () => document.documentElement.classList.remove('pb-prerender'), { once: true });
+      }
+      // PR C: si se llega por una transición de vista, la barra no repite su entrada (sigue quieta en pantalla).
+      addEventListener('pagereveal', (e) => {
+        if (e.viewTransition) document.documentElement.classList.add('pb-vt-nav');
+      });
+    </script>
+    {/* Pantalla de entrada (Intro.astro). Aquí, en <head> y en línea, para decidir antes del primer pintado.
+         Una vez por visita (sessionStorage; cualquier página la da por vista), nunca con movimiento reducido
+         ni en una página pre-renderizada. Sale cuando fuentes y carga están listas, entre minMs y capMs,
+         o al primer clic o tecla. Al terminar se elimina del DOM y avisa con pb:intro-done. */}
+    <script is:inline define:vars={{ INTRO }}>
+      (() => {
+        const root = document.documentElement;
+        let first = false;
+        try {
+          first = !sessionStorage.getItem('pb-intro');
+          sessionStorage.setItem('pb-intro', '1');
+        } catch {
+          /* sin almacenamiento: sin entrada */
+        }
+        if (!first || !root.hasAttribute('data-intro') || document.prerendering) return;
+        // Navegador automatizado (Playwright): sin entrada, para que las E2E midan la página de siempre.
+        // La prueba de la propia entrada la fuerza con ?intro (e2e/intro.spec.ts). Lighthouse sí la ve.
+        if (navigator.webdriver && !new URLSearchParams(location.search).has('intro')) return;
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        root.classList.add('pb-intro-on');
+        const t0 = performance.now();
+        let timer = 0;
+        let ended = false;
+        let finished = false;
+        const finish = () => {
+          if (finished) return;
+          finished = true;
+          document.querySelector('.pb-intro')?.remove();
+          root.classList.remove('pb-intro-on');
+          dispatchEvent(new Event('pb:intro-done'));
+        };
+        const end = () => {
+          if (ended) return;
+          ended = true;
+          clearTimeout(timer);
+          removeEventListener('pointerdown', end);
+          removeEventListener('keydown', end);
+          const el = document.querySelector('.pb-intro');
+          if (!el) return finish();
+          el.classList.add('is-out');
+          el.addEventListener('animationend', (e) => e.target === el && finish());
+          setTimeout(finish, INTRO.exitMs + 150);
+        };
+        const endAt = (ms) => {
+          clearTimeout(timer);
+          timer = setTimeout(end, Math.max(0, ms - (performance.now() - t0)));
+        };
+        endAt(INTRO.capMs);
+        addEventListener('pointerdown', end);
+        addEventListener('keydown', end);
+        const loaded = new Promise((r) => (document.readyState === 'complete' ? r() : addEventListener('load', r, { once: true })));
+        Promise.all([loaded, document.fonts ? document.fonts.ready : null]).then(() => {
+          if (!ended) endAt(Math.min(INTRO.capMs, Math.max(INTRO.minMs, performance.now() - t0)));
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    {intro && <Intro />}
+    {
+      header && (
+        <Header>
+          <slot name="chip" slot="chip" />
+        </Header>
+      )
+    }
+    {header && <MobileMenu />}
+    <slot />
+    {header && <Footer />}
+    {/* F12: UNA capa de grano fija para toda la página (antes una por sección). */}
+    <div class="pb-grain pb-grain--page" aria-hidden="true"></div>
+    <script>
+      import { initFx } from '../scripts/fx';
+      import { initLenis } from '../scripts/lenis';
+      initFx();
+      initLenis();
+      // Panel de diagnóstico de fluidez: solo con ?diag (docs/SESSIONS.md). Nadie más descarga nada.
+      if (new URLSearchParams(location.search).has('diag')) void import('../scripts/diag').then((m) => m.initDiag());
+    </script>
+  </body>
+</html>

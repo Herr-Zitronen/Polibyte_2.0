@@ -1,0 +1,38 @@
+---
+// Metadatos por página (H9.1): título, descripción, canónica, Open Graph, Twitter, favicons y manifiesto.
+import { ogPages } from '../lib/og-pages';
+import { absoluteUrl, ogImagePath } from '../lib/seo';
+
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+// `site` viene de astro.config (dominio definitivo pendiente: ver WOR-85).
+const site = Astro.site ?? Astro.url;
+const known = (await ogPages()).map((p) => p.slug);
+const canonical = absoluteUrl(Astro.url.pathname, site);
+const image = absoluteUrl(ogImagePath(Astro.url.pathname, known), site);
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="es_EC" />
+<meta property="og:site_name" content="PoliByte" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={image} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={image} />
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#1A2C78" />

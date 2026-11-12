@@ -1,0 +1,14 @@
+---
+// Laboratorio: Inicio sin próximo evento (el panel no debe renderizarse).
+import NextEvent from '../../components/home/NextEvent.astro';
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="Laboratorio · Sin próximo evento" noindex header={false}>
+  <main>
+    <section class="pb-section">
+      <NextEvent event={undefined} />
+      <p class="pb-container">Sin eventos próximos.</p>
+    </section>
+  </main>
+</Base>

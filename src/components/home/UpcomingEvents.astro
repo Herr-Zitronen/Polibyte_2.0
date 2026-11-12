@@ -1,0 +1,114 @@
+---
+// "Próximos eventos" en Inicio (DESIGN §3.6). Filas como <button aria-pressed>: el teclado
+// funciona sin código extra. El detalle de la izquierda vive en un contenedor aria-live; sin JS
+// se ve el primero. La isla event-picker.ts solo cambia la selección y mueve la luz del cursor.
+import type { UpcomingRow } from '../../lib/upcoming';
+import Button from '../Button.astro';
+import SectionChip from '../SectionChip.astro';
+import Status from '../Status.astro';
+import '../../styles/fx.css';
+import '../../styles/glass.css';
+import '../../styles/tags.css';
+import '../../styles/upcoming.css';
+
+interface Props {
+  rows: UpcomingRow[];
+}
+
+const { rows } = Astro.props;
+const total = String(rows.length).padStart(2, '0');
+// PR B: si ningún evento tiene fecha todavía, el CTA no invita a inscribirse a algo sin fecha.
+const onlyTbd = rows.length > 0 && rows.every((r) => r.status === 'tbd');
+const cta = onlyTbd
+  ? { t: 'Aún sin fechas confirmadas', s: 'Únete al club y te avisamos en cuanto se confirmen.', b: 'Unirme al club' }
+  : { t: 'Inscribe a tu equipo', s: 'Te ayudamos a armar equipo para la próxima competencia.', b: 'Quiero inscribirme' };
+const ISO = 'M0 0H180V184H0Z M736 0H913V184H736Z M0 269H433V410L258 411V1120H433V1264H0Z M483 269H913V1264H483V1120H659V411L483 410Z M330 847V621Q330 611 340 611H573Q583 611 583 621V847Z';
+const layers = [-84, -70, -56, -42, -28, -14, 0];
+---
+
+{
+  rows.length > 0 && (
+    <section id="calendario" class="pb-cal" data-event-picker>
+      <div class="pb-cal-bg" aria-hidden="true" />
+      <div class="pb-container pb-cal-in">
+        <div class="pb-cal-head">
+          <span class="pb-hl" aria-hidden="true" />
+          <div class="pb-cal-title">
+            <SectionChip />
+            <h2>Próximos eventos</h2>
+          </div>
+          <Button variant="secondary" size="sm" href="/eventos/#calendario">Calendario completo</Button>
+        </div>
+        <div class="pb-calgrid">
+          <span class="pb-vl dk" aria-hidden="true" />
+          <aside class="pb-aside" aria-live="polite">
+            <div class="pb-isowrap" aria-hidden="true">
+              <div class="pb-iso">
+                {layers.map((z) => (
+                  <svg viewBox="0 0 913 1264" style={`transform: translateZ(${z}px)`}>
+                    <path d={ISO} class={z === 0 ? 'front' : z === -84 ? 'back' : 'mid'} vector-effect="non-scaling-stroke" />
+                  </svg>
+                ))}
+              </div>
+            </div>
+            {rows.map((r, i) => (
+              <div class="pb-detail" data-detail={r.id} hidden={i !== 0}>
+                <span class="pb-dnum">
+                  evento {r.num} de {total}
+                </span>
+                <span class="pb-dname">{r.title}</span>
+                <span class="pb-tag">{r.typeLine}</span>
+                <p class="pb-dsum">{r.summary}</p>
+                <div class="pb-dcount">
+                  <span class="pb-dbig">{r.big}</span>
+                  <span>{r.small}</span>
+                </div>
+                <div>
+                  <Button variant="secondary" size="sm" href={`/eventos/${r.id}/`}>
+                    Ver detalles
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </aside>
+          <div class="pb-calR">
+            <p class="pb-cal-quote">Un ciclo para construir en serio: competimos fuera, enseñamos dentro y nos juntamos siempre.</p>
+            <div class="pb-rows">
+              <span class="pb-hl top" aria-hidden="true" />
+              {rows.map((r, i) => (
+                <button type="button" class:list={['pb-row', { sel: i === 0 }]} aria-pressed={i === 0 ? 'true' : 'false'} data-pick={r.id}>
+                  <span class="pb-glow" aria-hidden="true">
+                    <span />
+                  </span>
+                  <span class="pb-num">{r.num}</span>
+                  <span class="pb-name">
+                    <span class="pb-rname">{r.title}</span>
+                    <span class="pb-type">{r.typeLine}</span>
+                    <span class="pb-mdate">{r.date}</span>
+                  </span>
+                  <span class="pb-ddate" aria-hidden="true">
+                    {r.date}
+                  </span>
+                  <Status status={r.status} dot={r.isNext} />
+                </button>
+              ))}
+            </div>
+            <div class="pb-cal-cta">
+              <span class="pb-cta-t">{cta.t}</span>
+              <span class="pb-cta-s">{cta.s}</span>
+              <div class="pb-cta-b">
+                <Button variant="primary" href="/unirme/">{cta.b}</Button>
+                <Button variant="secondary" href="/eventos/#calendario">Calendario completo</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<script>
+  import { initEventPicker } from '../../scripts/event-picker';
+  initEventPicker();
+</script>

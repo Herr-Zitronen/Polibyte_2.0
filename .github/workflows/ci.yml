@@ -1,0 +1,109 @@
+# CI de PoliByte (ver docs/DEPLOY.md). Solo prueba; no despliega.
+# - push a feat/**, perf/**, fix/**, docs/**, chore/**: solo el job rápido (tipos + lint + Vitest, ~1-2 min).
+# - pull_request hacia staging/main: suite completa (build, Lighthouse, Playwright + axe). Sin paths-ignore:
+#   la protección de ramas exige estos checks, y un PR sin corrida quedaría bloqueado.
+# - push a staging/main: suite completa otra vez, sobre el resultado de la fusión.
+# El despliegue lo hace Workers Builds de Cloudflare al recibir el push (main → producción, demás ramas → preview).
+# El diagnóstico de fluidez vive aparte, en perf-diag.yml (manual).
+name: CI
+
+on:
+  push:
+    branches: ['feat/**', 'perf/**', 'fix/**', 'docs/**', 'chore/**', 'staging', 'main']
+    paths-ignore: ['**/*.md', 'docs/**', 'design/**', 'e2e/**/*-snapshots/**']
+  pull_request:
+    branches: ['staging', 'main']
+
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quick:
+    name: Rápido (tipos + lint + Vitest)
+    if: github.event_name == 'push' && github.ref != 'refs/heads/staging' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .node-version, cache: npm }
+      - run: npm ci
+      - run: npm run check:types
+      - run: npm run lint
+      - run: npm run test
+
+  # L1 (WOR-85): hacia main, el contenido de ejemplo bloquea. Job propio porque la protección de main lo exige
+  # por nombre: una corrida de push a staging (mismo commit) no lo trae y no puede abrir la puerta a producción.
+  content:
+    name: Contenido real (hacia main)
+    if: github.base_ref == 'main' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .node-version, cache: npm }
+      - run: npm ci
+      - run: npx vitest run tests/content-ready.test.ts
+        env:
+          CONTENT_READY: '1'
+
+  # Un solo job (un solo npm ci) para tipos, lint, Vitest, build y Lighthouse.
+  verify:
+    name: Tipos + lint + Vitest + build + Lighthouse
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .node-version, cache: npm }
+      - run: npm ci
+      - run: npm run check:types
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+      - name: Presupuesto de JS por página (< 20 KB) y fuentes del build
+        run: npx vitest run tests/js-budget.test.ts tests/dist-fonts.test.ts
+      - uses: actions/upload-artifact@v4
+        with: { name: dist, path: dist, retention-days: 7 }
+      - name: Lighthouse CI
+        run: npx --yes @lhci/cli@0.15.1 autorun
+
+  e2e:
+    name: Playwright (1440/1000/390) + axe
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .node-version, cache: npm }
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with: { name: dist, path: dist }
+      - id: pw
+        name: Versión de Playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - run: npm run e2e
+        env: { CI: 'true' }
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+            e2e/**/*-snapshots
+          retention-days: 14

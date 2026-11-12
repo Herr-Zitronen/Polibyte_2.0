@@ -1,0 +1,11 @@
+---
+import '../styles/tags.css';
+
+interface Props {
+  pill?: boolean;
+}
+
+const { pill = false } = Astro.props;
+---
+
+<span class:list={['pb-tag', { pill }]}><slot /></span>

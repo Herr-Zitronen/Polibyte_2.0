@@ -1,0 +1,25 @@
+---
+// Laboratorio de pruebas visuales (no enlazado, noindex).
+import Status from '../../components/Status.astro';
+import Tag from '../../components/Tag.astro';
+import TagPair from '../../components/TagPair.astro';
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="Laboratorio · Etiquetas" noindex header={false}>
+  <main>
+    <section class="pb-section">
+      <div class="pb-container">
+        <h1>Etiquetas y estados</h1>
+        <p><Tag>Del club</Tag> <Tag pill>IEEE CS</Tag></p>
+        <TagPair label="Competencia" pill="Microsoft" />
+        <p>
+          <Status status="upcoming" />
+          <Status status="past" />
+          <Status status="tbd" />
+          <Status status="past" dot />
+        </p>
+      </div>
+    </section>
+  </main>
+</Base>

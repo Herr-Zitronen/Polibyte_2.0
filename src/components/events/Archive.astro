@@ -1,0 +1,55 @@
+---
+// Archivo por año (DESIGN §5, design/Eventos.dc.html #archivo). Solo pinta: la lógica vive en lib/archive.ts.
+import type { ArchiveYear } from '../../lib/archive';
+import Button from '../Button.astro';
+import Cross from '../Cross.astro';
+import LiveLine from '../LiveLine.astro';
+import '../../styles/archive.css';
+
+interface Props {
+  years: ArchiveYear[];
+}
+
+const { years } = Astro.props;
+---
+
+{
+  years.length > 0 && (
+    <section id="archivo" class="pb-archive">
+      <div class="pb-archive__bg" aria-hidden="true" />
+      <div class="pb-container pb-archive__wrap">
+        <div class="pb-archive__bar">
+          <h2>Archivo</h2>
+          <p>Todo lo que ha hecho el club. Los eventos con proyectos publicados se pueden abrir.</p>
+        </div>
+        {years.map((y) => (
+          <div class="pb-year">
+            <LiveLine style="left: 0; right: 0; top: -1px" />
+            <h3 class="pb-yl">
+              <Cross x="100%" y="0" />
+              {y.year}
+            </h3>
+            <ul class="pb-arows">
+              {y.items.map((a) => (
+                <li class="pb-arow">
+                  <span class="pb-arow__date">{a.date}</span>
+                  <div class="pb-arow__name">
+                    <span class="pb-arow__title">{a.title}</span>
+                    <span class="pb-arow__type">{a.typeLine}</span>
+                  </div>
+                  {a.projectsHref ? (
+                    <Button variant="secondary" size="sm" href={a.projectsHref}>
+                      Ver proyectos
+                    </Button>
+                  ) : (
+                    <span class="pb-arow__done">Realizado</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}

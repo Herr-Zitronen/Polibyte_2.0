@@ -1,0 +1,12 @@
+---
+// Laboratorio H7.2: sin tutor → la sección no aparece.
+import Base from '../../layouts/Base.astro';
+import Board from '../../components/team/Board.astro';
+import Tutor from '../../components/team/Tutor.astro';
+
+const members = [{ role: 'Presidencia', name: 'María José Pérez' }];
+---
+
+<Base title="Laboratorio · Sin tutor" noindex header={false}>
+  <main><Board members={members} period="2026–2027" /><Tutor members={members} /></main>
+</Base>

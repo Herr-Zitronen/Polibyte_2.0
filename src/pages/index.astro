@@ -1,0 +1,36 @@
+---
+// Inicio: portada (H4.1), panel del próximo evento (H4.2) y Qué hacemos (H4.3). Próximos eventos (H4.4).
+import { getCollection } from 'astro:content';
+import HeaderChip from '../components/HeaderChip.astro';
+import JoinCta from '../components/home/JoinCta.astro';
+import Hero from '../components/home/Hero.astro';
+import NextEvent from '../components/home/NextEvent.astro';
+import UpcomingEvents from '../components/home/UpcomingEvents.astro';
+import WhatWeDo from '../components/home/WhatWeDo.astro';
+import PixelStrip from '../components/PixelStrip.astro';
+import Base from '../layouts/Base.astro';
+import { HOME_TITLE } from '../lib/page-title';
+import { nextEvent } from '../lib/events';
+import { EDGE } from '../lib/pixel-strip';
+import { upcomingRows } from '../lib/upcoming';
+
+const events = (await getCollection('events')).map((e) => ({ ...e.data, id: e.id }));
+const rows = upcomingRows(events, new Date());
+const next = nextEvent(events, new Date()) as ((typeof events)[number] & { date: Date }) | undefined;
+---
+
+<Base title={HOME_TITLE} cover="hero" intro>
+  {next && <HeaderChip slot="chip" title={next.title} date={next.date} time={next.time} />}
+  <main>
+    <Hero>
+      <NextEvent event={next} />
+    </Hero>
+    <PixelStrip seed={11} top={EDGE.cover} bottom={EDGE.paper} />
+    {/* PR B: sin próximos eventos, "Qué hacemos" empalma directo con el cierre (sin franja azul de más). */}
+    <WhatWeDo bottom={rows.length > 0 ? EDGE.navy : EDGE.image} />
+    <UpcomingEvents rows={rows} />
+    {rows.length > 0 && <PixelStrip seed={37} top={EDGE.navy} bottom={EDGE.image} />}
+    <JoinCta />
+    <PixelStrip seed={51} top={EDGE.cover} bottom={EDGE.footer} />
+  </main>
+</Base>

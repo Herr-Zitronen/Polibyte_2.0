@@ -1,0 +1,13 @@
+---
+// Laboratorio H5.1: sin eventos pasados → estado alternativo.
+import Recap from '../../components/events/Recap.astro';
+import Base from '../../layouts/Base.astro';
+import { recapView } from '../../lib/recap';
+import { RECAP_NOW, recapEvents } from '../../lib/recap-fixtures';
+
+const future = recapEvents.filter((e) => e.date > RECAP_NOW);
+---
+
+<Base title="Laboratorio · Sin eventos pasados" noindex header={false}>
+  <main><Recap view={recapView(future, [], RECAP_NOW)} /></main>
+</Base>

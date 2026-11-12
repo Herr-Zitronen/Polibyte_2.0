@@ -1,0 +1,128 @@
+/* Archivo por año (DESIGN §5, design/Eventos.dc.html #archivo). */
+.pb-archive {
+  position: relative;
+  display: flow-root;
+  background: linear-gradient(180deg, #22389c 0, #1a2b78 100%);
+  color: var(--pb-white);
+}
+
+.pb-archive__bg {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  pointer-events: none;
+}
+
+.pb-archive__wrap {
+  position: relative;
+  padding-top: 120px;
+  padding-bottom: 140px;
+}
+
+.pb-archive__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 56px;
+}
+
+.pb-archive__bar h2 {
+  margin: 0;
+  font-weight: 800;
+  font-size: clamp(44px, 7vw, 112px);
+  letter-spacing: -0.075em;
+  line-height: 0.95;
+}
+
+.pb-archive__bar p {
+  margin: 0;
+  max-width: 420px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.pb-year {
+  position: relative;
+  display: grid;
+  /* La columna crece con el ancho: Silkscreen a 60 px mide ~200 px y no cabía en 200 fijos. */
+  grid-template-columns: clamp(200px, 17vw, 260px) minmax(0, 1fr);
+  border-top: 1px solid rgba(242, 244, 250, 0.5);
+}
+
+.pb-yl {
+  position: relative;
+  margin: 0;
+  padding: 28px 24px 28px 0;
+  border-right: 1px solid rgba(242, 244, 250, 0.4);
+  font-family: var(--pb-font-pixel);
+  font-weight: 700;
+  font-size: clamp(36px, 4vw, 60px);
+  line-height: 0.85;
+}
+
+.pb-arows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pb-arow {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  padding: 22px 0 22px 28px;
+  border-bottom: 1px solid rgba(242, 244, 250, 0.22);
+}
+
+.pb-arow:last-child {
+  border-bottom: 0;
+}
+
+.pb-arow__date {
+  font-family: var(--pb-font-pixel);
+  font-size: 13px;
+}
+
+.pb-arow__name {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pb-arow__title {
+  font-weight: 700;
+  font-size: clamp(20px, 2.2vw, 28px);
+  letter-spacing: -0.05em;
+}
+
+.pb-arow__type {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.pb-arow__done {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* Punto de quiebre explícito: dos columnas se apilan, nunca se parten. */
+@media (max-width: 960px) {
+  .pb-year {
+    grid-template-columns: 1fr;
+  }
+
+  .pb-yl {
+    border-right: 0;
+    border-bottom: 1px solid rgba(242, 244, 250, 0.3);
+  }
+
+  .pb-arow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding-left: 0;
+  }
+}

@@ -1,0 +1,69 @@
+---
+// Pie de página (DESIGN §3.10): wordmark en tono sólido + linterna al pasar el mouse.
+import '../styles/glass.css';
+import '../styles/fx.css';
+import '../styles/footer.css';
+import site from '../content/site.json';
+import { footerLinks } from '../lib/footer-links';
+
+// Enlaces y periodo salen de src/content/site.json (docs/CONTENIDO.md): los vacíos no se muestran.
+const links = footerLinks(site.links);
+
+const wordmark = {
+  x: 0,
+  y: 235,
+  'font-family': "'Instrument Sans','Helvetica Neue',Arial,sans-serif",
+  'font-weight': 600,
+  'font-size': 270,
+  'letter-spacing': -16,
+};
+---
+
+<footer id="contacto" class="pb-foot">
+  <div class="pb-container pb-foot-in">
+    <div class="pb-foot-row">
+      <div class="pb-foot-id">
+        <span class="pb-foot-copy">© {site.period} {site.name} · {site.descriptor}</span>
+        <span class="pb-foot-org">ESPOCH · {site.institution}</span>
+        {/* WOR-105: la foto de los fondos es CC BY-SA 4.0 y la licencia pide el crédito donde se usa (CREDITS.md). */}
+        <span class="pb-foot-credit">
+          Foto del Chimborazo:
+          <a href="https://www.descubrecuador.com/item/volcan-chimborazo/" target="_blank" rel="noopener noreferrer">Go593</a>
+          ·
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer license">CC BY-SA 4.0</a>
+        </span>
+      </div>
+      {
+        links.length > 0 && (
+          <div class="pb-foot-links">
+            {links.map((l, i) => (
+              <>
+                {i > 0 && <span aria-hidden="true">·</span>}
+                <a href={l.href} {...(l.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                  {l.label}
+                </a>
+              </>
+            ))}
+          </div>
+        )
+      }
+    </div>
+    <div class="pb-foot-rule" aria-hidden="true"><span class="pb-x" style="left:0"></span><span class="pb-x" style="left:100%"></span></div>
+    <div class="pb-lamp" role="img" aria-label="PoliByte">
+      <svg class="pb-lamp__base" viewBox="0 0 1240 300" aria-hidden="true"><text {...wordmark} fill="#252D4F">PoliByte</text></svg>
+      <div class="lit" aria-hidden="true">
+        <svg viewBox="0 0 1240 300">
+          <defs>
+            <linearGradient id="pbLit" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#DCE3F5"></stop><stop offset="1" stop-color="#F2E0A0"></stop></linearGradient>
+          </defs>
+          <text {...wordmark} fill="url(#pbLit)">PoliByte</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  import { initLantern } from '../scripts/lantern';
+  initLantern();
+</script>

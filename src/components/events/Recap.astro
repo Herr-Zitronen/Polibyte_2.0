@@ -1,0 +1,68 @@
+---
+// Portada de Eventos: último evento concluido (DESIGN §5, design/Eventos.dc.html #recap).
+import type { RecapView } from '../../lib/recap';
+import { TIME_ZONE } from '../../lib/events';
+import Button from '../Button.astro';
+import GlassBackground from '../GlassBackground.astro';
+import Tag from '../Tag.astro';
+import TagPair from '../TagPair.astro';
+import '../../styles/recap.css';
+
+interface Props {
+  view: RecapView;
+}
+
+const { view } = Astro.props;
+const short = (d: Date) =>
+  new Intl.DateTimeFormat('es-EC', { timeZone: TIME_ZONE, day: 'numeric', month: 'short', year: 'numeric' })
+    .format(d)
+    .replace('.', '');
+---
+
+<section id="recap" class="pb-glass" data-bg>
+  <GlassBackground image="recap" parallax="root" />
+  <div class="pb-content pb-container pb-recap">
+    <div class="pb-recap__head">
+      {
+        view.kind === 'event' ? (
+          <>
+            <span class="pb-recap__eyebrow">
+              Último evento concluido<Tag>Realizado</Tag>
+            </span>
+            <h1 class="pb-rh1">{view.title}</h1>
+            <div class="pb-recap__tags">
+              {view.event.endDate ? (
+                <TagPair label={short(view.event.date)} pill={short(view.event.endDate)} />
+              ) : (
+                <Tag>{short(view.event.date)}</Tag>
+              )}
+              <Tag>{view.typeLine}</Tag>
+            </div>
+            <p class="pb-recap__text">{view.event.summary}</p>
+          </>
+        ) : (
+          <>
+            <h1 class="pb-rh1">{view.title}</h1>
+            <p class="pb-recap__text">{view.text}</p>
+          </>
+        )
+      }
+    </div>
+    {
+      view.kind === 'event' && view.stats.length > 0 && (
+        <div class="pb-stats" style={`--pb-cols: ${view.stats.length}`}>
+          {view.stats.map((s) => (
+            <div class="pb-stat">
+              <span class="pb-statn">{s.value}</span>
+              <span class="pb-statl">{s.label}</span>
+            </div>
+          ))}
+        </div>
+      )
+    }
+    <div class="pb-recap__actions">
+      <Button variant="primary" href={view.primary.href}>{view.primary.label}</Button>
+      {view.kind === 'event' && <Button variant="secondary" href="#archivo">Ver archivo</Button>}
+    </div>
+  </div>
+</section>

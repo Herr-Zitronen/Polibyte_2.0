@@ -1,0 +1,30 @@
+---
+// Detalle de evento (H6.1). Una página por evento en el build; slug inexistente → 404.
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import EventDetail from '../../components/event/EventDetail.astro';
+import Base from '../../layouts/Base.astro';
+import { pageTitle } from '../../lib/page-title';
+import { eventPaths } from '../../lib/event-detail';
+import { showcaseLayout } from '../../lib/showcase';
+
+export async function getStaticPaths() {
+  return eventPaths(await getCollection('events'));
+}
+
+interface Props {
+  entry: CollectionEntry<'events'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+// PR B: cada evento con vitrina publicada muestra sus proyectos en su detalle (#proyectos).
+const projects = (await getCollection('projects')).map((p) => ({ ...p.data, event: p.data.event.id }));
+const showcase = showcaseLayout({ id: entry.id, showcase: entry.data.showcase }, projects);
+---
+
+<Base title={pageTitle(entry.data.title, 'Eventos')} description={entry.data.summary} cover="recap">
+  <main>
+    <EventDetail event={entry.data} now={new Date()} showcase={showcase}><Content /></EventDetail>
+  </main>
+</Base>

@@ -1,0 +1,24 @@
+---
+// Fila de botones de un proyecto de la vitrina (DESIGN §5.2). Cada botón se activa por proyecto con su dato:
+// demoUrl → "Ver demo" (primario), repoUrl → "GitHub" (secundario, con icono). Sin ninguno, no hay fila.
+import Button from '../Button.astro';
+import GitHubIcon from '../GitHubIcon.astro';
+
+interface Props {
+  demoUrl?: string | undefined;
+  repoUrl?: string | undefined;
+  /** `sm` en tarjetas y filas; el panel grande usa el tamaño normal. */
+  size?: 'sm' | undefined;
+}
+
+const { demoUrl, repoUrl, size } = Astro.props;
+---
+
+{
+  (demoUrl || repoUrl) && (
+    <div class="pb-actions">
+      {demoUrl && <Button variant="primary" size={size} href={demoUrl} external>Ver demo</Button>}
+      {repoUrl && <Button variant="secondary" size={size} href={repoUrl} external><GitHubIcon slot="icon" />GitHub</Button>}
+    </div>
+  )
+}

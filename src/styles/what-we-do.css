@@ -1,0 +1,208 @@
+/* H4.3 · Qué hacemos + palabra "software" detrás de la franja (DESIGN §3.7). */
+.pb-wwd {
+  position: relative;
+  display: flow-root;
+  overflow-x: clip;
+  background: var(--pb-paper);
+  color: var(--pb-ink);
+  /* F12: bajo el pliegue, el navegador no la pinta hasta que se acerca. */
+}
+
+.pb-wwd-in {
+  position: relative;
+}
+
+.pb-wwd-cols {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.pb-qleft {
+  position: relative;
+  flex: 1 1 300px;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 160px 36px 40px 0;
+  box-sizing: border-box;
+  border-right: 1px solid var(--pb-ink);
+}
+
+.pb-qtitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.pb-qright {
+  flex: 999 1 560px;
+  min-width: 0;
+  padding: 160px 0 40px 36px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pb-big {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  flex-wrap: wrap;
+  text-decoration: none;
+  color: var(--pb-ink);
+  transition:
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.3s;
+}
+
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-big:hover {
+    transform: translateX(18px);
+  }
+}
+
+.pb-bigw {
+  font-weight: 800;
+  font-size: clamp(44px, 7vw, 112px);
+  letter-spacing: -0.075em;
+  line-height: 0.95;
+}
+
+.pb-hint {
+  font-size: 14px;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition:
+    opacity 0.35s,
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pb-big:focus-visible .pb-hint {
+  opacity: 1;
+  transform: none;
+}
+
+/* PR B: hover solo con cursor (en táctil se queda pegado tras tocar). */
+@media (hover: hover) {
+  .pb-big:hover .pb-hint {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.pb-qgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 32px 48px;
+  padding: 64px 0 120px;
+  border-top: 1px solid rgb(19 32 90 / 0.35);
+}
+
+.pb-qitem {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pb-qitem p {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+}
+
+.pb-qk {
+  font-family: Silkscreen, monospace;
+  font-size: 13px;
+  color: #2d4fc4;
+}
+
+/* Palabra fantasma: unida por defecto; la franja (z-index 2) la tapa por abajo. */
+.pb-gw {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  margin-bottom: -0.42em;
+  font-weight: 800;
+  font-size: clamp(60px, 19vw, 300px);
+  letter-spacing: -0.08em;
+  line-height: 1;
+  color: var(--pb-ghost);
+  white-space: nowrap;
+}
+
+.pb-gword {
+  position: relative;
+  display: inline-flex;
+}
+
+.pb-gdiv {
+  position: relative;
+  z-index: 2;
+}
+
+@keyframes pb-ghost-l {
+  from {
+    transform: translateX(-24vw);
+  }
+}
+
+@keyframes pb-ghost-r {
+  from {
+    transform: translateX(24vw);
+  }
+}
+
+/* Timeline en reglas aparte del shorthand (ver glass.css: el minificador los fusiona). */
+@supports (animation-timeline: view()) {
+  .pb-ghl {
+    animation: pb-ghost-l linear both;
+  }
+
+  .pb-ghr {
+    animation: pb-ghost-r linear both;
+  }
+
+  .pb-gword > span {
+    animation-timeline: view();
+    animation-range: cover 0% cover 40%;
+  }
+}
+
+@media (max-width: 960px) {
+  .pb-qleft {
+    border-right: 0;
+    justify-content: flex-start;
+    padding: 96px 0 16px;
+  }
+
+  .pb-qright {
+    padding: 0 0 40px;
+  }
+}
+
+@media (max-width: 820px) {
+  .pb-hint {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pb-ghl,
+  .pb-ghr {
+    animation: none;
+    transform: none;
+  }
+
+  .pb-big,
+  .pb-big:hover {
+    transition: none;
+    transform: none;
+  }
+}

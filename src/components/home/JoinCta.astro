@@ -1,0 +1,21 @@
+---
+// Cierre de Inicio antes del pie (design/Main.dc.html #unirme): panel con vidrio y llamada a unirse.
+import Button from '../Button.astro';
+import GlassBackground from '../GlassBackground.astro';
+import Panel from '../Panel.astro';
+import '../../styles/glass.css';
+import '../../styles/join-cta.css';
+---
+
+<section id="unirme" class="pb-glass pb-joincta" data-bg>
+  <GlassBackground image="join" parallax="view" fadeTo="var(--pb-blue-750)" fadeFrom="var(--pb-blue-700)" />
+  <div class="pb-content pb-container pb-joincta__in">
+    <Panel class="pb-joincta__panel" draw pulse>
+      <div class="pb-joincta__body">
+        <h2>Abierto a todos. Sin requisitos.</h2>
+        <p>Si quieres construir, competir o aprender con otros, ya eres parte. Llena el formulario y te sumamos al grupo.</p>
+        <Button variant="primary" href="/unirme/">Quiero unirme</Button>
+      </div>
+    </Panel>
+  </div>
+</section>

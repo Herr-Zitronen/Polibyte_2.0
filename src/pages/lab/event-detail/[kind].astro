@@ -1,0 +1,18 @@
+---
+// Laboratorio H6.1: detalle con reloj fijo (próximo, pasado y por confirmar).
+import EventDetail from '../../../components/event/EventDetail.astro';
+import Base from '../../../layouts/Base.astro';
+import { DETAIL_NOW, detailEvents } from '../../../lib/event-detail-fixtures';
+
+export function getStaticPaths() {
+  return Object.keys(detailEvents).map((kind) => ({ params: { kind } }));
+}
+
+const event = detailEvents[Astro.params.kind as keyof typeof detailEvents];
+---
+
+<Base title="Laboratorio · Detalle de evento" noindex header={false}>
+  <main>
+    <EventDetail event={event} now={DETAIL_NOW}><p>Sobre el evento.</p></EventDetail>
+  </main>
+</Base>

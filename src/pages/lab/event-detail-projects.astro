@@ -1,0 +1,17 @@
+---
+// Laboratorio PR B: detalle de un evento pasado con vitrina publicada (#proyectos) y sin cuerpo Markdown.
+import EventDetail from '../../components/event/EventDetail.astro';
+import Base from '../../layouts/Base.astro';
+import { DETAIL_NOW, detailEvents } from '../../lib/event-detail-fixtures';
+import { showcaseLayout } from '../../lib/showcase';
+import { showcaseProjects } from '../../lib/showcase-fixtures';
+
+const event = { ...detailEvents.past, showcase: 'published' as const };
+const layout = showcaseLayout({ id: 'hack', showcase: event.showcase }, showcaseProjects);
+---
+
+<Base title="Laboratorio · Detalle con proyectos" noindex header={false}>
+  <main>
+    <EventDetail event={event} now={DETAIL_NOW} showcase={layout} />
+  </main>
+</Base>

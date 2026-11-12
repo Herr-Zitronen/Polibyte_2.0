@@ -1,0 +1,11 @@
+---
+// Laboratorio H5.1: fixture con 3 pasados y reloj fijo.
+import Recap from '../../components/events/Recap.astro';
+import Base from '../../layouts/Base.astro';
+import { recapView } from '../../lib/recap';
+import { RECAP_NOW, recapEvents, recapProjects } from '../../lib/recap-fixtures';
+---
+
+<Base title="Laboratorio · Último evento" noindex header={false}>
+  <main><Recap view={recapView(recapEvents, recapProjects, RECAP_NOW)} /></main>
+</Base>

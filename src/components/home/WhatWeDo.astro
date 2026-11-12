@@ -1,0 +1,38 @@
+---
+// "Qué hacemos" (DESIGN §3.7 variante "palabra detrás"). "soft" y "ware" se unen con
+// animation-timeline: view(); el estado por defecto es unido (Firefox y movimiento reducido).
+import '../../styles/glass.css';
+import PixelStrip from '../PixelStrip.astro';
+import '../../styles/what-we-do.css';
+import { EDGE } from '../../lib/pixel-strip';
+
+interface Props {
+  /** Color de la sección siguiente (PR B: sin "Próximos eventos" la franja va directo al cierre con imagen). */
+  bottom?: string;
+}
+const { bottom = EDGE.navy } = Astro.props;
+---
+
+<section id="que-hacemos" class="pb-wwd" data-theme="light">
+  <div class="pb-container pb-wwd-in">
+    <div class="pb-wwd-cols">
+      <div class="pb-qleft">
+        <h2 class="pb-qtitle" data-reveal>Lo que hacemos<br />en PoliByte</h2>
+      </div>
+      <div class="pb-qright">
+        <a href="/eventos/" class="pb-big"><span class="pb-bigw">Eventos,</span><span class="pb-hint">ver el calendario</span></a>
+        <a href="/eventos/" class="pb-big"><span class="pb-bigw">competencias</span><span class="pb-hint">cómo participar</span></a>
+        <a href="/equipo/" class="pb-big"><span class="pb-bigw">y comunidad.</span><span class="pb-hint">conocer al equipo</span></a>
+      </div>
+    </div>
+    <div class="pb-qgrid">
+      <div class="pb-qitem"><span class="pb-qk">eventos</span><p>Dos eventos al año, abiertos a la carrera y a todo público.</p></div>
+      <div class="pb-qitem"><span class="pb-qk">competencias</span><p>Formamos equipos y entrenamos para Imagine Cup, IEEEXtreme y hackathones.</p></div>
+      <div class="pb-qitem"><span class="pb-qk">comunidad</span><p>Talleres, charlas y proyectos junto a IEEE CS y GDG.</p></div>
+    </div>
+  </div>
+  <div class="pb-gw" aria-hidden="true"><span class="pb-gword"><span class="pb-ghl">soft</span><span class="pb-ghr">ware</span></span></div>
+  <div class="pb-gdiv">
+    <PixelStrip seed={23} top="transparent" bottom={bottom} />
+  </div>
+</section>

@@ -1,0 +1,150 @@
+---
+// Proyectos destacados de un evento (DESIGN §5.2, design/Eventos.dc.html #destacados).
+// Solo se renderiza con un layout no nulo: `showcaseLayout` ya decidió que la vitrina está completa.
+// PR B · Nunca a medias: 1 destacado → solo el panel; 2 → panel + una tarjeta horizontal a ancho completo;
+// 3+ → panel + 2 tarjetas + filas. Sin enlaces, integrantes o stack no se pinta el contenedor vacío.
+// Se usa en /eventos (id "destacados") y en el detalle de cada evento publicado (id "proyectos").
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import type { ShowcaseLayout } from '../../lib/showcase';
+import Cross from '../Cross.astro';
+import SectionChip from '../SectionChip.astro';
+import ProjectActions from './ProjectActions.astro';
+import '../../styles/showcase.css';
+import '../../styles/tabs.css';
+
+export type ShowcaseItem = {
+  title: string;
+  team: string;
+  members: string[];
+  problem: string;
+  stack: string[];
+  demoUrl?: string | undefined;
+  repoUrl?: string | undefined;
+  shotDesktop: ImageMetadata;
+  shotMobile?: ImageMetadata | undefined;
+};
+
+interface Props {
+  eventTitle: string;
+  layout: ShowcaseLayout<ShowcaseItem>;
+  /** Ancla de la sección: "destacados" en /eventos, "proyectos" en el detalle del evento. */
+  id?: string;
+}
+
+const { eventTitle, layout, id = 'destacados' } = Astro.props;
+const { hero, cards, rows } = layout;
+const host = (url?: string) => (url ? new URL(url).host : 'sin demo pública');
+const people = (p: ShowcaseItem) => p.members.filter((m) => m.trim()).join(', ');
+---
+
+<section id={id} class="pb-showcase">
+  <div class="pb-showcase__bg" aria-hidden="true"></div>
+  <div class="pb-container pb-showcase__wrap">
+    <div class="pb-showcase__bar">
+      <div class="pb-stitle">
+        <SectionChip />
+        <h2>Proyectos destacados</h2>
+      </div>
+      <span class="pb-showcase__event">{eventTitle}</span>
+    </div>
+    <p class="pb-showcase__lead">Lo que construyeron nuestros equipos, publicado para que cualquiera lo pruebe.</p>
+
+    <article class="pb-feat" data-shot-toggle>
+      <div class="pb-featL">
+        {
+          hero.shotMobile && (
+            <div role="group" aria-label="Vista previa" class="pb-tabs">
+              <button type="button" class="pb-tab" aria-pressed="true" data-shot="desk">Escritorio</button>
+              <button type="button" class="pb-tab" aria-pressed="false" data-shot="mob">Móvil</button>
+            </div>
+          )
+        }
+        <div class="pb-stage">
+          <div class="pb-browser" data-view="desk">
+            <div class="pb-bbar" aria-hidden="true">
+              <span class="pb-sq"></span><span class="pb-sq"></span><span class="pb-sq"></span>
+              <span class="pb-bbar__url">{host(hero.demoUrl)}</span>
+            </div>
+            <Image class="pb-shot" src={hero.shotDesktop} alt={`Captura de escritorio de ${hero.title}`} widths={[640, 960]} sizes="(max-width: 960px) 100vw, 720px" />
+          </div>
+          {
+            hero.shotMobile && (
+              <div class="pb-phone" data-view="mob" hidden>
+                <span class="pb-notch" aria-hidden="true" />
+                <Image class="pb-shot" src={hero.shotMobile} alt={`Captura móvil de ${hero.title}`} width={320} />
+              </div>
+            )
+          }
+        </div>
+      </div>
+      <div class="pb-featR">
+        <span class="pb-featR__eyebrow"><span class="pb-dot" aria-hidden="true"></span>destacado</span>
+        <h3 class="pb-feat__title">{hero.title}</h3>
+        <div class="pb-pair">
+          <span class="pb-tag">{hero.team}</span>
+          {people(hero) && <span class="pb-pair__line" aria-hidden="true" />}
+          {people(hero) && <span class="pb-tag pill">{people(hero)}</span>}
+        </div>
+        <div class="pb-feat__problem">
+          <span>qué resuelve</span>
+          <p>{hero.problem}</p>
+        </div>
+        {hero.stack.length > 0 && <ul class="pb-stack">{hero.stack.map((t) => <li class="pb-tech">{t}</li>)}</ul>}
+        <ProjectActions demoUrl={hero.demoUrl} repoUrl={hero.repoUrl} />
+      </div>
+    </article>
+
+    {
+      cards.length > 0 && (
+        <div class:list={['pb-pgrid2', cards.length === 1 && 'is-one']}>
+          {cards.map((p) => (
+            <article class="pb-pcard">
+              <div class="pb-browser">
+                <div class="pb-bbar" aria-hidden="true">
+                  <span class="pb-sq" /><span class="pb-sq" /><span class="pb-sq" />
+                  <span class="pb-bbar__url">{host(p.demoUrl)}</span>
+                </div>
+                <Image class="pb-shot" src={p.shotDesktop} alt={`Captura de ${p.title}`} widths={[480, 720]} sizes="(max-width: 960px) 100vw, 640px" loading="lazy" />
+              </div>
+              <div class="pb-pcardb">
+                <h3 class="pb-pcard__title">{p.title}</h3>
+                <span class="pb-meta">{people(p) ? `${p.team} · ${people(p)}` : p.team}</span>
+                <p>{p.problem}</p>
+                {p.stack.length > 0 && <ul class="pb-stack">{p.stack.map((t) => <li class="pb-tech">{t}</li>)}</ul>}
+                <ProjectActions demoUrl={p.demoUrl} repoUrl={p.repoUrl} size="sm" />
+              </div>
+            </article>
+          ))}
+        </div>
+      )
+    }
+
+    {
+      rows.length > 0 && (
+        <div class="pb-more">
+          <h3>Más proyectos del evento</h3>
+          <div class="pb-plist">
+            <Cross x="0" y="0" />
+            <Cross x="100%" y="0" />
+            {rows.map((p) => (
+              <div class="pb-prow">
+                <div class="pb-pn">
+                  <span class="pb-pn__title">{p.title}</span>
+                  <span class="pb-meta">{p.team}</span>
+                </div>
+                {p.stack.length > 0 ? <ul class="pb-stack">{p.stack.map((t) => <li class="pb-tech">{t}</li>)}</ul> : <span />}
+                <ProjectActions demoUrl={p.demoUrl} repoUrl={p.repoUrl} size="sm" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<script>
+  import { initShotToggle } from '../../scripts/shot-toggle';
+  document.querySelectorAll<HTMLElement>('[data-shot-toggle]').forEach(initShotToggle);
+</script>

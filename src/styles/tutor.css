@@ -1,0 +1,87 @@
+/* H7.2 · Tutor responsable (design/Equipo.dc.html #tutor). */
+.pb-tutor-s {
+  position: relative;
+  display: flow-root;
+  overflow: clip;
+  background: var(--pb-paper);
+  color: var(--pb-ink);
+  /* F12: bajo el pliegue, el navegador no la pinta hasta que se acerca. */
+}
+
+.pb-tutor-in {
+  position: relative;
+  padding-top: 120px;
+  padding-bottom: 120px;
+}
+
+.pb-tutor-rule {
+  position: relative;
+  border-top: 1px solid var(--pb-ink);
+  padding-top: 56px;
+  color: var(--pb-ink);
+}
+
+.pb-tutor {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 48px;
+  align-items: end;
+}
+
+.pb-tutor-photo {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: clip;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, #2a44b4, var(--pb-ink));
+}
+
+.pb-tutor-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pb-tutor-kicker {
+  font-family: var(--pb-font-pixel);
+  font-size: 14px;
+}
+
+.pb-tutor-body h2 {
+  margin: 0;
+  font-weight: 800;
+  font-size: clamp(40px, 6vw, 96px);
+  letter-spacing: -0.075em;
+  line-height: 0.95;
+}
+
+.pb-tutor-about {
+  margin: 0;
+  max-width: 560px;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--pb-muted-light);
+}
+
+.pb-tutor-mail {
+  align-self: flex-start;
+  color: var(--pb-ink);
+  font-size: 14px;
+}
+
+@media (max-width: 960px) {
+  .pb-tutor {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .pb-tutor-photo {
+    max-width: 300px;
+  }
+}
+
+.pb-tutor-photo .pb-ini {
+  width: 40%;
+}

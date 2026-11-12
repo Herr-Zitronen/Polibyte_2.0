@@ -12,7 +12,7 @@ Sitio del club **PoliByte · Club de la Carrera de Software** (ESPOCH). Copia es
 ## Stack
 - Astro + TypeScript estricto, CSS propio (sin framework de UI). Islas solo donde haya interacción (filtros, menú, conmutador de vitrina, cuenta regresiva).
 - Content collections + Zod para eventos, proyectos y miembros.
-- Lenis para el scroll con inercia. View Transitions nativas (`@view-transition`).
+- Lenis para el scroll con inercia, solo en escritorio y con su rAF solo en movimiento (ver `DESIGN.md §4`). View Transitions nativas (`@view-transition`).
 - Despliegue en Cloudflare (Workers con assets estáticos), con previews por rama.
 - Pruebas: Vitest (unitarias), Playwright (E2E y capturas a 1440/1000/390), @axe-core/playwright, Lighthouse CI.
 
@@ -29,7 +29,7 @@ Nunca marques una historia como terminada sin pruebas en verde.
 
 ## Reglas de diseño que no se negocian
 - Solo dos botones (primario y secundario). Nunca estirados a ancho completo en escritorio.
-- Una sola capa de grano por sección, encima del contenido.
+- Una sola capa de grano por página, fija, encima del contenido y bajo la barra (`Base.astro`). Ninguna sección pinta la suya (solo el menú móvil, que vive en la top layer).
 - Contenedores de animaciones de scroll: `overflow: clip`, nunca `hidden`. Secciones con `display: flow-root`.
 - Ningún ancestro de un `backdrop-filter` puede tener `view-transition-name`.
 - Solo se animan `transform` y `opacity`. Nunca `filter`/`backdrop-filter`.

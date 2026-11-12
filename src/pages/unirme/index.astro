@@ -1,0 +1,18 @@
+---
+// /unirme/ · H8.1. La URL del formulario vive en site.json (cambiarla no toca código).
+import Base from '../../layouts/Base.astro';
+import { pageTitle } from '../../lib/page-title';
+import JoinForm from '../../components/join/JoinForm.astro';
+import JoinSteps from '../../components/join/JoinSteps.astro';
+import PixelStrip from '../../components/PixelStrip.astro';
+import site from '../../content/site.json';
+---
+
+<Base title={pageTitle('Unirme')} description="Cómo ser parte de PoliByte: formulario de ingreso, grupo y primera reunión presencial." cover="join">
+  <main>
+    <JoinForm formUrl={site.joinFormUrl} />
+    <PixelStrip seed={151} top="#1B2C78" bottom="#ECEFF6" />
+    <JoinSteps formUrl={site.joinFormUrl} />
+    <PixelStrip seed={163} top="#ECEFF6" bottom="#0D1438" />
+  </main>
+</Base>
