@@ -18,6 +18,7 @@ export const BOARD_ORDER = [
   "Secretaría",
   "Tesorería",
   "Webmaster",
+  "Creative Director",
 ] as const;
 
 export function boardMembers<T extends { role: string }>(members: T[]): T[] {

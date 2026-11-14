@@ -5,8 +5,9 @@ const m = (role: string, extra = {}) => ({ role, name: role, period: '2026', ...
 
 describe('boardMembers', () => {
   it('ordena por cargo y excluye al tutor', () => {
-    const out = boardMembers([m('Webmaster'), m('Tutor'), m('Tesorería'), m('Presidencia'), m('Secretaría'), m('Vicepresidencia')]);
+    const out = boardMembers([m('Creative Director'), m('Webmaster'), m('Tutor'), m('Tesorería'), m('Presidencia'), m('Secretaría'), m('Vicepresidencia')]);
     expect(out.map((x: { role: string }) => x.role)).toEqual([...BOARD_ORDER]);
+    expect(BOARD_ORDER.at(-1)).toBe('Creative Director');
   });
 });
 

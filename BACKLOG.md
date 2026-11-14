@@ -135,7 +135,7 @@ Estimación en puntos (1, 2, 3, 5, 8). Sprints de 1 semana.
 ## Épica 7 · Equipo
 
 **H7.1 · Directiva** (3)
-- Entonces se muestran 3 cargos arriba y 2 abajo centrados, todos del mismo tamaño. [V]
+- Entonces se muestran 3 cargos arriba y 3 abajo, todos del mismo tamaño (Presidencia, Vicepresidencia, Secretaría / Tesorería, Webmaster, Creative Director). [V]
 - Dado un miembro sin foto, entonces se muestran sus iniciales en pixel art. [E]
 - Entonces Instagram, LinkedIn y GitHub se ven como enlaces simples iguales. [V]
 

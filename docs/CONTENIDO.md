@@ -22,11 +22,11 @@ El pie muestra solo los enlaces que tengan dato. Hace falta al menos uno para pa
 
 ## 2. Directiva y tutor · `src/content/members/`
 
-Un archivo `.md` por persona (`directiva-1.md` … `directiva-5.md`, `tutor.md`). La foto va **en la misma carpeta**.
+Un archivo `.md` por persona (`directiva-1.md` … `directiva-6.md`, `tutor.md`). La foto va **en la misma carpeta**.
 
 ```yaml
 ---
-role: Presidencia          # Presidencia | Vicepresidencia | Secretaría | Tesorería | Webmaster | Tutor
+role: Presidencia          # Presidencia | Vicepresidencia | Secretaría | Tesorería | Webmaster | Creative Director | Tutor
 name: 'Ana Pérez'          # obligatorio
 photo: ./ana-perez.jpg     # opcional (sin foto se muestran las iniciales)
 instagram: '@anaperez'     # opcional

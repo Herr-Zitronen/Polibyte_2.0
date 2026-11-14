@@ -44,6 +44,9 @@ describe('memberSchema', () => {
     expect(() => memberSchema(fakeImage).parse(m)).toThrow();
     expect(memberSchema(fakeImage).parse({ ...m, period: '2026–2027' }).period).toBe('2026–2027');
   });
+  it('acepta el cargo Creative Director', () => {
+    expect(memberSchema(fakeImage).parse({ ...m, role: 'Creative Director', period: '2026–2027' }).role).toBe('Creative Director');
+  });
   it('rechaza cargos fuera de la lista', () => {
     expect(() => memberSchema(fakeImage).parse({ ...m, role: 'Jefe', period: '2026–2027' })).toThrow();
   });
