@@ -66,7 +66,7 @@ Vitrina visible solo si `event.showcase === 'published'` **y** hay al menos un p
 
 ```ts
 const member = z.object({
-  role: z.enum(['Presidencia', 'Vicepresidencia', 'Secretaría', 'Tesorería', 'Webmaster', 'Tutor']),
+  role: z.enum(['Presidencia', 'Vicepresidencia', 'Secretaría', 'Tesorería', 'Webmaster', 'Creative Director', 'Tutor']),
   name: z.string(),
   photo: image().optional(),           // sin foto → iniciales en pixel art
   instagram: z.string().optional(),    // "@usuario"

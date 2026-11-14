@@ -214,7 +214,7 @@ View Transitions API nativa (`@view-transition { navigation: auto; }`), sin JS:
 | Inicio | `Main.dc.html` | Portada · Próximo evento (panel) · Qué hacemos + "software" · Próximos eventos (4, sin filtros) · Únete |
 | Eventos | `Eventos.dc.html` | Último evento concluido · Proyectos destacados (**solo si la vitrina está publicada**) · Calendario (filtros Todos / Del club / Competencias) · Archivo por año |
 | Detalle de evento | `EventoDetalle.dc.html` | Portada con ruta, tipo, título, cuenta regresiva · Sobre el evento + datos clave · Cronograma · Inscripción |
-| Equipo | `Equipo.dc.html` | Portada · Directiva (3 + 2, mismo tamaño; foto cuadrada, cargo, nombre, Instagram/LinkedIn/GitHub como enlaces simples) · Tutor responsable |
+| Equipo | `Equipo.dc.html` | Portada · Directiva (3 + 3, mismo tamaño; foto cuadrada, cargo, nombre, Instagram/LinkedIn/GitHub como enlaces simples) · Tutor responsable |
 | Unirme | `Unirme.dc.html` | Portada + panel con botón a Microsoft Forms (abre en otra pestaña) · Tres pasos: formulario → grupo → primera reunión presencial |
 | 404 | `NoEncontrado.dc.html` | "404" en pixel art + `110010100` + volver |
 | Marca | `Compartir.dc.html`, `Favicon.dc.html` | Imagen OG 1200×630 · favicon |
@@ -251,7 +251,7 @@ Dos columnas: izquierda (etiqueta, nombre, par de etiquetas, fecha/lugar/modalid
 - `:hover` solo dentro de `@media (hover: hover)`: en táctil se quedaría pegado tras tocar.
 - Áreas táctiles de al menos 44 px con puntero grueso (botones pequeños, pestañas, enlaces sociales y del pie).
 - Portada de Inicio: altura `clamp(700px, 100svh − 64px, 860px)`.
-- Directiva: 2 por fila (la quinta centrada) hasta 380 px; una columna solo por debajo.
+- Directiva: 2 por fila hasta 380 px; una columna solo por debajo.
 - Las fotos de la directiva declaran `sizes` según esa grilla (`(max-width: 379px) 100vw, (max-width: 960px) 50vw, 360px`): con `100vw` hasta 520 px el celular descargaba la de 720 px para una tarjeta de ~190 px (unos 440 KB en `/equipo/`) y el LCP de Lighthouse se volvía inestable. Si cambia la grilla de `team.css`, cambia `sizes`.
 - Ninguna página desborda a lo ancho a 390 px (prueba E2E por página).
 

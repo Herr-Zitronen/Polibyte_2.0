@@ -4,12 +4,12 @@ import { expect, test } from "@playwright/test";
 type Box = { x: number; y: number; width: number; height: number };
 const boxes = async (
   page: import("@playwright/test").Page,
-): Promise<[Box, Box, Box, Box, Box]> => {
+): Promise<[Box, Box, Box, Box, Box, Box]> => {
   const cards = page.locator("#directiva .pb-mem");
-  await expect(cards).toHaveCount(5);
+  await expect(cards).toHaveCount(6);
   return (await Promise.all(
     (await cards.all()).map(async (c) => (await c.boundingBox())!),
-  )) as [Box, Box, Box, Box, Box];
+  )) as [Box, Box, Box, Box, Box, Box];
 };
 
 test("orden por cargo", async ({ page }) => {
@@ -20,10 +20,11 @@ test("orden por cargo", async ({ page }) => {
     "Secretaría",
     "Tesorería",
     "Webmaster",
+    "Creative Director",
   ]);
 });
 
-test("1440: 3 arriba y 2 abajo centradas, todas del mismo tamaño", async ({
+test("1440: 3 arriba y 3 abajo, todas del mismo tamaño", async ({
   page,
 }) => {
   test.skip(page.viewportSize()!.width !== 1440, "solo 1440");
@@ -37,23 +38,21 @@ test("1440: 3 arriba y 2 abajo centradas, todas del mismo tamaño", async ({
   expect(Math.abs(b[2].y - b[0].y)).toBeLessThanOrEqual(1);
   expect(b[3].y).toBeGreaterThan(b[0].y + b[0].height - 1);
   expect(Math.abs(b[4].y - b[3].y)).toBeLessThanOrEqual(1);
-  const grid = (await page.locator("#directiva .pb-dir").boundingBox())!;
-  const bottomCenter = (b[3].x + b[4].x + b[4].width) / 2;
-  expect(
-    Math.abs(bottomCenter - (grid.x + grid.width / 2)),
-  ).toBeLessThanOrEqual(1);
+  expect(Math.abs(b[5].y - b[3].y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(b[3].x - b[0].x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(b[5].x - b[2].x)).toBeLessThanOrEqual(1);
 });
 
-test("390: dos por fila y la quinta centrada (PR B)", async ({ page }) => {
+test("390: dos por fila, tres filas", async ({ page }) => {
   test.skip(page.viewportSize()!.width !== 390, "solo 390");
   await page.goto("/equipo/");
   const b = await boxes(page);
   expect(Math.abs(b[0].y - b[1].y)).toBeLessThanOrEqual(1);
   expect(Math.abs(b[2].y - b[3].y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(b[4].y - b[5].y)).toBeLessThanOrEqual(1);
   expect(b[2].y).toBeGreaterThan(b[0].y);
   expect(b[4].y).toBeGreaterThan(b[2].y);
-  const grid = (await page.locator("#directiva .pb-dir").boundingBox())!;
-  expect(Math.abs(b[4].x + b[4].width / 2 - (grid.x + grid.width / 2))).toBeLessThanOrEqual(1);
+  expect(Math.abs(b[4].x - b[0].x)).toBeLessThanOrEqual(1);
 });
 
 test("miembro sin foto: SVG de iniciales en pixel art con nombre accesible", async ({

@@ -59,7 +59,7 @@ export const projectSchema = <I extends z.ZodType, R extends z.ZodType>(image: (
 
 export const memberSchema = <I extends z.ZodType>(image: () => I) =>
   z.object({
-    role: z.enum(['Presidencia', 'Vicepresidencia', 'Secretaría', 'Tesorería', 'Webmaster', 'Tutor']),
+    role: z.enum(['Presidencia', 'Vicepresidencia', 'Secretaría', 'Tesorería', 'Webmaster', 'Creative Director', 'Tutor']),
     name: z.string(),
     photo: image().optional(),
     instagram: z.string().optional(),
